@@ -1,4 +1,4 @@
-discord-twitter-webhooks
+Discord-twitter-webhooks
 =========
 
 A bot for Discord that send tweets via webhooks
