@@ -25,8 +25,15 @@ print("---------------------------")
 
 
 class MyStreamListener(tweepy.StreamListener):
+    def on_connect(self):
+        print("You are now connected to the streaming API.")
+
     def on_status(self, status):
         try:
+            # Don't get replies
+            if status.in_reply_to_screen_name is not None:
+                return
+
             # Skip retweets
             if status.retweeted and "RT @" in status.text:
                 return
@@ -65,7 +72,7 @@ class MyStreamListener(tweepy.StreamListener):
             embed.post()
         except Exception as e:
             embed = Webhook(config.error_url)
-            embed.set_content("Shits fucked\n" + str(e))
+            embed.set_content("<@126462229892694018> I'm broken again <:PepeHands:461899012136632320> \n" + str(e))
 
     def on_error(self, status_code):
 
