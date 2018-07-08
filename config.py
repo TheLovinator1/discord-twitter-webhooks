@@ -3,6 +3,9 @@
 # Name will automatically be changed to the Twitter username
 url = "WEBHOOK_URL"
 
+# Send errors to this channel
+error_url = "ERROR_URL"
+
 # Go to http://apps.twitter.com and create an app.
 # The consumer key and secret will be generated for you after
 consumer_key = "CONSUMER_KEY"
