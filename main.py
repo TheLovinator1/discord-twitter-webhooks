@@ -49,6 +49,7 @@ class MyStreamListener(tweepy.StreamListener):
 
             # Remove the "_normal.jpg" part in url
             avatar_hd = status.user.profile_image_url_https[:-11]
+            extension = status.user.profile_image_url_https[-4:]
 
             # Discord makes link previews from URLs, we can hide those with < and > before and after URLs
             # We do that with regular expression https://t.co/[a-zA-Z0-9]*
@@ -62,7 +63,7 @@ class MyStreamListener(tweepy.StreamListener):
             embed.set_username(status.user.screen_name)
 
             # Change the webhook avatar to the twitter avatar
-            embed.set_avatar(str(avatar_hd) + ".jpg")
+            embed.set_avatar(str(avatar_hd) + extension)
 
             # Message
             embed.set_content(
