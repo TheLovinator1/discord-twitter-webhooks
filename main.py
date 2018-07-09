@@ -29,13 +29,14 @@ class MyStreamListener(tweepy.StreamListener):
         print("You are now connected to the streaming API.")
 
     def on_status(self, status):
+        print(status)
         try:
-            # Don't get replies
-            if status.in_reply_to_screen_name is not None:
+            # Skip retweets
+            if status.retweeted or "RT @" in status.text:
                 return
 
-            # Skip retweets
-            if status.retweeted and "RT @" in status.text:
+            # Don't get replies
+            if status.in_reply_to_screen_name is not None:
                 return
 
             # Check if the tweet is extended and get content
