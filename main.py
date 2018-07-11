@@ -29,7 +29,9 @@ class MyStreamListener(tweepy.StreamListener):
         print("You are now connected to the streaming API.")
 
     def on_status(self, status):
-        print(status)
+        link_list = []
+
+        print("Raw tweet: " + str(status))
         try:
             # Skip retweets
             if status.retweeted or "RT @" in status.text:
@@ -49,7 +51,14 @@ class MyStreamListener(tweepy.StreamListener):
             except AttributeError:
                 text = status.text
 
-            print(str(status.user.screen_name) + ": " + str(text))
+            if 'media' in status.entities:
+                for media in status.extended_entities['media']:
+                    print("Media: " + media['media_url_https'])
+                    link = media['media_url_https']
+                    link_list.append(link)
+
+            print("Link List:")
+            print(*link_list)
 
             # Remove the "_normal.jpg" part in url
             avatar_hd = status.user.profile_image_url_https[:-11]
@@ -69,16 +78,27 @@ class MyStreamListener(tweepy.StreamListener):
             # Change the webhook avatar to the twitter avatar
             embed.set_avatar(str(avatar_hd) + extension)
 
-            # Message
-            embed.set_content(
-                    text_cleaned + "\n\n" + "[" + str(status.created_at) + "](https://twitter.com/statuses/"
-                    + str(status.id) + ")")
+            # Append media so Discords link preview picks them up
+            # TODO: Fix gifs and polls(?)
+
+            links = '\n'.join([str(v) for v in link_list])
+            if not link_list:
+                embed.set_content(
+                        text_cleaned + "\n\n" + "[" + str(status.created_at) + "](https://twitter.com/statuses/"
+                        + str(status.id) + ")")
+            else:
+                embed.set_content(
+                        text_cleaned + "\n\n" + "[" + str(status.created_at) + "](https://twitter.com/statuses/"
+                        + str(status.id) + ")\n" + links)
 
             # Post to channel
             embed.post()
+
+            print("Posted.")
         except Exception as e:
             embed = Webhook(config.error_url)
             embed.set_content("<@126462229892694018> I'm broken again <:PepeHands:461899012136632320> \n" + str(e))
+            embed.post()
 
     def on_error(self, status_code):
 
@@ -91,7 +111,9 @@ class MyStreamListener(tweepy.StreamListener):
         print("Error: " + str(status_code))
 
         embed = Webhook(config.error_url)
-        embed.set_content("Shits fucked\n" + str(status_code))
+        embed.set_content(
+                "<@126462229892694018> I'm broken again <:PepeHands:461899012136632320> \n" + str(status_code))
+        embed.post()
 
 
 listener = MyStreamListener()
