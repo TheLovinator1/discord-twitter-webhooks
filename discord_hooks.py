@@ -5,6 +5,8 @@ from collections import defaultdict
 
 import requests
 
+import config
+
 
 class Webhook:
     def __init__(self, url, **kwargs):
@@ -162,6 +164,9 @@ class Webhook:
 
         if result.status_code == 400:
             print("Post Failed, Error 400")
+            embed = Webhook(config.error_url)
+            embed.set_content("<@126462229892694018> The webhook failed <:NotLikeThis:351150549132902400>")
+            embed.post()
         else:
             print(str(result.status_code) + " - Webhook delivered successfully")
             time.sleep(2)
