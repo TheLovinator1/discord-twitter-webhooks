@@ -39,6 +39,10 @@ class MyStreamListener(tweepy.StreamListener):
             if status.in_reply_to_screen_name is not None:
                 return
 
+            # Skip PUBG tweets for Xbox
+            if "Xbox players: " in status.text:
+                return
+
             # Check if the tweet is extended and get content
             try:
                 text = status.extended_tweet["full_text"]
