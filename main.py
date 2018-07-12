@@ -85,7 +85,7 @@ class MyStreamListener(tweepy.StreamListener):
             if not link_list:
                 embed.set_content(
                         text_cleaned + "\n\n" + "[" + str(status.created_at) + "](https://twitter.com/statuses/"
-                        + str(status.id) + ")")
+                        + str(status.id) + ")\n" + links)
             else:
                 embed.set_content(
                         text_cleaned + "\n\n" + "[" + str(status.created_at) + "](https://twitter.com/statuses/"
