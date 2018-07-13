@@ -108,15 +108,15 @@ class MyStreamListener(tweepy.StreamListener):
             embed.set_content("<@126462229892694018> I'm broken again <:PepeHands:461899012136632320> \n" + str(e))
             embed.post()
 
-    def on_error(self, status_code):
+    def on_error(self, error_code):
 
-        if status_code == 420:
+        if error_code == 420:
             print("420 Enhance Your Calm - We are being rate limited.\n"
                   "Possible reasons: Too many login attempts or running too many copies of the same "
                   "application authenticating with the same credentials")
             return False  # returning False in on_error disconnects the stream
 
-        print("Error: " + str(status_code))
+        print("Error: " + str(error_code))
 
         embed = Webhook(config.error_url)
         embed.set_content(
