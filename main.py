@@ -52,14 +52,17 @@ class MyStreamListener(tweepy.StreamListener):
             except AttributeError:
                 text = tweet.text
 
+            # Get media links if existing
             if 'media' in tweet.entities:
                 for media in tweet.extended_entities['media']:
                     print("Media: " + media['media_url_https'])
                     link = media['media_url_https']
                     link_list.append(link)
 
-            print("Link List:")
-            print(*link_list)
+            # Only print link list if not empty
+            if link_list:
+                print("Link List:")
+                print(*link_list)
 
             # Remove the "_normal.jpg" part in url
             avatar_hd = tweet.user.profile_image_url_https[:-11]
@@ -69,13 +72,17 @@ class MyStreamListener(tweepy.StreamListener):
             tweet_time = pytz.utc.localize(tweet.created_at, is_dst=None).astimezone(tz).strftime("%Y-%m-%d %H:%M:%S")
 
             # Replace names with links
-            text_profile_link = re.sub(r'@\w*', '[\g<0>](https://twitter.com/\g<0>)', text, flags=re.MULTILINE)
+            text_profile_link = re.sub(r"@(\w*)", "[\g<0>](https://twitter.com/\g<1>/)", text, flags=re.MULTILINE)
+
+            # Replace hashtags with links
+            text_hashtag_link = re.sub(r"#(\w*)", "[\g<0>](https://twitter.com/hashtag/\g<1>/)", text_profile_link,
+                                       flags=re.MULTILINE)
 
             # Discord makes link previews from URLs, we can hide those with < and > before and after URLs
             # We do that with regular expression https://t.co/[a-zA-Z0-9]*
             # \g<0>	- Insert entire match
-            text_link_preview = re.sub(r'https://t.co/[a-zA-Z0-9]*', '<\g<0>>', text_profile_link, flags=re.MULTILINE)
-
+            # text_link_preview = re.sub(r'https://t.co/[a-zA-Z0-9]*', '<\g<0>>', text_hashtag_link, flags=re.MULTILINE)
+            text_link_preview = re.sub(r"[^(](https://\S*)", "<\g<1>>", text_hashtag_link, flags=re.MULTILINE)
             # Make webhook embed
             embed = Webhook(config.url)
 
@@ -85,18 +92,14 @@ class MyStreamListener(tweepy.StreamListener):
             # Change the webhook avatar to the twitter avatar
             embed.set_avatar(str(avatar_hd) + extension)
 
-            # Append media so Discords link preview picks them up
-            # TODO: Fix gifs and polls(?)
-
+            # Append media so Discords link preview picks them up TODO: Fix gifs and polls(?)
             links = '\n'.join([str(v) for v in link_list])
-            if not link_list:
-                embed.set_content(
-                        text_link_preview + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/"
-                        + str(tweet.id) + ")\n" + links)
-            else:
-                embed.set_content(
-                        text_link_preview + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/"
-                        + str(tweet.id) + ")\n" + links)
+
+            message = text_link_preview + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/" + str(
+                    tweet.id) + ")\n" + links
+
+            print("\nMessage: " + str(message) + "\n")
+            embed.set_content(message)
 
             # Post to channel
             embed.post()
