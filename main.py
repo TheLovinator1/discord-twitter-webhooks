@@ -64,10 +64,13 @@ class MyStreamListener(tweepy.StreamListener):
             avatar_hd = status.user.profile_image_url_https[:-11]
             extension = status.user.profile_image_url_https[-4:]
 
+            # Replace names with links
+            text_profile_link = re.sub(r'@\w*', '[\g<0>](https://twitter.com/\g<0>)', text, flags=re.MULTILINE)
+
             # Discord makes link previews from URLs, we can hide those with < and > before and after URLs
             # We do that with regular expression https://t.co/[a-zA-Z0-9]*
             # \g<0>	- Insert entire match
-            text_cleaned = re.sub(r'https://t.co/[a-zA-Z0-9]*', '<\g<0>>', text, flags=re.MULTILINE)
+            text_link_preview = re.sub(r'https://t.co/[a-zA-Z0-9]*', '<\g<0>>', text_profile_link, flags=re.MULTILINE)
 
             # Make webhook embed
             embed = Webhook(config.url)
@@ -84,11 +87,11 @@ class MyStreamListener(tweepy.StreamListener):
             links = '\n'.join([str(v) for v in link_list])
             if not link_list:
                 embed.set_content(
-                        text_cleaned + "\n\n" + "[" + str(status.created_at) + "](https://twitter.com/statuses/"
+                        text_link_preview + "\n\n" + "[" + str(status.created_at) + "](https://twitter.com/statuses/"
                         + str(status.id) + ")\n" + links)
             else:
                 embed.set_content(
-                        text_cleaned + "\n\n" + "[" + str(status.created_at) + "](https://twitter.com/statuses/"
+                        text_link_preview + "\n\n" + "[" + str(status.created_at) + "](https://twitter.com/statuses/"
                         + str(status.id) + ")\n" + links)
 
             # Post to channel
