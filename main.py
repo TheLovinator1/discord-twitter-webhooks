@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import re
 
+import pytz
 import tweepy
 from tweepy import OAuthHandler, Stream
 
@@ -64,6 +65,9 @@ class MyStreamListener(tweepy.StreamListener):
             avatar_hd = status.user.profile_image_url_https[:-11]
             extension = status.user.profile_image_url_https[-4:]
 
+            tz = pytz.timezone("Europe/Stockholm")  # TODO: Add to config file
+            tweet_time = pytz.utc.localize(status.created_at, is_dst=None).astimezone(tz).strftime("%Y-%m-%d %H:%M:%S")
+
             # Replace names with links
             text_profile_link = re.sub(r'@\w*', '[\g<0>](https://twitter.com/\g<0>)', text, flags=re.MULTILINE)
 
@@ -87,11 +91,11 @@ class MyStreamListener(tweepy.StreamListener):
             links = '\n'.join([str(v) for v in link_list])
             if not link_list:
                 embed.set_content(
-                        text_link_preview + "\n\n" + "[" + str(status.created_at) + "](https://twitter.com/statuses/"
+                        text_link_preview + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/"
                         + str(status.id) + ")\n" + links)
             else:
                 embed.set_content(
-                        text_link_preview + "\n\n" + "[" + str(status.created_at) + "](https://twitter.com/statuses/"
+                        text_link_preview + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/"
                         + str(status.id) + ")\n" + links)
 
             # Post to channel
