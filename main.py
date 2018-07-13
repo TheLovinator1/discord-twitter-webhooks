@@ -120,7 +120,7 @@ class MyStreamListener(tweepy.StreamListener):
 
         embed = Webhook(config.error_url)
         embed.set_content(
-                "<@126462229892694018> I'm broken again <:PepeHands:461899012136632320> \n" + str(status_code))
+                "<@126462229892694018> I'm broken again <:PepeHands:461899012136632320> \n" + str(error_code))
         embed.post()
 
 
