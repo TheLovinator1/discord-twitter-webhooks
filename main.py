@@ -31,8 +31,6 @@ class MyStreamListener(tweepy.StreamListener):
 
     def on_status(self, status):
         link_list = []
-
-        print("Raw tweet: " + str(status))
         try:
             # Skip retweets
             if status.retweeted or "RT @" in status.text:
@@ -45,6 +43,8 @@ class MyStreamListener(tweepy.StreamListener):
             # Skip PUBG tweets for Xbox
             if "Xbox players: " in status.text:
                 return
+
+            print("Raw tweet: " + str(status))
 
             # Check if the tweet is extended and get content
             try:
