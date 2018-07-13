@@ -103,6 +103,7 @@ class MyStreamListener(tweepy.StreamListener):
 
             print("Posted.")
         except Exception as e:
+            print("Error: " + str(e))
             embed = Webhook(config.error_url)
             embed.set_content("<@126462229892694018> I'm broken again <:PepeHands:461899012136632320> \n" + str(e))
             embed.post()
