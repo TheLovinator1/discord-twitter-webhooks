@@ -29,31 +29,31 @@ class MyStreamListener(tweepy.StreamListener):
     def on_connect(self):
         print("You are now connected to the streaming API.")
 
-    def on_status(self, status):
+    def on_status(self, tweet):
         link_list = []
         try:
             # Skip retweets
-            if status.retweeted or "RT @" in status.text:
+            if tweet.retweeted or "RT @" in tweet.text:
                 return
 
             # Don't get replies
-            if status.in_reply_to_screen_name is not None:
+            if tweet.in_reply_to_screen_name is not None:
                 return
 
             # Skip PUBG tweets for Xbox
-            if "Xbox players: " in status.text:
+            if "Xbox players: " in tweet.text:
                 return
 
-            print("Raw tweet: " + str(status))
+            print("Raw tweet: " + str(tweet))
 
             # Check if the tweet is extended and get content
             try:
-                text = status.extended_tweet["full_text"]
+                text = tweet.extended_tweet["full_text"]
             except AttributeError:
-                text = status.text
+                text = tweet.text
 
-            if 'media' in status.entities:
-                for media in status.extended_entities['media']:
+            if 'media' in tweet.entities:
+                for media in tweet.extended_entities['media']:
                     print("Media: " + media['media_url_https'])
                     link = media['media_url_https']
                     link_list.append(link)
@@ -62,11 +62,11 @@ class MyStreamListener(tweepy.StreamListener):
             print(*link_list)
 
             # Remove the "_normal.jpg" part in url
-            avatar_hd = status.user.profile_image_url_https[:-11]
-            extension = status.user.profile_image_url_https[-4:]
+            avatar_hd = tweet.user.profile_image_url_https[:-11]
+            extension = tweet.user.profile_image_url_https[-4:]
 
             tz = pytz.timezone("Europe/Stockholm")  # TODO: Add to config file
-            tweet_time = pytz.utc.localize(status.created_at, is_dst=None).astimezone(tz).strftime("%Y-%m-%d %H:%M:%S")
+            tweet_time = pytz.utc.localize(tweet.created_at, is_dst=None).astimezone(tz).strftime("%Y-%m-%d %H:%M:%S")
 
             # Replace names with links
             text_profile_link = re.sub(r'@\w*', '[\g<0>](https://twitter.com/\g<0>)', text, flags=re.MULTILINE)
@@ -80,7 +80,7 @@ class MyStreamListener(tweepy.StreamListener):
             embed = Webhook(config.url)
 
             # Replace the webhook username with the Twitter username
-            embed.set_username(status.user.screen_name)
+            embed.set_username(tweet.user.screen_name)
 
             # Change the webhook avatar to the twitter avatar
             embed.set_avatar(str(avatar_hd) + extension)
@@ -92,11 +92,11 @@ class MyStreamListener(tweepy.StreamListener):
             if not link_list:
                 embed.set_content(
                         text_link_preview + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/"
-                        + str(status.id) + ")\n" + links)
+                        + str(tweet.id) + ")\n" + links)
             else:
                 embed.set_content(
                         text_link_preview + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/"
-                        + str(status.id) + ")\n" + links)
+                        + str(tweet.id) + ")\n" + links)
 
             # Post to channel
             embed.post()
