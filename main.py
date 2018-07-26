@@ -82,7 +82,8 @@ class MyStreamListener(tweepy.StreamListener):
             # We do that with regular expression https://t.co/[a-zA-Z0-9]*
             # \g<0>	- Insert entire match
             # text_link_preview = re.sub(r'https://t.co/[a-zA-Z0-9]*', '<\g<0>>', text_hashtag_link, flags=re.MULTILINE)
-            text_link_preview = re.sub(r"[^(](https://\S*)", "<\g<1>>", text_hashtag_link, flags=re.MULTILINE)
+            text_link_preview = re.sub(r"(https://\S*[^\s^.)])", "<\g<0>>", text_hashtag_link, flags=re.MULTILINE)
+
             # Make webhook embed
             embed = Webhook(config.url)
 
@@ -96,7 +97,7 @@ class MyStreamListener(tweepy.StreamListener):
             links = '\n'.join([str(v) for v in link_list])
 
             message = text_link_preview + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/" + str(
-                    tweet.id) + ")\n" + links
+                    tweet.id) + ")\n" + links + "\n"
 
             print("\nMessage: " + str(message) + "\n")
             embed.set_content(message)
