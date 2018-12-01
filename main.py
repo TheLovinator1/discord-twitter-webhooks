@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import logging.config
 import re
 
 import pytz
@@ -12,6 +13,17 @@ import config
 # TODO: Make /u/user and /r/subreddit to a link
 # TODO: Fix gifs
 # TODO: Fix polls
+# TODO: Log to file
+
+logger = logging.getLogger()
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s %(levelname)-12s %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
+# CRITICAL, ERROR, WARNING, INFO, DEBUG
+logger.setLevel(logging.DEBUG)  # TODO: Add to config file
+logger.debug('This is a debug message')
 
 # We need to be authenticated to use the Twitter API
 auth = OAuthHandler(config.consumer_key, config.consumer_secret)
@@ -19,14 +31,12 @@ auth.set_access_token(config.access_token, config.access_token_secret)
 
 # Authenticate to the API
 api = tweepy.API(auth)
-print("API key belongs to " + api.me().screen_name)
+logger.info("API key belongs to " + api.me().screen_name)
+logger.info("Following: ")
 
-print("---------------------------")
-print("Following: ")
 for twitter_id in config.users_to_follow:
     username = api.get_user(twitter_id)
     print(twitter_id + " - " + str(username.screen_name))
-print("---------------------------")
 
 
 class MyStreamListener(tweepy.StreamListener):
@@ -36,82 +46,84 @@ class MyStreamListener(tweepy.StreamListener):
     def on_status(self, tweet):
         link_list = []
         try:
+            logger.debug("Raw tweet: " + str(tweet))
             # Skip retweets
             if tweet.retweeted or "RT @" in tweet.text:
-                print("Is retweet")
+                logger.debug("Tweet is retweet")
                 return
 
             # Don't get replies
             if tweet.in_reply_to_screen_name is not None:
-                print("Is reply")
+                logger.debug("Tweet is reply")
                 return
 
             # Skip PUBG tweets for Xbox
             if "Xbox players: " in tweet.text:
-                print("Is for xbox")
+                logger.debug("Tweet is for xbox")
                 return
-
-            print("Raw tweet: " + str(tweet))
 
             # Check if the tweet is extended and get content
             try:
                 text = tweet.extended_tweet["full_text"]
-                print("Tweet is extended", text)
+                logger.debug(f"Tweet is extended:")
+                logger.debug(f"{text}")
             except AttributeError:
                 text = tweet.text
-                print("Tweet is not extended", text)
-                
+                logger.debug(f"Tweet is not extended:")
+                logger.debug(f"{text}")
+
             # Get media link
             if 'media' in tweet.entities:
                 for media in tweet.extended_entities['media']:
-                    print("Media: " + media['media_url_https'])
+                    logger.debug(f"Media: {media['media_url_https']}")
                     link = media['media_url_https']
                     link_list.append(link)
+                    logger.debug(f"Media link: {link}")
 
             # Only print link list if not empty
             if link_list:
-                print("Link List:")
-                print(*link_list)
+                logger.debug("Link List:")
+                logger.debug(*link_list)
 
             # Remove the "_normal.jpg" part in url
             avatar_hd = tweet.user.profile_image_url_https[:-11]
             extension = tweet.user.profile_image_url_https[-4:]
-            print("Avatar: ", avatar_hd + extension)
+            logger.debug(f"Avatar: {avatar_hd}{extension}")
 
             tz = pytz.timezone("Europe/Stockholm")  # TODO: Add to config file
             tweet_time = pytz.utc.localize(tweet.created_at, is_dst=None).astimezone(tz).strftime("%Y-%m-%d %H:%M:%S")
-            print("Time: ", tweet_time)
+            logger.debug(f"Time: {tweet_time}")
 
             # Replace username with link
             text_profile_link = re.sub(r"@(\w*)", "[\g<0>](https://twitter.com/\g<1>/)", text, flags=re.MULTILINE)
-            print("Text - profile links: ", text_profile_link)
+            logger.debug(f"Text - profile links: {text_profile_link}")
 
             # Replace hashtag with link
             text_hashtag_link = re.sub(r"#(\w*)", "[\g<0>](https://twitter.com/hashtag/\g<1>/)", text_profile_link,
                                        flags=re.MULTILINE)
-            print("Text - hashtags: ", text_hashtag_link)
+            logger.debug(f"Text - hashtags: {text_hashtag_link}")
 
             # Discord makes link previews from URLs, we can hide those with < and > before and after URLs
             # We do that with https://t.co/[a-zA-Z0-9]*
             # \g<0>	- Insert entire match
             # text_link_preview = re.sub(r'https://t.co/[a-zA-Z0-9]*', '<\g<0>>', text_hashtag_link, flags=re.MULTILINE)
             text_link_preview = re.sub(r"(https://\S*[^\s^.)])", "<\g<0>>", text_hashtag_link, flags=re.MULTILINE)
-            print("Text - link preview: ", text_link_preview)
+            logger.debug(f"Text - link preview: {text_link_preview}")
 
             # Append media so Discords link preview picks them up
             links = '\n'.join([str(v) for v in link_list])
-            print("Links: ", links)
+            logger.debug(f"Links: {links}")
 
             message = text_link_preview + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/" + str(
                     tweet.id) + ")\n" + links + "\n"
-            print("\nMessage: " + str(message) + "\n")
+            logger.debug(f"Message: {message}")
 
             # Make webhook embed
             hook = Webhook(config.url)
 
             embed = Embed(
                     description=message,
-                    color=0x1e0f3,
+                    color=0x1e0f3,  # Light blue
                     timestamp=True  # Set the timestamp to current time
             )
 
@@ -120,29 +132,29 @@ class MyStreamListener(tweepy.StreamListener):
 
             first_image = link_list[0]
             embed.set_image(first_image)  # TODO: Change to highest quality
-            print("First image: ", first_image)
+            logger.debug(f"First image: {first_image}")
 
             # Post to channel
             hook.send(embeds=embed)
 
-            print("Posted.")
+            logger.info("Posted.")
             print("-----------------")
+
         except Exception as e:
-            print("Error: " + str(e))
+            logger.error(f"Error: {e}")
             hook = Webhook(config.error_url)
-            hook.send("<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n" + str(e))
+            hook.send(f"<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n{e}")
 
     def on_error(self, error_code):
-
         if error_code == 420:
-            print("420 Enhance Your Calm - We are being rate limited.\n"
-                  "Possible reasons: Too many login attempts or running too many copies of the same "
-                  "application authenticating with the same credentials")
+            logger.error("420 Enhance Your Calm - We are being rate limited."
+                         "Possible reasons: Too many login attempts or running too many copies of the same "
+                         "application authenticating with the same credentials")
             return False  # returning False in on_error disconnects the stream
 
-        print("Error: " + str(error_code))
+        logger.error(f"Error: {error_code}")
         hook = Webhook(config.error_url)
-        hook.send("<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n" + str(error_code))
+        hook.send(f"<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n{error_code}")
 
 
 listener = MyStreamListener()
