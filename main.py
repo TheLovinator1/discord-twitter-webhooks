@@ -109,7 +109,7 @@ class MyStreamListener(tweepy.StreamListener):
 
             first_image = link_list[0]
             print("First image: ", first_image)
-            embed.set_image(first_image) # TODO: Change to highest quality
+            embed.set_image(first_image)  # TODO: Change to highest quality
 
             # Post to channel
             hook.send(embeds=embed)
@@ -120,7 +120,7 @@ class MyStreamListener(tweepy.StreamListener):
             embed = Embed(
                     description="<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n" + str(
                             e),
-                    color=0xFF0000, # Red
+                    color=0xFF0000,  # Red
                     timestamp=True  # Sets the timestamp to current time
             )
             hook = Webhook(config.error_url)
@@ -136,7 +136,7 @@ class MyStreamListener(tweepy.StreamListener):
 
         print("Error: " + str(error_code))
         embed = Embed(
-                color=0xFF0000, # Red
+                color=0xFF0000,  # Red
                 timestamp=True  # Sets the timestamp to current time
         )
         Embed(description="<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n" + str(error_code))
