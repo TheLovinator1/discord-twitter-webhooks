@@ -3,11 +3,15 @@ import re
 
 import pytz
 import tweepy
+from dhooks import Embed, Webhook
 from tweepy import OAuthHandler, Stream
 
 # Import settings from config.py
 import config
-from discord_hooks import Webhook
+
+# TODO: Make /u/user and /r/subreddit to a link
+# TODO: Fix gifs
+# TODO: Fix polls
 
 # We need to be authenticated to use the Twitter API
 auth = OAuthHandler(config.consumer_key, config.consumer_secret)
@@ -84,33 +88,43 @@ class MyStreamListener(tweepy.StreamListener):
             # text_link_preview = re.sub(r'https://t.co/[a-zA-Z0-9]*', '<\g<0>>', text_hashtag_link, flags=re.MULTILINE)
             text_link_preview = re.sub(r"(https://\S*[^\s^.)])", "<\g<0>>", text_hashtag_link, flags=re.MULTILINE)
 
-            # Make webhook embed
-            embed = Webhook(config.url)
-
-            # Replace the webhook username with the Twitter username
-            embed.set_username(tweet.user.screen_name)
-
-            # Change the webhook avatar to the twitter avatar
-            embed.set_avatar(str(avatar_hd) + extension)
-
-            # Append media so Discords link preview picks them up TODO: Fix gifs and polls(?)
+            # Append media so Discords link preview picks them up
             links = '\n'.join([str(v) for v in link_list])
 
             message = text_link_preview + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/" + str(
                     tweet.id) + ")\n" + links + "\n"
 
             print("\nMessage: " + str(message) + "\n")
-            embed.set_content(message)
+
+            # Make webhook embed
+            hook = Webhook(config.url)
+
+            embed = Embed(
+                    description=message,
+                    color=0x1e0f3,
+                    timestamp=True  # Sets the timestamp to current time
+            )
+            # Change webhook avatar to twitter avatar and replace webhook username with Twitter username
+            embed.set_author(icon_url=str(avatar_hd) + extension, name=tweet.user.screen_name)
+
+            first_image = link_list[0]
+            print("First image: ", first_image)
+            embed.set_image(first_image) # TODO: Change to highest quality
 
             # Post to channel
-            embed.post()
+            hook.send(embeds=embed)
 
             print("Posted.")
         except Exception as e:
             print("Error: " + str(e))
-            embed = Webhook(config.error_url)
-            embed.set_content("<@126462229892694018> I'm broken again <:PepeHands:461899012136632320> \n" + str(e))
-            embed.post()
+            embed = Embed(
+                    description="<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n" + str(
+                            e),
+                    color=0xFF0000, # Red
+                    timestamp=True  # Sets the timestamp to current time
+            )
+            hook = Webhook(config.error_url)
+            hook.send(embeds=embed)
 
     def on_error(self, error_code):
 
@@ -121,11 +135,13 @@ class MyStreamListener(tweepy.StreamListener):
             return False  # returning False in on_error disconnects the stream
 
         print("Error: " + str(error_code))
-
-        embed = Webhook(config.error_url)
-        embed.set_content(
-                "<@126462229892694018> I'm broken again <:PepeHands:461899012136632320> \n" + str(error_code))
-        embed.post()
+        embed = Embed(
+                color=0xFF0000, # Red
+                timestamp=True  # Sets the timestamp to current time
+        )
+        Embed(description="<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n" + str(error_code))
+        hook = Webhook(config.error_url)
+        hook.send(embeds=embed)
 
 
 listener = MyStreamListener()
