@@ -130,9 +130,10 @@ class MyStreamListener(tweepy.StreamListener):
             # Change webhook avatar to twitter avatar and replace webhook username with Twitter username
             embed.set_author(icon_url=str(avatar_hd) + extension, name=tweet.user.screen_name)
 
-            first_image = link_list[0]
-            embed.set_image(first_image)  # TODO: Change to highest quality
-            logger.debug(f"First image: {first_image}")
+            if link_list:
+                first_image = link_list[0]
+                embed.set_image(first_image)  # TODO: Change to highest quality
+                logger.debug(f"First image: {first_image}")
 
             # Post to channel
             hook.send(embeds=embed)
