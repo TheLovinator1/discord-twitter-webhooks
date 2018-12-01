@@ -38,14 +38,17 @@ class MyStreamListener(tweepy.StreamListener):
         try:
             # Skip retweets
             if tweet.retweeted or "RT @" in tweet.text:
+                print("Is retweet")
                 return
 
             # Don't get replies
             if tweet.in_reply_to_screen_name is not None:
+                print("Is reply")
                 return
 
             # Skip PUBG tweets for Xbox
             if "Xbox players: " in tweet.text:
+                print("Is for xbox")
                 return
 
             print("Raw tweet: " + str(tweet))
@@ -53,10 +56,12 @@ class MyStreamListener(tweepy.StreamListener):
             # Check if the tweet is extended and get content
             try:
                 text = tweet.extended_tweet["full_text"]
+                print("Tweet is extended", text)
             except AttributeError:
                 text = tweet.text
-
-            # Get media links if existing
+                print("Tweet is not extended", text)
+                
+            # Get media link
             if 'media' in tweet.entities:
                 for media in tweet.extended_entities['media']:
                     print("Media: " + media['media_url_https'])
@@ -71,29 +76,34 @@ class MyStreamListener(tweepy.StreamListener):
             # Remove the "_normal.jpg" part in url
             avatar_hd = tweet.user.profile_image_url_https[:-11]
             extension = tweet.user.profile_image_url_https[-4:]
+            print("Avatar: ", avatar_hd + extension)
 
             tz = pytz.timezone("Europe/Stockholm")  # TODO: Add to config file
             tweet_time = pytz.utc.localize(tweet.created_at, is_dst=None).astimezone(tz).strftime("%Y-%m-%d %H:%M:%S")
+            print("Time: ", tweet_time)
 
-            # Replace names with links
+            # Replace username with link
             text_profile_link = re.sub(r"@(\w*)", "[\g<0>](https://twitter.com/\g<1>/)", text, flags=re.MULTILINE)
+            print("Text - profile links: ", text_profile_link)
 
-            # Replace hashtags with links
+            # Replace hashtag with link
             text_hashtag_link = re.sub(r"#(\w*)", "[\g<0>](https://twitter.com/hashtag/\g<1>/)", text_profile_link,
                                        flags=re.MULTILINE)
+            print("Text - hashtags: ", text_hashtag_link)
 
             # Discord makes link previews from URLs, we can hide those with < and > before and after URLs
-            # We do that with regular expression https://t.co/[a-zA-Z0-9]*
+            # We do that with https://t.co/[a-zA-Z0-9]*
             # \g<0>	- Insert entire match
             # text_link_preview = re.sub(r'https://t.co/[a-zA-Z0-9]*', '<\g<0>>', text_hashtag_link, flags=re.MULTILINE)
             text_link_preview = re.sub(r"(https://\S*[^\s^.)])", "<\g<0>>", text_hashtag_link, flags=re.MULTILINE)
+            print("Text - link preview: ", text_link_preview)
 
             # Append media so Discords link preview picks them up
             links = '\n'.join([str(v) for v in link_list])
+            print("Links: ", links)
 
             message = text_link_preview + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/" + str(
                     tweet.id) + ")\n" + links + "\n"
-
             print("\nMessage: " + str(message) + "\n")
 
             # Make webhook embed
@@ -102,20 +112,21 @@ class MyStreamListener(tweepy.StreamListener):
             embed = Embed(
                     description=message,
                     color=0x1e0f3,
-                    timestamp=True  # Sets the timestamp to current time
+                    timestamp=True  # Set the timestamp to current time
             )
 
             # Change webhook avatar to twitter avatar and replace webhook username with Twitter username
             embed.set_author(icon_url=str(avatar_hd) + extension, name=tweet.user.screen_name)
 
             first_image = link_list[0]
-            print("First image: ", first_image)
             embed.set_image(first_image)  # TODO: Change to highest quality
+            print("First image: ", first_image)
 
             # Post to channel
             hook.send(embeds=embed)
 
             print("Posted.")
+            print("-----------------")
         except Exception as e:
             print("Error: " + str(e))
             hook = Webhook(config.error_url)
