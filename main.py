@@ -104,6 +104,7 @@ class MyStreamListener(tweepy.StreamListener):
                     color=0x1e0f3,
                     timestamp=True  # Sets the timestamp to current time
             )
+
             # Change webhook avatar to twitter avatar and replace webhook username with Twitter username
             embed.set_author(icon_url=str(avatar_hd) + extension, name=tweet.user.screen_name)
 
@@ -117,14 +118,8 @@ class MyStreamListener(tweepy.StreamListener):
             print("Posted.")
         except Exception as e:
             print("Error: " + str(e))
-            embed = Embed(
-                    description="<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n" + str(
-                            e),
-                    color=0xFF0000,  # Red
-                    timestamp=True  # Sets the timestamp to current time
-            )
             hook = Webhook(config.error_url)
-            hook.send(embeds=embed)
+            hook.send("<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n" + str(e))
 
     def on_error(self, error_code):
 
@@ -135,13 +130,8 @@ class MyStreamListener(tweepy.StreamListener):
             return False  # returning False in on_error disconnects the stream
 
         print("Error: " + str(error_code))
-        embed = Embed(
-                color=0xFF0000,  # Red
-                timestamp=True  # Sets the timestamp to current time
-        )
-        Embed(description="<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n" + str(error_code))
         hook = Webhook(config.error_url)
-        hook.send(embeds=embed)
+        hook.send("<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n" + str(error_code))
 
 
 listener = MyStreamListener()
