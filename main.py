@@ -23,7 +23,6 @@ logger.addHandler(handler)
 
 # CRITICAL, ERROR, WARNING, INFO, DEBUG
 logger.setLevel(logging.DEBUG)  # TODO: Add to config file
-logger.debug('This is a debug message')
 
 # We need to be authenticated to use the Twitter API
 auth = OAuthHandler(config.consumer_key, config.consumer_secret)
