@@ -10,7 +10,6 @@ import tweepy
 from dhooks import Embed, Webhook
 from tweepy import OAuthHandler, Stream
 
-# TODO: Make /u/user and /r/subreddit to a link
 # TODO: Fix gifs
 # TODO: Fix polls
 
@@ -182,13 +181,16 @@ class MyStreamListener(tweepy.StreamListener):
             logger.debug(f"Text - link preview: {text_link_preview}")
 
             text_reddit_user_link = re.sub(r"/?u/(\S{3,20})", "[https://www.reddit.com/user/\g<1>](\g<1>)", text_link_preview, flags=re.MULTILINE)
-            logger.debug(f"Text - reddit: {text_reddit_user_link}")
+            logger.debug(f"Text - reddit user: {text_reddit_user_link}")
+
+            text_reddit_subreddit_link = re.sub(r"/?r/(\S{3,21})", "[https://www.reddit.com/r/\g<1>](\g<1>)", text_reddit_user_link, flags=re.MULTILINE)
+            logger.debug(f"Text - reddit subreddit: {text_reddit_subreddit_link}")
 
             # Append media so Discords link preview picks them up
             links = '\n'.join([str(v) for v in link_list])
             logger.debug(f"Links: {links}")
 
-            message = text_reddit_user_link + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/" + str(
+            message = text_reddit_subreddit_link + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/" + str(
                     tweet.id) + ")\n" + links + "\n"
             logger.debug(f"Message: {message}")
 
