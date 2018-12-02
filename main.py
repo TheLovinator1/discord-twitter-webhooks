@@ -94,18 +94,19 @@ auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 logger.info("API key belongs to " + api.me().screen_name)
 
+# TODO: Fix this
+# if parser.getboolean("logging", "sensitive_logs"):
+#     config_keys = [webhook_url,
+#                    webhook_error_url,
+#                    consumer_key,
+#                    consumer_secret,
+#                    access_token,
+#                    access_token_secret,
+#                    users_to_follow]
+#
+#     for key in range(len(config_keys)):
+#         logger.debug(key)
 
-if parser.getboolean("logging", "sensitive_logs"):
-    config_keys = [webhook_url,
-                   webhook_error_url,
-                   consumer_key,
-                   consumer_secret,
-                   access_token,
-                   access_token_secret,
-                   users_to_follow]
-
-    for key in range(len(config_keys)):
-        logger.debug(key)
 
 for twitter_id in user_list:
     username = api.get_user(twitter_id)
@@ -183,11 +184,14 @@ class MyStreamListener(tweepy.StreamListener):
             text_link_preview = re.sub(r"(https://\S*[^\s^.)])", "<\g<0>>", text_hashtag_link, flags=re.MULTILINE)
             logger.debug(f"Text - link preview: {text_link_preview}")
 
+            text_reddit_user_link = re.sub(r"/?u/(\S{3,20})", "[https://www.reddit.com/user/\g<1>](\g<1>)", text_link_preview, flags=re.MULTILINE)
+            logger.debug(f"Text - reddit: {text_reddit_user_link}")
+
             # Append media so Discords link preview picks them up
             links = '\n'.join([str(v) for v in link_list])
             logger.debug(f"Links: {links}")
 
-            message = text_link_preview + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/" + str(
+            message = text_reddit_user_link + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/" + str(
                     tweet.id) + ")\n" + links + "\n"
             logger.debug(f"Message: {message}")
 
