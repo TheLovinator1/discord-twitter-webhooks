@@ -1,39 +1,113 @@
 #!/usr/bin/env python3
 import logging.config
+import os
 import re
+import sys
+from configparser import ConfigParser
 
 import pytz
 import tweepy
 from dhooks import Embed, Webhook
 from tweepy import OAuthHandler, Stream
 
-# Import settings from config.py
-import config
-
 # TODO: Make /u/user and /r/subreddit to a link
 # TODO: Fix gifs
 # TODO: Fix polls
-# TODO: Log to file
 
+config = ConfigParser()
+
+config["discord"] = {
+    "webhook_url": "webhook_url",
+    "webhook_error_url": "webhook_error_url",
+}
+
+config["twitter"] = {
+    "consumer_key": "consumer_key",
+    "consumer_secret": "consumer_secret",
+    "access_token": "access_token",
+    "access_token_secret": "access_token_secret",
+    "users_to_follow": "user1, user2, user3",
+}
+
+config["logging"] = {
+    "log_level": "INFO",
+    "log_to_file": False,
+    "log_level_file": "INFO",
+    "log_name": "log.txt",
+    "sensitive_logs": False
+}
+
+# Check if config file exists before creating one
+if not os.path.isfile("config.ini"):
+    with open("config.ini", "w") as f:
+        config.write(f)
+
+parser = ConfigParser()
+parser.read("config.ini")
+
+if parser.get("discord", "webhook_url") == "webhook_url":
+    print("Please fill out the config file!")
+    sys.exit(0)
+
+webhook_url = parser.get("discord", "webhook_url")
+webhook_error_url = parser.get("discord", "webhook_error_url")
+
+consumer_key = parser.get("twitter", "consumer_key")
+consumer_secret = parser.get("twitter", "consumer_secret")
+access_token = parser.get("twitter", "access_token")
+access_token_secret = parser.get("twitter", "access_token_secret")
+
+users_to_follow = parser.get("twitter", "users_to_follow")
+user_list = [x.strip() for x in users_to_follow.split(',')]
+
+log_level_file = parser.get("logging", "log_level_file")
+log_level = parser.get("logging", "log_level")
+log_name = parser.get("logging", "log_name")
+sensitive_logs = parser.get("logging", "sensitive_logs")
+
+# Logger
+formatter = logging.Formatter('%(asctime)s %(levelname)-12s %(message)s')
 logger = logging.getLogger()
 handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-12s %(message)s')
+
+# Log to file
+if parser.getboolean("logging", "log_to_file"):
+    file_handler = logging.FileHandler(parser.get("logging", "log_name"))
+    level = logging.getLevelName(log_level_file)
+    file_handler.setLevel(level)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+# Log to console
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 # CRITICAL, ERROR, WARNING, INFO, DEBUG
-logger.setLevel(logging.DEBUG)  # TODO: Add to config file
+level = logging.getLevelName(log_level)
+logger.setLevel(level)
 
 # We need to be authenticated to use the Twitter API
-auth = OAuthHandler(config.consumer_key, config.consumer_secret)
-auth.set_access_token(config.access_token, config.access_token_secret)
+auth = OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
 
 # Authenticate to the API
 api = tweepy.API(auth)
 logger.info("API key belongs to " + api.me().screen_name)
-logger.info("Following: ")
 
-for twitter_id in config.users_to_follow:
+
+if parser.getboolean("logging", "sensitive_logs"):
+    config_keys = [webhook_url,
+                   webhook_error_url,
+                   consumer_key,
+                   consumer_secret,
+                   access_token,
+                   access_token_secret,
+                   users_to_follow]
+
+    for key in range(len(config_keys)):
+        logger.debug(key)
+
+for twitter_id in user_list:
     username = api.get_user(twitter_id)
     print(twitter_id + " - " + str(username.screen_name))
 
@@ -118,7 +192,7 @@ class MyStreamListener(tweepy.StreamListener):
             logger.debug(f"Message: {message}")
 
             # Make webhook embed
-            hook = Webhook(config.url)
+            hook = Webhook(webhook_url)
 
             embed = Embed(
                     description=message,
@@ -138,11 +212,10 @@ class MyStreamListener(tweepy.StreamListener):
             hook.send(embeds=embed)
 
             logger.info("Posted.")
-            print("-----------------")
 
         except Exception as e:
             logger.error(f"Error: {e}")
-            hook = Webhook(config.error_url)
+            hook = Webhook(webhook_error_url)
             hook.send(f"<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n{e}")
 
     def on_error(self, error_code):
@@ -153,7 +226,7 @@ class MyStreamListener(tweepy.StreamListener):
             return False  # returning False in on_error disconnects the stream
 
         logger.error(f"Error: {error_code}")
-        hook = Webhook(config.error_url)
+        hook = Webhook(webhook_error_url)
         hook.send(f"<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n{error_code}")
 
 
@@ -162,4 +235,4 @@ stream = Stream(auth, listener)
 
 # Streams are only terminated if the connection is closed, blocking the thread.
 # The async parameter makes the stream run on a new thread.
-stream.filter(follow=config.users_to_follow, async=True)
+stream.filter(follow=user_list, async=True)
