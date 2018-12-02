@@ -178,9 +178,6 @@ class MyStreamListener(tweepy.StreamListener):
             logger.debug(f"Text - hashtags: {text_hashtag_link}")
 
             # Discord makes link previews from URLs, we can hide those with < and > before and after URLs
-            # We do that with https://t.co/[a-zA-Z0-9]*
-            # \g<0>	- Insert entire match
-            # text_link_preview = re.sub(r'https://t.co/[a-zA-Z0-9]*', '<\g<0>>', text_hashtag_link, flags=re.MULTILINE)
             text_link_preview = re.sub(r"(https://\S*[^\s^.)])", "<\g<0>>", text_hashtag_link, flags=re.MULTILINE)
             logger.debug(f"Text - link preview: {text_link_preview}")
 
