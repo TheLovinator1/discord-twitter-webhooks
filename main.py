@@ -182,6 +182,7 @@ class MyStreamListener(tweepy.StreamListener):
             text_reddit_user_link = re.sub(r"/?u/(\S{3,20})", "[/u/\g<1>](https://www.reddit.com/user/\g<1>)",
                                            text_reddit_subreddit_link, flags=re.MULTILINE)
             logger.debug(f"Text - reddit user: {text_reddit_user_link}")
+
             # Append media so Discords link preview picks them up
             links = '\n'.join([str(v) for v in link_list])
             logger.debug(f"Links: {links}")
