@@ -105,7 +105,7 @@ logger.info("API key belongs to " + api.me().screen_name)
 #     for key in range(len(config_keys)):
 #         logger.debug(key)
 
-
+# Print users we follow
 for twitter_id in user_list:
     username = api.get_user(twitter_id)
     print(twitter_id + " - " + str(username.screen_name))
@@ -175,10 +175,12 @@ class MyStreamListener(tweepy.StreamListener):
             text_link_preview = re.sub(r"(https://\S*[^\s^.)])", "<\g<0>>", text_hashtag_link, flags=re.MULTILINE)
             logger.debug(f"Text - link preview: {text_link_preview}")
 
+            # Change /r/subreddit to clickable link
             text_reddit_subreddit_link = re.sub(r"/?r/(\S{3,21})", "[/r/\g<1>](https://www.reddit.com/r/\g<1>)",
                                                 text_link_preview, flags=re.MULTILINE)
             logger.debug(f"Text - reddit subreddit: {text_reddit_subreddit_link}")
 
+            # Change /u/user to clickable link
             text_reddit_user_link = re.sub(r"/?u/(\S{3,20})", "[/u/\g<1>](https://www.reddit.com/user/\g<1>)",
                                            text_reddit_subreddit_link, flags=re.MULTILINE)
             logger.debug(f"Text - reddit user: {text_reddit_user_link}")
@@ -187,6 +189,7 @@ class MyStreamListener(tweepy.StreamListener):
             links = '\n'.join([str(v) for v in link_list])
             logger.debug(f"Links: {links}")
 
+            # Final message that we send
             message = text_reddit_user_link + links + "\n"
             logger.debug(f"Message: {message}")
 
