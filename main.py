@@ -5,7 +5,6 @@ import re
 import sys
 from configparser import ConfigParser
 
-import pytz
 import tweepy
 from dhooks import Embed, Webhook
 from tweepy import OAuthHandler, Stream
@@ -122,17 +121,17 @@ class MyStreamListener(tweepy.StreamListener):
             logger.debug("Raw tweet: " + str(tweet))
             # Skip retweets
             if tweet.retweeted or "RT @" in tweet.text:
-                logger.debug("Tweet is retweet")
+                # logger.debug("Tweet is retweet")
                 return
 
             # Don't get replies
             if tweet.in_reply_to_screen_name is not None:
-                logger.debug("Tweet is reply")
+                # logger.debug("Tweet is reply")
                 return
 
             # Skip PUBG tweets for Xbox
             if "Xbox players: " in tweet.text:
-                logger.debug("Tweet is for xbox")
+                # logger.debug("Tweet is for xbox")
                 return
 
             # Check if the tweet is extended and get content
@@ -163,10 +162,6 @@ class MyStreamListener(tweepy.StreamListener):
             extension = tweet.user.profile_image_url_https[-4:]
             logger.debug(f"Avatar: {avatar_hd}{extension}")
 
-            tz = pytz.timezone("Europe/Stockholm")  # TODO: Add to config file
-            tweet_time = pytz.utc.localize(tweet.created_at, is_dst=None).astimezone(tz).strftime("%Y-%m-%d %H:%M:%S")
-            logger.debug(f"Time: {tweet_time}")
-
             # Replace username with link
             text_profile_link = re.sub(r"@(\w*)", "[\g<0>](https://twitter.com/\g<1>/)", text, flags=re.MULTILINE)
             logger.debug(f"Text - profile links: {text_profile_link}")
@@ -180,18 +175,18 @@ class MyStreamListener(tweepy.StreamListener):
             text_link_preview = re.sub(r"(https://\S*[^\s^.)])", "<\g<0>>", text_hashtag_link, flags=re.MULTILINE)
             logger.debug(f"Text - link preview: {text_link_preview}")
 
-            text_reddit_user_link = re.sub(r"/?u/(\S{3,20})", "[https://www.reddit.com/user/\g<1>](\g<1>)", text_link_preview, flags=re.MULTILINE)
-            logger.debug(f"Text - reddit user: {text_reddit_user_link}")
-
-            text_reddit_subreddit_link = re.sub(r"/?r/(\S{3,21})", "[https://www.reddit.com/r/\g<1>](\g<1>)", text_reddit_user_link, flags=re.MULTILINE)
+            text_reddit_subreddit_link = re.sub(r"/?r/(\S{3,21})", "[/r/\g<1>](https://www.reddit.com/r/\g<1>)",
+                                                text_link_preview, flags=re.MULTILINE)
             logger.debug(f"Text - reddit subreddit: {text_reddit_subreddit_link}")
 
+            text_reddit_user_link = re.sub(r"/?u/(\S{3,20})", "[/u/\g<1>](https://www.reddit.com/user/\g<1>)",
+                                           text_reddit_subreddit_link, flags=re.MULTILINE)
+            logger.debug(f"Text - reddit user: {text_reddit_user_link}")
             # Append media so Discords link preview picks them up
             links = '\n'.join([str(v) for v in link_list])
             logger.debug(f"Links: {links}")
 
-            message = text_reddit_subreddit_link + "\n\n" + "[" + str(tweet_time) + "](https://twitter.com/statuses/" + str(
-                    tweet.id) + ")\n" + links + "\n"
+            message = text_reddit_user_link + links + "\n"
             logger.debug(f"Message: {message}")
 
             # Make webhook embed
@@ -204,7 +199,9 @@ class MyStreamListener(tweepy.StreamListener):
             )
 
             # Change webhook avatar to twitter avatar and replace webhook username with Twitter username
-            embed.set_author(icon_url=str(avatar_hd) + extension, name=tweet.user.screen_name)
+            embed.set_author(icon_url=str(avatar_hd) + extension,
+                             name=tweet.user.screen_name,
+                             url="https://twitter.com/statuses/" + str(tweet.id))
 
             if link_list:
                 first_image = link_list[0]
