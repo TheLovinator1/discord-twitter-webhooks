@@ -213,7 +213,7 @@ class MyStreamListener(tweepy.StreamListener):
                 logger.debug(f"First image: {first_image}")
 
             # Post to channel
-            hook.send(embeds=embed)
+            hook.send(embed=embed)
 
             logger.info("Posted.")
 
