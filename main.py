@@ -197,9 +197,9 @@ class MyStreamListener(tweepy.StreamListener):
             hook = Webhook(webhook_url)
 
             embed = Embed(
-                    description=message,
-                    color=0x1e0f3,  # Light blue
-                    timestamp=True  # Set the timestamp to current time
+                description=message,
+                color=0x1e0f3,  # Light blue
+                timestamp="now"  # Set the timestamp to current time
             )
 
             # Change webhook avatar to twitter avatar and replace webhook username with Twitter username
