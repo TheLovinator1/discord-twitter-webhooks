@@ -239,4 +239,4 @@ stream = Stream(auth, listener)
 
 # Streams are only terminated if the connection is closed, blocking the thread.
 # The async parameter makes the stream run on a new thread.
-stream.filter(follow=user_list, async=True)
+stream.filter(follow=user_list, is_async=True)
