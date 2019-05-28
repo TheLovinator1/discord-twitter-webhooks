@@ -31,8 +31,7 @@ config["logging"] = {
     "log_level": "INFO",
     "log_to_file": False,
     "log_level_file": "INFO",
-    "log_name": "log.txt",
-    "sensitive_logs": False
+    "log_name": "log.txt"
 }
 
 # Check if config file exists before creating one
@@ -61,7 +60,6 @@ user_list = [x.strip() for x in users_to_follow.split(',')]
 log_level_file = parser.get("logging", "log_level_file")
 log_level = parser.get("logging", "log_level")
 log_name = parser.get("logging", "log_name")
-sensitive_logs = parser.get("logging", "sensitive_logs")
 
 # Logger
 formatter = logging.Formatter('%(asctime)s %(levelname)-12s %(message)s')
@@ -91,19 +89,6 @@ auth.set_access_token(access_token, access_token_secret)
 # Authenticate to the API
 api = tweepy.API(auth)
 logger.info("API key belongs to " + api.me().screen_name)
-
-# TODO: Fix this
-# if parser.getboolean("logging", "sensitive_logs"):
-#     config_keys = [webhook_url,
-#                    webhook_error_url,
-#                    consumer_key,
-#                    consumer_secret,
-#                    access_token,
-#                    access_token_secret,
-#                    users_to_follow]
-#
-#     for key in range(len(config_keys)):
-#         logger.debug(key)
 
 # Print users we follow
 for twitter_id in user_list:
