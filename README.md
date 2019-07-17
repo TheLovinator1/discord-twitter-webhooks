@@ -20,7 +20,7 @@ cd discord-twitter-webhooks/
 pip3 install -r requirements.txt
 
 # Edit and fill out the information in the config file
-editor config.py
+nano config.ini
 
 # Run the bot (Shut down the bot with ctrl + c)
 python3 main.py
