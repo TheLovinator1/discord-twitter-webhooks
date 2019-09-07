@@ -21,7 +21,7 @@ config["logging"] = {
     "log_level": "INFO",
     "log_to_file": False,
     "log_level_file": "INFO",
-    "log_name": "log.txt"
+    "log_name": "log.txt",
 }
 
 # Check if config file exists before creating one
@@ -46,7 +46,7 @@ access_token = parser.get("twitter", "access_token")
 access_token_secret = parser.get("twitter", "access_token_secret")
 
 users_to_follow = parser.get("twitter", "users_to_follow")
-user_list = [x.strip() for x in users_to_follow.split(',')]
+user_list = [x.strip() for x in users_to_follow.split(",")]
 
 log_level_file = parser.get("logging", "log_level_file")
 log_level = parser.get("logging", "log_level")

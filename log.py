@@ -2,7 +2,7 @@ import logging.config
 import config
 
 # Logger
-formatter = logging.Formatter('%(asctime)s %(levelname)-12s %(message)s')
+formatter = logging.Formatter("%(asctime)s %(levelname)-12s %(message)s")
 logger = logging.getLogger()
 handler = logging.StreamHandler()
 

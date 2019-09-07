@@ -57,10 +57,10 @@ class MyStreamListener(tweepy.StreamListener):
                 log.logger.debug(f"{text}")
 
             # Get media link
-            if 'media' in tweet.entities:
-                for media in tweet.extended_entities['media']:
+            if "media" in tweet.entities:
+                for media in tweet.extended_entities["media"]:
                     log.logger.debug(f"Media: {media['media_url_https']}")
-                    link = media['media_url_https']
+                    link = media["media_url_https"]
                     link_list.append(link)
                     log.logger.debug(f"Media link: {link}")
 
@@ -75,30 +75,52 @@ class MyStreamListener(tweepy.StreamListener):
             log.logger.debug(f"Avatar: {avatar_hd}{extension}")
 
             # Replace username with link
-            text_profile_link = re.sub(r"@(\w*)", "[\g<0>](https://twitter.com/\g<1>/)", text, flags=re.MULTILINE)
+            text_profile_link = re.sub(
+                r"@(\w*)",
+                "[\g<0>](https://twitter.com/\g<1>/)",
+                text,
+                flags=re.MULTILINE,
+            )
             log.logger.debug(f"Text - profile links: {text_profile_link}")
 
             # Replace hashtag with link
-            text_hashtag_link = re.sub(r"#(\w*)", "[\g<0>](https://twitter.com/hashtag/\g<1>/)", text_profile_link,
-                                       flags=re.MULTILINE)
+            text_hashtag_link = re.sub(
+                r"#(\w*)",
+                "[\g<0>](https://twitter.com/hashtag/\g<1>/)",
+                text_profile_link,
+                flags=re.MULTILINE,
+            )
             log.logger.debug(f"Text - hashtags: {text_hashtag_link}")
 
             # Discord makes link previews from URLs, we can hide those with < and > before and after URLs
-            text_link_preview = re.sub(r"(https://\S*[^\s^.)])", "<\g<0>>", text_hashtag_link, flags=re.MULTILINE)
+            text_link_preview = re.sub(
+                r"(https://\S*[^\s^.)])",
+                "<\g<0>>",
+                text_hashtag_link,
+                flags=re.MULTILINE,
+            )
             log.logger.debug(f"Text - link preview: {text_link_preview}")
 
             # Change /r/subreddit to clickable link
-            text_reddit_subreddit_link = re.sub(r"/?r/(\S{3,21})", "[/r/\g<1>](https://www.reddit.com/r/\g<1>)",
-                                                text_link_preview, flags=re.MULTILINE)
+            text_reddit_subreddit_link = re.sub(
+                r"/?r/(\S{3,21})",
+                "[/r/\g<1>](https://www.reddit.com/r/\g<1>)",
+                text_link_preview,
+                flags=re.MULTILINE,
+            )
             log.logger.debug(f"Text - reddit subreddit: {text_reddit_subreddit_link}")
 
             # Change /u/user to clickable link
-            text_reddit_user_link = re.sub(r"/?u/(\S{3,20})", "[/u/\g<1>](https://www.reddit.com/user/\g<1>)",
-                                           text_reddit_subreddit_link, flags=re.MULTILINE)
+            text_reddit_user_link = re.sub(
+                r"/?u/(\S{3,20})",
+                "[/u/\g<1>](https://www.reddit.com/user/\g<1>)",
+                text_reddit_subreddit_link,
+                flags=re.MULTILINE,
+            )
             log.logger.debug(f"Text - reddit user: {text_reddit_user_link}")
 
             # Append media so Discords link preview picks them up
-            links = '\n'.join([str(v) for v in link_list])
+            links = "\n".join([str(v) for v in link_list])
             log.logger.debug(f"Links: {links}")
 
             # Final message that we send
@@ -110,14 +132,16 @@ class MyStreamListener(tweepy.StreamListener):
 
             embed = Embed(
                 description=message,
-                color=0x1e0f3,  # Light blue
-                timestamp="now"  # Set the timestamp to current time
+                color=0x1E0F3,  # Light blue
+                timestamp="now",  # Set the timestamp to current time
             )
 
             # Change webhook avatar to twitter avatar and replace webhook username with Twitter username
-            embed.set_author(icon_url=str(avatar_hd) + extension,
-                             name=tweet.user.screen_name,
-                             url="https://twitter.com/statuses/" + str(tweet.id))
+            embed.set_author(
+                icon_url=str(avatar_hd) + extension,
+                name=tweet.user.screen_name,
+                url="https://twitter.com/statuses/" + str(tweet.id),
+            )
 
             if link_list:
                 first_image = link_list[0]
@@ -132,18 +156,24 @@ class MyStreamListener(tweepy.StreamListener):
         except Exception as e:
             log.logger.error(f"Error: {e}")
             hook = Webhook(config.webhook_error_url)
-            hook.send(f"<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n{e}")
+            hook.send(
+                f"<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n{e}"
+            )
 
     def on_error(self, error_code):
         if error_code == 420:
-            log.logger.error("420 Enhance Your Calm - We are being rate limited."
-                             "Possible reasons: Too many login attempts or running too many copies of the same "
-                             "application authenticating with the same credentials")
+            log.logger.error(
+                "420 Enhance Your Calm - We are being rate limited."
+                "Possible reasons: Too many login attempts or running too many copies of the same "
+                "application authenticating with the same credentials"
+            )
             return False  # returning False in on_error disconnects the stream
 
         log.logger.error(f"Error: {error_code}")
         hook = Webhook(config.webhook_error_url)
-        hook.send(f"<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n{error_code}")
+        hook.send(
+            f"<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n{error_code}"
+        )
 
 
 listener = MyStreamListener()
