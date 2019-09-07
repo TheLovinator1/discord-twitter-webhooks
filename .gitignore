@@ -108,3 +108,6 @@ venv.bak/
 
 # Config file
 config.ini
+
+# Visual Studio Code
+.vscode/
