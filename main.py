@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""This program fetches tweets and writes them in Discord."""
+
 import re
 import log
 import config
@@ -24,37 +26,36 @@ for twitter_id in config.user_list:
 
 
 class MyStreamListener(tweepy.StreamListener):
+    """This listens for tweets."""
+
     def on_connect(self):
+        """Print when you are succesfully connected to the Twitter API."""
         print("You are now connected to the streaming API.")
 
     def on_status(self, tweet):
+        """Trigger when tweets change."""
         link_list = []
         try:
             log.logger.debug("Raw tweet: " + str(tweet))
             # Skip retweets
             if tweet.retweeted or "RT @" in tweet.text:
-                # logger.debug("Tweet is retweet")
                 return
 
             # Don't get replies
             if tweet.in_reply_to_screen_name is not None:
-                # logger.debug("Tweet is reply")
                 return
 
             # Skip PUBG tweets for Xbox
             if "Xbox players: " in tweet.text:
-                # logger.debug("Tweet is for xbox")
                 return
 
             # Check if the tweet is extended and get content
             try:
                 text = tweet.extended_tweet["full_text"]
-                log.logger.debug(f"Tweet is extended:")
-                log.logger.debug(f"{text}")
+                log.logger.debug(f"Tweet is extended:\n{text}")
             except AttributeError:
                 text = tweet.text
-                log.logger.debug(f"Tweet is not extended:")
-                log.logger.debug(f"{text}")
+                log.logger.debug(f"Tweet is not extended:\n{text}")
 
             # Get media link
             if "media" in tweet.entities:
@@ -77,7 +78,7 @@ class MyStreamListener(tweepy.StreamListener):
             # Replace username with link
             text_profile_link = re.sub(
                 r"@(\w*)",
-                "[\g<0>](https://twitter.com/\g<1>/)",
+                r"[\g<0>](https://twitter.com/\g<1>/)",
                 text,
                 flags=re.MULTILINE,
             )
@@ -86,16 +87,17 @@ class MyStreamListener(tweepy.StreamListener):
             # Replace hashtag with link
             text_hashtag_link = re.sub(
                 r"#(\w*)",
-                "[\g<0>](https://twitter.com/hashtag/\g<1>/)",
+                r"[\g<0>](https://twitter.com/hashtag/\g<1>/)",
                 text_profile_link,
                 flags=re.MULTILINE,
             )
             log.logger.debug(f"Text - hashtags: {text_hashtag_link}")
 
-            # Discord makes link previews from URLs, we can hide those with < and > before and after URLs
+            # Discord makes link previews from URLs,
+            # we can hide those with < and > before and after URLs
             text_link_preview = re.sub(
                 r"(https://\S*[^\s^.)])",
-                "<\g<0>>",
+                r"<\g<0>>",
                 text_hashtag_link,
                 flags=re.MULTILINE,
             )
@@ -104,16 +106,16 @@ class MyStreamListener(tweepy.StreamListener):
             # Change /r/subreddit to clickable link
             text_reddit_subreddit_link = re.sub(
                 r"/?r/(\S{3,21})",
-                "[/r/\g<1>](https://www.reddit.com/r/\g<1>)",
+                r"[/r/\g<1>](https://www.reddit.com/r/\g<1>)",
                 text_link_preview,
                 flags=re.MULTILINE,
             )
-            log.logger.debug(f"Text - reddit subreddit: {text_reddit_subreddit_link}")
+            log.logger.debug(f"Text - subreddit: {text_reddit_subreddit_link}")
 
             # Change /u/user to clickable link
             text_reddit_user_link = re.sub(
                 r"/?u/(\S{3,20})",
-                "[/u/\g<1>](https://www.reddit.com/user/\g<1>)",
+                r"[/u/\g<1>](https://www.reddit.com/user/\g<1>)",
                 text_reddit_subreddit_link,
                 flags=re.MULTILINE,
             )
@@ -136,7 +138,8 @@ class MyStreamListener(tweepy.StreamListener):
                 timestamp="now",  # Set the timestamp to current time
             )
 
-            # Change webhook avatar to twitter avatar and replace webhook username with Twitter username
+            # Change webhook avatar to twitter avatar
+            # and replace webhook username with Twitter username
             embed.set_author(
                 icon_url=str(avatar_hd) + extension,
                 name=tweet.user.screen_name,
@@ -157,22 +160,24 @@ class MyStreamListener(tweepy.StreamListener):
             log.logger.error(f"Error: {e}")
             hook = Webhook(config.webhook_error_url)
             hook.send(
-                f"<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n{e}"
+                f"<@126462229892694018> I'm broken again"
+                "<:PepeHands:461899012136632320>\n{e}"
             )
 
     def on_error(self, error_code):
+        """Handle errors."""
         if error_code == 420:
             log.logger.error(
-                "420 Enhance Your Calm - We are being rate limited."
-                "Possible reasons: Too many login attempts or running too many copies of the same "
-                "application authenticating with the same credentials"
+                "We are being rate limited. Too many login attempts or"
+                "running too many copies of the same credentials"
             )
             return False  # returning False in on_error disconnects the stream
 
         log.logger.error(f"Error: {error_code}")
         hook = Webhook(config.webhook_error_url)
         hook.send(
-            f"<@126462229892694018> I'm broken again <:PepeHands:461899012136632320>\n{error_code}"
+            f"<@126462229892694018> I'm broken again"
+            "<:PepeHands:461899012136632320>\n{error_code}"
         )
 
 
