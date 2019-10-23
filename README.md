@@ -22,6 +22,18 @@ pip3 install -r requirements.txt
 # Edit and fill out the information in the config file
 nano config.ini
 
+# It should look like this
+[discord]
+webhook_url = https://discordapp.com/api/webhooks/87629431744371866618/XWx4oZctMiliGhqA6xKSXWx4oZctMiliGhqA6xKSXWx4oZctMiliGhqA6xKS-ukRePERn-kekrWb0fYMbgQBEg9Tgn
+webhook_error_url = https://discordapp.com/api/webhooks/87629431744371866618/XWx4oZctMiliGhqA6xKSXWx4oZctMiliGhqA6xKSXWx4oZctMiliGhqA6xKS-ukRePERn-kekrWb0fYMbgQBEg9Tgn
+
+[twitter]
+consumer_key = uXCoFuGelkHWWVkgtYDg
+consumer_secret = akSWodGsnGSLnyioyeSyakSWodGsnGSLnyioyeSy
+access_token = 7590329167-MYlEJVmbWMBGsEKgshRWMYlEJVmbWMBGsEKgshRW
+access_token_secret = APspzJmSoDfWAqtHTPeNAPspzJmSoDfWAqtHTPeN
+users_to_follow = 1114707756, 36803580
+
 # Run the bot (Shut down the bot with ctrl + c)
 python3 main.py
 ```
