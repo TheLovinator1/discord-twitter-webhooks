@@ -2,11 +2,13 @@
 """This program fetches tweets and writes them in Discord."""
 
 import re
-import log
-import config
+
 import tweepy
 from dhooks import Embed, Webhook
 from tweepy import OAuthHandler, Stream
+
+import config
+import log
 
 # TODO: Fix gifs
 # TODO: Fix polls
