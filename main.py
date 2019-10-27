@@ -28,17 +28,14 @@ for twitter_id in config.user_list:
 
 
 class MyStreamListener(tweepy.StreamListener):
-    """This listens for tweets."""
-
     def on_connect(self):
-        """Print when you are succesfully connected to the Twitter API."""
         print("You are now connected to the streaming API.")
 
     def on_status(self, tweet):
-        """Trigger when tweets change."""
         link_list = []
         try:
             log.logger.debug("Raw tweet: " + str(tweet))
+
             # Skip retweets
             if tweet.retweeted or "RT @" in tweet.text:
                 return
@@ -47,11 +44,7 @@ class MyStreamListener(tweepy.StreamListener):
             if tweet.in_reply_to_screen_name is not None:
                 return
 
-            # Skip PUBG tweets for Xbox
-            if "Xbox players: " in tweet.text:
-                return
-
-            # Check if the tweet is extended and get content
+            # Check if the tweet is truncated and get full tweet
             try:
                 text = tweet.extended_tweet["full_text"]
                 log.logger.debug(f"Tweet is extended:\n{text}")
@@ -72,75 +65,39 @@ class MyStreamListener(tweepy.StreamListener):
                 log.logger.debug("Link List:")
                 log.logger.debug(*link_list)
 
-            # Remove the "_normal.jpg" part in url
+            # Remove the "_normal.jpg" part in url to get higher quality
             avatar_hd = tweet.user.profile_image_url_https[:-11]
             extension = tweet.user.profile_image_url_https[-4:]
             log.logger.debug(f"Avatar: {avatar_hd}{extension}")
 
-            # Replace username with link
-            text_profile_link = re.sub(
-                r"@(\w*)",
-                r"[\g<0>](https://twitter.com/\g<1>/)",
-                text,
-                flags=re.MULTILINE,
-            )
-            log.logger.debug(f"Text - profile links: {text_profile_link}")
+            regex_dict = {
+                r"@(\w*)": r"[\g<0>](https://twitter.com/\g<1>/)",  # Replace @username with link
+                r"#(\w*)": r"[\g<0>](https://twitter.com/hashtag/\g<1>/)",  # Replace #hashtag with link
+                r"(https://\S*[^\s^.)])": r"<\g<0>>",  # Discord makes link previews, can fix this by changing to <url>
+                r"/?r/(\S{3,21})": r"[/r/\g<1>](https://reddit.com/r/\g<1>)",  # Change /r/subreddit to clickable link
+                r"/?u/(\S{3,20})": r"[/u/\g<1>](https://reddit.com/u/\g<1>)",  # Change /u/user to clickable link
+            }
 
-            # Replace hashtag with link
-            text_hashtag_link = re.sub(
-                r"#(\w*)",
-                r"[\g<0>](https://twitter.com/hashtag/\g<1>/)",
-                text_profile_link,
-                flags=re.MULTILINE,
-            )
-            log.logger.debug(f"Text - hashtags: {text_hashtag_link}")
+            for pat, rep in regex_dict.items():
+                text = self.regex_substitutor(pattern=pat, replacement=rep, string=text)
 
-            # Discord makes link previews from URLs,
-            # we can hide those with < and > before and after URLs
-            text_link_preview = re.sub(
-                r"(https://\S*[^\s^.)])",
-                r"<\g<0>>",
-                text_hashtag_link,
-                flags=re.MULTILINE,
-            )
-            log.logger.debug(f"Text - link preview: {text_link_preview}")
-
-            # Change /r/subreddit to clickable link
-            text_reddit_subreddit_link = re.sub(
-                r"/?r/(\S{3,21})",
-                r"[/r/\g<1>](https://www.reddit.com/r/\g<1>)",
-                text_link_preview,
-                flags=re.MULTILINE,
-            )
-            log.logger.debug(f"Text - subreddit: {text_reddit_subreddit_link}")
-
-            # Change /u/user to clickable link
-            text_reddit_user_link = re.sub(
-                r"/?u/(\S{3,20})",
-                r"[/u/\g<1>](https://www.reddit.com/user/\g<1>)",
-                text_reddit_subreddit_link,
-                flags=re.MULTILINE,
-            )
-            log.logger.debug(f"Text - reddit user: {text_reddit_user_link}")
-
-            # Append media so Discords link preview picks them up
+            # Append media so Discord link preview picks them up
             links = "\n".join([str(v) for v in link_list])
             log.logger.debug(f"Links: {links}")
 
             # Final message that we send
-            message = text_reddit_user_link + links + "\n"
+            message = text + " " + links + "\n"
             log.logger.debug(f"Message: {message}")
 
             # Make webhook embed
             hook = Webhook(config.webhook_url)
-
             embed = Embed(
                 description=message,
                 color=0x1E0F3,  # Light blue
                 timestamp="now",  # Set the timestamp to current time
             )
 
-            # Change webhook avatar to twitter avatar
+            # Change webhook avatar to Twitter avatar
             # and replace webhook username with Twitter username
             embed.set_author(
                 icon_url=str(avatar_hd) + extension,
@@ -167,7 +124,6 @@ class MyStreamListener(tweepy.StreamListener):
             )
 
     def on_error(self, error_code):
-        """Handle errors."""
         if error_code == 420:
             log.logger.error(
                 "We are being rate limited. Too many login attempts or "
@@ -178,9 +134,16 @@ class MyStreamListener(tweepy.StreamListener):
         log.logger.error(f"Error: {error_code}")
         hook = Webhook(config.webhook_error_url)
         hook.send(
-            f"<@126462229892694018> I'm broken again"
+            f"<@126462229892694018> I'm broken again "
             f"<:PepeHands:461899012136632320>\n{error_code}"
         )
+        return False
+
+    def regex_substitutor(self, pattern: str, replacement: str, string: str) -> str:
+        substitute = re.sub(
+            r"{}".format(pattern), r"{}".format(replacement), string, flags=re.MULTILINE
+        )
+        return substitute
 
 
 listener = MyStreamListener()
