@@ -160,15 +160,15 @@ class MyStreamListener(tweepy.StreamListener):
             log.logger.error(f"Error: {e}")
             hook = Webhook(config.webhook_error_url)
             hook.send(
-                f"<@126462229892694018> I'm broken again"
-                "<:PepeHands:461899012136632320>\n{e}"
+                f"<@126462229892694018> I'm broken again "
+                f"<:PepeHands:461899012136632320>\n{e}"
             )
 
     def on_error(self, error_code):
         """Handle errors."""
         if error_code == 420:
             log.logger.error(
-                "We are being rate limited. Too many login attempts or"
+                "We are being rate limited. Too many login attempts or "
                 "running too many copies of the same credentials"
             )
             return False  # returning False in on_error disconnects the stream
@@ -177,7 +177,7 @@ class MyStreamListener(tweepy.StreamListener):
         hook = Webhook(config.webhook_error_url)
         hook.send(
             f"<@126462229892694018> I'm broken again"
-            "<:PepeHands:461899012136632320>\n{error_code}"
+            f"<:PepeHands:461899012136632320>\n{error_code}"
         )
 
 
