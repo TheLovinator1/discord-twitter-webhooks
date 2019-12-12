@@ -73,12 +73,17 @@ class MyStreamListener(tweepy.StreamListener):
             for url in tweet.entities["urls"]:
                 text = text.replace(url["url"], url["expanded_url"])
 
-            regex_dict = {
-                r"@(\w*)": r"[\g<0>](https://twitter.com/\g<1>)",  # Replace @username with link
-                r"#(\w*)": r"[\g<0>](https://twitter.com/hashtag/\g<1>)",  # Replace #hashtag with link
-                r"(https://\S*[^\s^.)])": r"<\g<0>>",  # Discord makes link previews, can fix this by changing to <url>
-                r"/?r/(\S{3,21})": r"[/r/\g<1>](https://reddit.com/r/\g<1>)",  # Change /r/subreddit to clickable link
-                r"/?u/(\S{3,20})": r"[/u/\g<1>](https://reddit.com/u/\g<1>)",  # Change /u/user to clickable link
+            regex_dict = {  # I have no idea what I am doing so don't judge my regex lol
+                # Replace @username with link
+                r"@(\w*)": r"[\g<0>](https://twitter.com/\g<1>)",
+                # Replace #hashtag with link
+                r"#(\w*)": r"[\g<0>](https://twitter.com/hashtag/\g<1>)",
+                # Discord makes link previews, can fix this by changing to <url>
+                r"(https://\S*)\)": r"<\g<1>>)",
+                # Change /r/subreddit to clickable link
+                r"/?r/(\S{3,21})": r"[/r/\g<1>](https://reddit.com/r/\g<1>)",
+                # Change /u/user to clickable link
+                r"/?u/(\S{3,20})": r"[/u/\g<1>](https://reddit.com/u/\g<1>)",
             }
 
             for pat, rep in regex_dict.items():
