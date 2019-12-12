@@ -10,8 +10,7 @@ from tweepy import OAuthHandler, Stream
 import config
 import log
 
-# TODO: Fix gifs
-# TODO: Fix polls
+# TODO: Fix gifs and polls
 
 # We need to be authenticated to use the Twitter API
 auth = OAuthHandler(config.consumer_key, config.consumer_secret)
@@ -70,6 +69,10 @@ class MyStreamListener(tweepy.StreamListener):
             extension = tweet.user.profile_image_url_https[-4:]
             log.logger.debug(f"Avatar: {avatar_hd}{extension}")
 
+            # Replace t.co url with real url
+            for url in tweet.entities["urls"]:
+                text = text.replace(url["url"], url["expanded_url"])
+
             regex_dict = {
                 r"@(\w*)": r"[\g<0>](https://twitter.com/\g<1>)",  # Replace @username with link
                 r"#(\w*)": r"[\g<0>](https://twitter.com/hashtag/\g<1>)",  # Replace #hashtag with link
@@ -97,8 +100,8 @@ class MyStreamListener(tweepy.StreamListener):
                 timestamp="now",  # Set the timestamp to current time
             )
 
-            # Change webhook avatar to Twitter avatar
-            # and replace webhook username with Twitter username
+            # Change webhook avatar to Twitter avatar and replace
+            # webhook username with Twitter username
             embed.set_author(
                 icon_url=str(avatar_hd) + extension,
                 name=tweet.user.screen_name,
@@ -115,7 +118,7 @@ class MyStreamListener(tweepy.StreamListener):
 
             log.logger.info("Posted.")
 
-        except Exception as e:
+        except Exception as e:  # TODO: Write what we did before the error
             log.logger.error(f"Error: {e}")
             hook = Webhook(config.webhook_error_url)
             hook.send(
@@ -123,6 +126,8 @@ class MyStreamListener(tweepy.StreamListener):
                 f"<:PepeHands:461899012136632320>\n{e}"
             )
 
+    # TODO: Write information about the error instead of just the error
+    # number
     def on_error(self, error_code):
         if error_code == 420:
             log.logger.error(
@@ -149,6 +154,6 @@ class MyStreamListener(tweepy.StreamListener):
 listener = MyStreamListener()
 stream = Stream(auth, listener)
 
-# Streams are only terminated if the connection is closed, blocking the thread.
-# The async parameter makes the stream run on a new thread.
+# Streams are only terminated if the connection is closed, blocking the
+# thread. The async parameter makes the stream run on a new thread.
 stream.filter(follow=config.user_list, is_async=True)
