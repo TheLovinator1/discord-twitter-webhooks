@@ -70,8 +70,13 @@ class MyStreamListener(tweepy.StreamListener):
             log.logger.debug(f"Avatar: {avatar_hd}{extension}")
 
             # Replace t.co url with real url
-            for url in tweet.entities["urls"]:
-                text = text.replace(url["url"], url["expanded_url"])
+            try:
+                for url in tweet.extended_tweet["entities"]["urls"]:
+                    text = text.replace(url["url"], url["expanded_url"])
+
+            except AttributeError:
+                for url in tweet.entities["urls"]:
+                    text = text.replace(url["url"], url["expanded_url"])
 
             regex_dict = {  # I have no idea what I am doing so don't judge my regex lol
                 # Replace @username with link
