@@ -34,7 +34,10 @@ parser.read("config.ini")
 
 # TODO: Check if the url is correct and not if it is "webhook_url"
 if parser.get("discord", "webhook_url") == "webhook_url":
-    print("Please fill out the config file!")
+    print("Please fill out the config.ini file!")
+    print(
+        "Example: https://github.com/TheLovinator1/discord-twitter-webhooks/wiki/Example-config"
+    )
     sys.exit(0)
 
 webhook_url = parser.get("discord", "webhook_url")
