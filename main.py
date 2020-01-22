@@ -85,10 +85,10 @@ class MyStreamListener(tweepy.StreamListener):
                 r"#(\w*)": r"[\g<0>](https://twitter.com/hashtag/\g<1>)",
                 # Discord makes link previews, can fix this by changing to <url>
                 r"(https://\S*)\)": r"<\g<1>>)",
-                # Change /r/subreddit to clickable link
-                r"/?r/(\S{3,21})": r"[/r/\g<1>](https://reddit.com/r/\g<1>)",
-                # Change /u/user to clickable link
-                r"/?u/(\S{3,20})": r"[/u/\g<1>](https://reddit.com/u/\g<1>)",
+                # Change /r/subreddit to clickable link # FIXME: Broken.
+                # r"/?r/(\S{3,21})": r"[/r/\g<1>](https://reddit.com/r/\g<1>)",
+                # Change /u/user to clickable link      # FIXME: Broken.
+                # r"/?u/(\S{3,20})": r"[/u/\g<1>](https://reddit.com/u/\g<1>)",
             }
 
             for pat, rep in regex_dict.items():
