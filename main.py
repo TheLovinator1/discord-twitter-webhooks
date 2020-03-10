@@ -9,13 +9,9 @@ from tweepy import OAuthHandler, Stream
 import config
 import log
 
-# TODO: Fix gifs and polls
-
-# We need to be authenticated to use the Twitter API
+# Authenticate to the Twitter API
 auth = OAuthHandler(config.consumer_key, config.consumer_secret)
 auth.set_access_token(config.access_token, config.access_token_secret)
-
-# Authenticate to the API
 api = tweepy.API(auth)
 log.logger.info("API key belongs to " + api.me().screen_name)
 
