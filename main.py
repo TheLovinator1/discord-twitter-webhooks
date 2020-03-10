@@ -18,7 +18,7 @@ log.logger.info(f"API key belongs to {api.me().screen_name}")
 # Print users we follow
 for twitter_id in config.user_list:
     username = api.get_user(twitter_id)
-    print(twitter_id + " - " + str(username.screen_name))
+    print(f"{twitter_id} - {username.screen_name}")
 
 
 class MyStreamListener(tweepy.StreamListener):
