@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """This program fetches tweets and writes them in Discord."""
 
 import re
