@@ -13,7 +13,7 @@ import log
 auth = OAuthHandler(config.consumer_key, config.consumer_secret)
 auth.set_access_token(config.access_token, config.access_token_secret)
 api = tweepy.API(auth)
-log.logger.info("API key belongs to " + api.me().screen_name)
+log.logger.info(f"API key belongs to {api.me().screen_name}")
 
 # Print users we follow
 for twitter_id in config.user_list:
@@ -28,7 +28,7 @@ class MyStreamListener(tweepy.StreamListener):
     def on_status(self, tweet):
         link_list = []
         try:
-            log.logger.debug("Raw tweet: " + str(tweet))
+            log.logger.debug(f"Raw tweet: {tweet}")
 
             # Skip retweets
             if tweet.retweeted or "RT @" in tweet.text:
@@ -41,10 +41,10 @@ class MyStreamListener(tweepy.StreamListener):
             # Check if the tweet is truncated and get full tweet
             try:
                 text = tweet.extended_tweet["full_text"]
-                log.logger.debug(f"Tweet is extended:\n{text}")
+                log.logger.debug(f"Tweet is extended:\n\t{text}")
             except AttributeError:
                 text = tweet.text
-                log.logger.debug(f"Tweet is not extended:\n{text}")
+                log.logger.debug(f"Tweet is not extended:\n\t{text}")
 
             # Get media link
             if "media" in tweet.entities:
@@ -110,7 +110,7 @@ class MyStreamListener(tweepy.StreamListener):
             embed.set_author(
                 icon_url=str(avatar_hd) + extension,
                 name=tweet.user.screen_name,
-                url="https://twitter.com/statuses/" + str(tweet.id),
+                url=f"https://twitter.com/statuses/{tweet.id}",
             )
 
             if link_list:
