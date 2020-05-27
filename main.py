@@ -1,32 +1,93 @@
 """This program fetches tweets and writes them in Discord."""
 
+import logging.config
+import os
 import re
+import sys
 
 import tweepy
 from dhooks import Embed, Webhook
+from dotenv import load_dotenv
 from tweepy import OAuthHandler, Stream
 
-import config
-import log
+load_dotenv(verbose=True)
+
+
+# Enviroment variables
+consumer_key = os.getenv(key="CONSUMER_KEY")
+consumer_secret = os.getenv(key="CONSUMER_SECRET")
+access_token = os.getenv(key="ACCESS_TOKEN")
+access_token_secret = os.getenv(key="ACCESS_TOKEN_SECRET")
+users_to_follow = os.getenv(
+    key="USERS_TO_FOLLOW", default=""  # Add default so user_list doesn't hate us
+)
+webhook_url_error = os.getenv(key="WEBHOOK_URL_ERROR")
+webhook_url = os.getenv(key="WEBHOOK_URL")
+log_level = os.getenv(  # CRITICAL, ERROR, WARNING, INFO, DEBUG
+    key="LOG_LEVEL", default="INFO"
+)
+
+
+print(consumer_key)
+print(consumer_secret)
+print(access_token)
+print(access_token_secret)
+print(users_to_follow)
+print(webhook_url_error)
+print(webhook_url)
+
+"""
+# Check if the user has filled out the enviroment variables
+if (
+    consumer_key
+    or consumer_secret
+    or access_token
+    or access_token_secret
+    or users_to_follow
+    or webhook_url_error
+    or webhook_url is None
+):
+    print("Fill out the enviroment variables!")
+    sys.exit()
+
+"""
+
+
+# Logger
+formatter = logging.Formatter("%(asctime)s %(levelname)-12s %(message)s")
+logger = logging.getLogger()
+handler = logging.StreamHandler()
+
+# Log to console
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
+level = logging.getLevelName(log_level)  # CRITICAL, ERROR, WARNING, INFO, DEBUG
+logger.setLevel(level)
+
 
 # Authenticate to the Twitter API
-auth = OAuthHandler(config.consumer_key, config.consumer_secret)
-auth.set_access_token(config.access_token, config.access_token_secret)
+auth = OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
-log.logger.info(f"API key belongs to {api.me().screen_name}")
+logger.info(f"API key belongs to {api.me().screen_name}")
 
-# Print users we follow
-for twitter_id in config.user_list:
+
+user_list = [x.strip() for x in users_to_follow.split(",")]
+for twitter_id in user_list:
+    """ Print users we follow. """
     username = api.get_user(twitter_id)
     print(f"{twitter_id} - {username.screen_name}")
 
 
 def is_retweet(tweet):
+    """ Skip retweets. """
     if tweet.retweeted or "RT @" in tweet.text:
         return True
 
 
 def is_reply(tweet):
+    """ Skip replies. """
     if tweet.in_reply_to_screen_name is not None:
         return True
 
@@ -36,11 +97,11 @@ def tweet_text(tweet):
 
     try:
         text = tweet.extended_tweet["full_text"]
-        log.logger.debug(f"Tweet is extended:\n\t{text}")
+        logger.debug(f"Tweet is extended:\n\t{text}")
         return text
     except AttributeError:
         text = tweet.text
-        log.logger.debug(f"Tweet is not extended:\n\t{text}")
+        logger.debug(f"Tweet is not extended:\n\t{text}")
         return text
 
 
@@ -48,10 +109,10 @@ def tweet_media_links(tweet):
     link_list = []
     if "media" in tweet.entities:
         for media in tweet.extended_entities["media"]:
-            log.logger.debug(f"Media: {media['media_url_https']}")
+            logger.debug(f"Media: {media['media_url_https']}")
             link = media["media_url_https"]
             link_list.append(link)
-            log.logger.debug(f"Link list: {link_list}")
+            logger.debug(f"Link list: {link_list}")
         return link_list
 
 
@@ -106,8 +167,8 @@ def twitter_regex(text):
 
 def send_error_notification(error):
     """ Send errror message webhook """
-    log.logger.error(f"Error: {error}")
-    hook = Webhook(config.webhook_error_url)
+    logger.error(f"Error: {error}")
+    hook = Webhook(webhook_url_error)
     hook.send(
         f"<@126462229892694018> I'm broken again "
         f"<:PepeHands:461899012136632320>\n{error}"
@@ -117,9 +178,9 @@ def send_error_notification(error):
 
 def make_webhook(avatar, tweet, link_list, text):
     """Make webhook embed"""
-    log.logger.debug(f"Tweet: {text}")
+    logger.debug(f"Tweet: {text}")
 
-    hook = Webhook(config.webhook_url)
+    hook = Webhook(webhook_url)
 
     embed = Embed(
         description=text,
@@ -141,11 +202,11 @@ def make_webhook(avatar, tweet, link_list, text):
         if links:
             hook.send(f"I found some links:\n{links}")
 
-    log.logger.info("Posted.")
+    logger.info("Posted.")
 
 
 def main(tweet):
-    log.logger.debug(f"Raw tweet: {tweet}")
+    logger.debug(f"Raw tweet: {tweet}")
 
     text = tweet_text(tweet=tweet)
     media_links = tweet_media_links(tweet=tweet)
@@ -216,7 +277,7 @@ class MyStreamListener(tweepy.StreamListener):
 
     def on_timeout(self):
         """Called when stream connection times out"""
-        msg = f"on_timeout"
+        msg = "on_timeout"
         send_error_notification(error=msg)
 
     def on_friends(self, friends):
@@ -245,4 +306,4 @@ stream = Stream(auth, listener)
 
 # Streams are only terminated if the connection is closed, blocking the
 # thread. The async parameter makes the stream run on a new thread.
-stream.filter(follow=config.user_list, is_async=True, stall_warnings=True)
+stream.filter(follow=user_list, is_async=True, stall_warnings=True)
