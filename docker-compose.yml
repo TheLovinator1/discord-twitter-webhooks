@@ -1,0 +1,16 @@
+version: "3"
+services:
+  discord-twitter-webhooks:
+    env_file:
+      - .env
+    container_name: discord-twitter-webhooks
+    build: .
+    environment:
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - WEBHOOK_URL_ERROR=${WEBHOOK_URL_ERROR}
+      - CONSUMER_KEY=${CONSUMER_KEY}
+      - CONSUMER_SECRET=${CONSUMER_SECRET}
+      - ACCESS_TOKEN=${ACCESS_TOKEN}
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - USERS_TO_FOLLOW=1114707756,36803580,439480409,730579257538301952,1141417774201184257,1132250894,1070387504149196801
+      - LOG_LEVEL=DEBUG
