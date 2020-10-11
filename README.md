@@ -11,9 +11,9 @@ This program sends [tweets](https://twitter.com) to [Discord](https://discord.co
 * (Optional) Activate virtual enviroment:
     * Windows:  `.\.venv\Scripts\activate`
     * Not windows:  `source .venv/bin/activate`
-* Download packages
+* Download packages:
     * `pip install -r requirements.txt`
-* Rename .env-example to .env and fill it with things from https://developer.twitter.com and https://tweeterid.com
+* Rename .env-example to .env and fill it with things from https://developer.twitter.com and https://tweeterid.com.
 * Start the bot (inside the virtual enviroment):
     * `python main.py`
 * Be happy
