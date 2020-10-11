@@ -28,31 +28,6 @@ log_level = os.getenv(  # CRITICAL, ERROR, WARNING, INFO, DEBUG
 )
 
 
-print(consumer_key)
-print(consumer_secret)
-print(access_token)
-print(access_token_secret)
-print(users_to_follow)
-print(webhook_url_error)
-print(webhook_url)
-
-"""
-# Check if the user has filled out the enviroment variables
-if (
-    consumer_key
-    or consumer_secret
-    or access_token
-    or access_token_secret
-    or users_to_follow
-    or webhook_url_error
-    or webhook_url is None
-):
-    print("Fill out the enviroment variables!")
-    sys.exit()
-
-"""
-
-
 # Logger
 formatter = logging.Formatter("%(asctime)s %(levelname)-12s %(message)s")
 logger = logging.getLogger()
@@ -71,6 +46,14 @@ auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 logger.info(f"API key belongs to {api.me().screen_name}")
+
+logger.debug(f"Consumer key: {consumer_key}")
+logger.debug(f"Consumer secret: {consumer_secret}")
+logger.debug(f"Access Token: {access_token}")
+logger.debug(f"Access Token Secret: {access_token_secret}")
+logger.debug(f"Users to follow: {users_to_follow}")
+logger.debug(f"Webhook url for errors: {webhook_url_error}")
+logger.debug(f"Webhook url: {webhook_url}")
 
 
 user_list = [x.strip() for x in users_to_follow.split(",")]
