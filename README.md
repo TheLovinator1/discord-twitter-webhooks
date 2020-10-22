@@ -6,16 +6,14 @@ This program sends [tweets](https://twitter.com) to [Discord](https://discord.co
 ## Installation
 
 * Install latest version of Python 3.
-* (Optional) Create a virtual environment:
-    * `python -m venv .venv`
-* (Optional) Activate virtual enviroment:
-    * Windows:  `.\.venv\Scripts\activate`
-    * Not windows:  `source .venv/bin/activate`
-* Download packages:
-    * `pip install -r requirements.txt`
+* Install pipenv
+    * `pip install pipenv`
+* Install requirements and make virtual enviroment
+    * `pipenv install`
+    * (Optional) `pipenv install --dev`
 * Rename .env-example to .env and fill it with things from https://developer.twitter.com and https://tweeterid.com.
-* Start the bot (inside the virtual enviroment):
-    * `python main.py`
+* Start the bot:
+    * `pipenv run python main.py`
 * Be happy
 
 ## Help
