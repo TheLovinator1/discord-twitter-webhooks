@@ -1,0 +1,13 @@
+[Unit]
+Description=discord-twitter-webhooks
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/discord-twitter-webhooks
+ExecStart=/usr/bin/pipenv run python %h/discord-twitter-webhooks/main.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
