@@ -131,10 +131,10 @@ def twitter_regex(text):
         r"#(\w*)": r"[\g<0>](https://twitter.com/hashtag/\g<1>)",
         # Discord makes link previews, can fix this by changing to <url>
         r"(https://\S*)\)": r"<\g<1>>)",
-        # Change /r/subreddit to clickable link # FIXME: Broken.
-        # r"/?r/(\S{3,21})": r"[/r/\g<1>](https://reddit.com/r/\g<1>)",
-        # Change /u/user to clickable link      # FIXME: Broken.
-        # r"/?u/(\S{3,20})": r"[/u/\g<1>](https://reddit.com/u/\g<1>)",
+        # Change /r/subreddit to clickable link
+        r".*?(/r/)([^\s^\/]*)(/|)": r"[/r/\g<2>](https://reddit.com/r/\g<2>)",
+        # Change /u/user to clickable link
+        r".*?(/u/|/user/)([^\s^\/]*)(/|)": r"[/u/\g<2>](https://reddit.com/u/\g<2>)",
     }
 
     for pat, rep in regex_dict.items():
@@ -169,7 +169,7 @@ def make_webhook(avatar, tweet, link_list, text):
     embed.set_author(
         icon_url=avatar,
         name=tweet.user.screen_name,
-        url=f"https://twitter.com/statuses/{tweet.id}",
+        url=f" https://twitter.com/i/web/status/{tweet.id}",
     )
 
     hook.send(embed=embed)
@@ -217,6 +217,7 @@ class MyStreamListener(tweepy.StreamListener):
                 "running too many copies of the same credentials"
             )
             send_error_notification(error=msg)
+            return
         send_error_notification(error=error_code)
 
     def on_direct_message(self, status):
