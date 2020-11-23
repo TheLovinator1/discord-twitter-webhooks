@@ -3,7 +3,6 @@
 import logging.config
 import os
 import re
-import sys
 
 import tweepy
 from dhooks import Embed, Webhook
@@ -18,14 +17,10 @@ consumer_key = os.getenv(key="CONSUMER_KEY")
 consumer_secret = os.getenv(key="CONSUMER_SECRET")
 access_token = os.getenv(key="ACCESS_TOKEN")
 access_token_secret = os.getenv(key="ACCESS_TOKEN_SECRET")
-users_to_follow = os.getenv(
-    key="USERS_TO_FOLLOW", default=""  # Add default so user_list doesn't hate us
-)
+users_to_follow = os.getenv(key="USERS_TO_FOLLOW", default="")
 webhook_url_error = os.getenv(key="WEBHOOK_URL_ERROR")
 webhook_url = os.getenv(key="WEBHOOK_URL")
-log_level = os.getenv(  # CRITICAL, ERROR, WARNING, INFO, DEBUG
-    key="LOG_LEVEL", default="INFO"
-)
+log_level = os.getenv(key="LOG_LEVEL", default="INFO")
 
 
 # Logger
@@ -37,7 +32,7 @@ handler = logging.StreamHandler()
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-level = logging.getLevelName(log_level)  # CRITICAL, ERROR, WARNING, INFO, DEBUG
+level = logging.getLevelName(log_level)
 logger.setLevel(level)
 
 
