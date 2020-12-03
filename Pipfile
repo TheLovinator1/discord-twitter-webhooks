@@ -8,7 +8,7 @@ black = "*"
 
 [packages]
 tweepy = "*"
-dhooks = "*"
+dhooks = {editable = true, git = "https://github.com/kyb3r/dhooks.git"}
 python-dotenv = "*"
 
 [requires]
