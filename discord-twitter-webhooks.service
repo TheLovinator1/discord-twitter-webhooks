@@ -10,4 +10,4 @@ ExecStart=/usr/bin/pipenv run python %h/discord-twitter-webhooks/main.py
 Restart=always
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
