@@ -12,7 +12,7 @@ from tweepy import OAuthHandler, Stream
 load_dotenv(verbose=True)
 
 
-# Enviroment variables
+# Environment variables
 consumer_key = os.getenv(key="CONSUMER_KEY")
 consumer_secret = os.getenv(key="CONSUMER_SECRET")
 access_token = os.getenv(key="ACCESS_TOKEN")
@@ -144,7 +144,7 @@ def twitter_regex(text):
 
 
 def send_error_notification(error):
-    """ Send errror message webhook """
+    """ Send error message webhook """
     logger.error(f"Error: {error}")
     hook = Webhook(webhook_url_error)
     hook.send(
