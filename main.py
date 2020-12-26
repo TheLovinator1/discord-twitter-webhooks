@@ -1,16 +1,18 @@
 """This program fetches tweets and writes them in Discord."""
 
+import html
 import logging.config
 import os
 import re
 
+import requests
 import tweepy
+import urllib3
 from dhooks import Embed, Webhook
 from dotenv import load_dotenv
 from tweepy import OAuthHandler, Stream
 
 load_dotenv(verbose=True)
-
 
 # Environment variables
 consumer_key = os.getenv(key="CONSUMER_KEY")
@@ -21,7 +23,6 @@ users_to_follow = os.getenv(key="USERS_TO_FOLLOW", default="")
 webhook_url_error = os.getenv(key="WEBHOOK_URL_ERROR")
 webhook_url = os.getenv(key="WEBHOOK_URL")
 log_level = os.getenv(key="LOG_LEVEL", default="INFO")
-
 
 # Logger
 formatter = logging.Formatter("%(asctime)s %(levelname)-12s %(message)s")
@@ -34,7 +35,6 @@ logger.addHandler(handler)
 
 level = logging.getLevelName(log_level)
 logger.setLevel(level)
-
 
 # Authenticate to the Twitter API
 auth = OAuthHandler(consumer_key, consumer_secret)
@@ -49,7 +49,6 @@ logger.debug(f"Access Token Secret: {access_token_secret}")
 logger.debug(f"Users to follow: {users_to_follow}")
 logger.debug(f"Webhook url for errors: {webhook_url_error}")
 logger.debug(f"Webhook url: {webhook_url}")
-
 
 user_list = [x.strip() for x in users_to_follow.split(",")]
 for twitter_id in user_list:
@@ -72,7 +71,6 @@ def is_reply(tweet):
 
 def tweet_text(tweet):
     """Check if the tweet is truncated and get full tweet"""
-
     try:
         text = tweet.extended_tweet["full_text"]
         logger.debug(f"Tweet is extended:\n\t{text}")
@@ -96,7 +94,6 @@ def tweet_media_links(tweet):
 
 def get_avatar_url(tweet):
     """Remove the "_normal.jpg" part in url to get higher quality"""
-
     avatar_hd = tweet.user.profile_image_url_https[:-11]
     extension = tweet.user.profile_image_url_https[-4:]
     avatar_url = f"{avatar_hd}{extension}"
@@ -105,7 +102,6 @@ def get_avatar_url(tweet):
 
 def replace_tco_link_with_real_link(tweet, text):
     """Replace t.co url with real url"""
-
     try:
         for url in tweet.extended_tweet["entities"]["urls"]:
             text = text.replace(url["url"], url["expanded_url"])
@@ -157,9 +153,7 @@ def send_error_notification(error):
 def make_webhook(avatar, tweet, link_list, text):
     """Make webhook embed"""
     logger.debug(f"Tweet: {text}")
-
     hook = Webhook(webhook_url)
-
     embed = Embed(
         description=text,
         color=0x1E0F3,  # Light blue
@@ -169,7 +163,7 @@ def make_webhook(avatar, tweet, link_list, text):
     embed.set_author(
         icon_url=avatar,
         name=tweet.user.screen_name,
-        url=f" https://twitter.com/i/web/status/{tweet.id}",
+        url=f"https://twitter.com/i/web/status/{tweet.id}",
     )
 
     hook.send(embed=embed)
@@ -186,11 +180,27 @@ def make_webhook(avatar, tweet, link_list, text):
 def main(tweet):
     logger.debug(f"Raw tweet: {tweet}")
 
+    # The text from the tweet
     text = tweet_text(tweet=tweet)
+
+    # Change &amp; to &
+    text_convert_safe_html_unicode = html.unescape(text)
+
+    # Images from the tweet
     media_links = tweet_media_links(tweet=tweet)
+
+    # Get user avatar
     avatar = get_avatar_url(tweet=tweet)
-    text_replaced = replace_tco_link_with_real_link(tweet=tweet, text=text)
+
+    # Replace t.co url with real url
+    text_replaced = replace_tco_link_with_real_link(
+        tweet=tweet, text=text_convert_safe_html_unicode
+    )
+
+    # Replace username, hashtag and subreddit with links
     regex = twitter_regex(text=text_replaced)
+
+    # Send webhook to Discord
     make_webhook(avatar=avatar, tweet=tweet, text=regex, link_list=media_links)
 
 
@@ -199,7 +209,7 @@ class MyStreamListener(tweepy.StreamListener):
         print("You are now connected to the streaming API.")
 
     def on_status(self, tweet):
-        """Called when an unhandled exception occurs."""
+        """Called when a new status arrives"""
         try:
             if is_retweet(tweet=tweet):
                 return
@@ -207,82 +217,60 @@ class MyStreamListener(tweepy.StreamListener):
                 return
             main(tweet=tweet)
 
-        except Exception as e:
-            send_error_notification(error=e)
+        except Exception as error:
+            send_error_notification(
+                f"on_status failed!\n"
+                f"{tweet.user.screen_name}: {tweet.text}\n"
+                f"Error: {error}"
+            )
 
     def on_error(self, error_code):
         if error_code == 420:
-            msg = (
-                "We are being rate limited. Too many login attempts or "
-                "running too many copies of the same credentials"
+            send_error_notification(
+                error="Can't connect to Twitter. Too many login attempts or running too many copies of the same "
+                "credentials. "
             )
-            send_error_notification(error=msg)
             return
         send_error_notification(error=error_code)
 
-    def on_direct_message(self, status):
-        """Called when a new direct message arrives"""
-        msg = f"on_direct_message:\n{status}"
-        send_error_notification(error=msg)
-
-    def on_warning(self, notice):
-        """Called when a disconnection warning message arrives"""
-        msg = f"on_warning:\n{notice}"
-        send_error_notification(error=msg)
-
-    def on_disconnect(self, notice):
-        """Called when twitter sends a disconnect notice
-
-        Disconnect codes are listed here:
-        https://developer.twitter.com/en/docs/tweets/filter-realtime/guides/streaming-message-types
-
-        error_codes = {
-            1: "Shutdown: The feed was shutdown (possibly a machine restart)",
-            2: "Duplicate stream: The same endpoint was connected too many times.",
-            4: "Stall: The client was reading too slowly and was disconnected by the server.",
-            5: "Normal: The client appeared to have initiated a disconnect.",
-            7: "Admin logout: The same credentials were used to connect a new stream and the oldest was disconnected.",
-            9: "Max message limit: The stream connected with a negative count "
-            + "parameter and was disconnected after all backfill was delivered.",
-            10: "Stream exception: An internal issue disconnected the stream.",
-            11: "Broker stall: An internal issue disconnected the stream.",
-            12: "Shed load: The host the stream was connected to became"
-            + " overloaded and streams were disconnected to balance load. Reconnect as usual.",
-        }
-        error_codes.get(notice, "on_disconnect - Unknown message")
-        """
-        msg = f"on_disconnect:\n{notice}"
-        send_error_notification(error=msg)
-
-    def on_timeout(self):
-        """Called when stream connection times out"""
-        msg = "on_timeout"
-        send_error_notification(error=msg)
-
-    def on_friends(self, friends):
-        """Called when a friends list arrives."""
-        msg = f"on_friends:\n{friends}"
-        send_error_notification(error=msg)
-
     def on_delete(self, status_id, user_id):
         """Called when a delete notice arrives for a status"""
-        msg = f"on_delete:\n{status_id}: {user_id}"
-        send_error_notification(error=msg)
-
-    def on_limit(self, track):
-        """Called when a limitation notice arrives"""
-        msg = f"on_limit:\n{track}"
-        send_error_notification(error=msg)
+        send_error_notification(
+            error=f"Tweet from {user_id} \n{status_id} was deleted."
+        )
 
     def on_exception(self, exception):
         """Called when an unhandled exception occurs."""
-        msg = f"on_exception:\n{exception}"
-        send_error_notification(error=msg)
+        send_error_notification(
+            error=f"Called when an unhandled exception occurs:\n{exception}"
+        )
 
 
-listener = MyStreamListener()
-stream = Stream(auth, listener)
+if __name__ == "__main__":
+    print("Bot started.")
+    listener = MyStreamListener()
+    stream = Stream(auth, listener)
 
-# Streams are only terminated if the connection is closed, blocking the
-# thread. The async parameter makes the stream run on a new thread.
-stream.filter(follow=user_list, is_async=True, stall_warnings=True)
+    # Streams are only terminated if the connection is closed, blocking the
+    # thread. The async parameter makes the stream run on a new thread.
+
+    # Exceptions taken from https://github.com/NNTin/discord-twitter-bot/blob/master/bot/main.py#L112
+    while True:
+        try:
+            stream.filter(follow=user_list, stall_warnings=True)
+        except urllib3.exceptions.ProtocolError as e:
+            send_error_notification(
+                f"Raised when something unexpected happens mid-request/response:\n{e}"
+            )
+
+        except ConnectionResetError as e:
+            send_error_notification(f"Connection reset:\n{e}")
+
+        except ConnectionError as e:
+            send_error_notification(f"Connection error:\n{e}")
+
+        except requests.exceptions.ConnectionError as e:
+            send_error_notification(f"A Connection error occurred:\n{e}")
+
+        except Exception as e:
+            send_error_notification(f"Unknown error:\n" f"{e}\n")
