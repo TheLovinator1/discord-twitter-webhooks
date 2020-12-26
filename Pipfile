@@ -10,6 +10,8 @@ black = "*"
 tweepy = "*"
 dhooks = {editable = true, git = "https://github.com/kyb3r/dhooks.git"}
 python-dotenv = "*"
+requests = "*"
+urllib3 = "*"
 
 [requires]
 python_version = "3.9"
