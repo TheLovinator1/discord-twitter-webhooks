@@ -5,7 +5,7 @@ RUN pacman -Syu --noconfirm && pacman --noconfirm -S gcc python python-pip git &
 
 # Copy requirements for the bot and install them
 COPY requirements.txt /tmp/
-RUN pip install --disable-pip-version-check --no-cache-dir --yes --requirement  /tmp/requirements.txt
+RUN pip install --disable-pip-version-check --no-cache-dir --requirement  /tmp/requirements.txt
 
 # Create user
 RUN useradd --create-home botuser
