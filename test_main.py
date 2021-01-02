@@ -2,7 +2,6 @@ from main import twitter_regex
 import html
 import os
 from dhooks import Webhook
-import settings
 
 # TODO: Use real tweet instead of str
 tweet_text = """Hello.
