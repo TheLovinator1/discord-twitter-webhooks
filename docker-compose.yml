@@ -14,4 +14,5 @@ services:
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
       - USERS_TO_FOLLOW=${USERS_TO_FOLLOW}
       - LOG_LEVEL=${LOG_LEVEL}
+      - DISCORD_OWNER_ID=${DISCORD_OWNER_ID}
     restart: unless-stopped
