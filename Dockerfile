@@ -37,7 +37,7 @@ USER botuser
 WORKDIR /home/botuser
 
 # Copy our Python bot to our home directory.
-COPY main.py .
+COPY main.py settings.py ./
 
 # Don't generate byte code (.pyc-files). 
 # These are only needed if we run the python-files several times.
