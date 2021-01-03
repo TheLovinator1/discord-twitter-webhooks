@@ -1,7 +1,10 @@
 # Discord-twitter-webhooks
 
-![Bot](/Bot.png)
-<sup>Theme is [DiscordNight by KillYoy](https://github.com/KillYoy/DiscordNight)<sup>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/TheLovinator1/discord-twitter-webhooks/master/Bot.png" />
+</p>
+
+<p align="center"><sup>Theme is [DiscordNight by KillYoy](https://github.com/KillYoy/DiscordNight)<sup></p>
 
 `discord-twitter-webhooks` is automated tool that checks [Twitter](https://twitter.com) for new tweets and sends them to a [Discord](https://discord.com/) webhook.
 
