@@ -255,6 +255,8 @@ WantedBy=default.target
 * Email: [tlovinator@gmail.com](mailto:tlovinator@gmail.com)
 * Discord: TheLovinator#9276
 * Steam: [TheLovinator](https://steamcommunity.com/id/TheLovinator/)
+* Send an issue: [discord-twitter-webhooks/issues](https://github.com/TheLovinator1/discord-twitter-webhooks/issues)
+* GitHub Discussions: [discord-twitter-webhooks/discussions](https://github.com/TheLovinator1/discord-twitter-webhooks/discussions)
 
 ## License
 
