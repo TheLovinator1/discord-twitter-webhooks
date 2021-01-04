@@ -250,7 +250,7 @@ WantedBy=default.target
 
 </details>
 
-## Get help
+## Need help?
 
 * Email: [tlovinator@gmail.com](mailto:tlovinator@gmail.com)
 * Discord: TheLovinator#9276
