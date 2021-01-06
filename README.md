@@ -29,14 +29,12 @@ services:
     container_name: discord-twitter-webhooks
     environment:
       - WEBHOOK_URL=${WEBHOOK_URL}
-      - WEBHOOK_URL_ERROR=${WEBHOOK_URL_ERROR}
       - CONSUMER_KEY=${CONSUMER_KEY}
       - CONSUMER_SECRET=${CONSUMER_SECRET}
       - ACCESS_TOKEN=${ACCESS_TOKEN}
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
       - USERS_TO_FOLLOW=${USERS_TO_FOLLOW}
       - LOG_LEVEL=${LOG_LEVEL}
-      - DISCORD_OWNER_ID=${DISCORD_OWNER_ID}
     restart: unless-stopped
 ```
 
@@ -49,7 +47,7 @@ No space should be between the equal sign in your .env.
 Right click channel you want the tweets in -> Integrations -> Webhooks -> New Webhook -> Copy Webhook URL
 
 * WEBHOOK_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
-* WEBHOOK_URL_ERROR=https://discordapp.com/api/webhooks/58304394/a3CMwHAXItB_lzBx0-CeVPI1ac1vT
+
   
 Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. If you don't get one try to fill out as much as possible. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
@@ -66,9 +64,6 @@ How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WA
 
 * LOG_LEVEL=INFO
 
-Enable Developer Mode in Discord settings and right click your username and Copy ID. This is used only for errors.
-
-* DISCORD_OWNER_ID=126462229892694018
 
 </details>
 <details>
@@ -78,14 +73,12 @@ Enable Developer Mode in Discord settings and right click your username and Copy
 docker run -d \
   --name=discord-twitter-webhooks \
   -e WEBHOOK_URL=https://discord.com/api/webhooks/151256151521/Drw1jBO9Xyo1hAVsvaNdI1d077dOsfsafAV-nxIDvH-XJeSIeAVavasvkM0Vu \
-  -e WEBHOOK_URL_ERROR=https://discord.com/api/webhooks/151256151521/Drw1jBO9Xyo1hAVsvaNdI1d077dOsfsafAV-nxIDvH-XJeSIeAVavasvkM0Vu \
   -e CONSUMER_KEY=akaopspokfpofasfsaf \
   -e CONSUMER_SECRET=fsa0fskaopfsoapfkofskaopfskopafskopaf \
   -e ACCESS_TOKEN=1521521515-JeASFAd0cGtASifvSSaSFmIr4kopAw8V0oyiH6jN \
   -e ACCESS_TOKEN_SECRET=VlHAS12FYqkQdASFd5XvyunwPaS12F8zPMTZ6IZASF1No \
   -e USERS_TO_FOLLOW=1114707756,36803580 \
   -e LOG_LEVEL=INFO \
-  -e DISCORD_OWNER_ID=126462229892694018 \
   --restart unless-stopped \
   thelovinator/discord-twitter-webhooks
 ```
@@ -99,7 +92,6 @@ No space should be between the equal sign in your .env.
 Right click channel you want the tweets in -> Integrations -> Webhooks -> New Webhook -> Copy Webhook URL
 
 * WEBHOOK_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
-* WEBHOOK_URL_ERROR=https://discordapp.com/api/webhooks/58304394/a3CMwHAXItB_lzBx0-CeVPI1ac1vT
   
 Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. If you don't get one try to fill out as much as possible. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
@@ -115,10 +107,6 @@ List of Twitter users to follow, comma separated list with no spaces.
 How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
 * LOG_LEVEL=INFO
-
-Enable Developer Mode in Discord settings and right click your username and Copy ID. This is used only for errors.
-
-* DISCORD_OWNER_ID=126462229892694018
 
 </details>
 <details>
@@ -140,8 +128,7 @@ No space should be between the equal sign in your .env.
 Right click channel you want the tweets in -> Integrations -> Webhooks -> New Webhook -> Copy Webhook URL
 
 * WEBHOOK_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
-* WEBHOOK_URL_ERROR=https://discordapp.com/api/webhooks/58304394/a3CMwHAXItB_lzBx0-CeVPI1ac1vT
-  
+
 Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. If you don't get one try to fill out as much as possible. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
 * CONSUMER_KEY=ASFkopkoasfPOFkopaf
@@ -156,10 +143,6 @@ List of Twitter users to follow, comma separated list with no spaces.
 How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
 * LOG_LEVEL=INFO
-
-Enable Developer Mode in Discord settings and right click your username and Copy ID. This is used only for errors.
-
-* DISCORD_OWNER_ID=126462229892694018
 
 </details>
 
@@ -186,7 +169,6 @@ No space should be between the equal sign in your .env.
 Right click channel you want the tweets in -> Integrations -> Webhooks -> New Webhook -> Copy Webhook URL
 
 * WEBHOOK_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
-* WEBHOOK_URL_ERROR=https://discordapp.com/api/webhooks/58304394/a3CMwHAXItB_lzBx0-CeVPI1ac1vT
   
 Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. If you don't get one try to fill out as much as possible. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
@@ -203,9 +185,6 @@ How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WA
 
 * LOG_LEVEL=INFO
 
-Enable Developer Mode in Discord settings and right click your username and Copy ID. This is used only for errors.
-
-* DISCORD_OWNER_ID=126462229892694018
 
 </details>
 

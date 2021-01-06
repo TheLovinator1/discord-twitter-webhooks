@@ -4,7 +4,7 @@ import html
 import logging.config
 import re
 import sys
-
+import logging
 import tweepy
 from dhooks import Embed, Webhook
 from tweepy import Stream
@@ -17,66 +17,49 @@ from settings import (
     consumer_secret,
     users_to_follow,  # TODO: Add support for twitter usernames
     log_level,
-    owner_id,
     webhook_url,
-    webhook_url_error,
 )
 
-logger = logging
-logger.basicConfig(format="%(asctime)s - %(message)s", level=log_level)
 
-level = logging.getLevelName(log_level)
-
-logger.debug(f"Consumer key: {consumer_key}")
-logger.debug(f"Consumer secret: {consumer_secret}")
-logger.debug(f"Access Token: {access_token}")
-logger.debug(f"Access Token Secret: {access_token_secret}")
-logger.debug(f"Users to follow: {users_to_follow}")
-logger.debug(f"Webhook url for errors: {webhook_url_error}")
-logger.debug(f"Webhook url: {owner_id}")
-logger.debug(f"Discord owner ID: {webhook_url}")
-
-
-def tweet_text(tweet):
-    """Check if the tweet is truncated and get full tweet"""
+def get_text(tweet) -> str:
     try:
         text = tweet.extended_tweet["full_text"]
-        logger.debug(f"Tweet is extended:\n\t{text}")
+        logger.debug(f"Tweet is extended:\n{text}")
         return text
     except AttributeError:
         text = tweet.text
-        logger.debug(f"Tweet is not extended:\n\t{text}")
+        logger.debug(f"Tweet is not extended:\n{text}")
         return text
 
 
-def tweet_media_links(tweet):
+def get_media_links(tweet):
     link_list = []
     if "media" in tweet.entities:
         for media in tweet.extended_entities["media"]:
             logger.debug(f"Media: {media['media_url_https']}")
             link = media["media_url_https"]
             link_list.append(link)
-            logger.debug(f"Link list: {link_list}")
+            logger.debug(f"Links found in tweet: {link_list}")
         return link_list
 
 
-def get_avatar_url(tweet):
-    """Remove the "_normal.jpg" part in url to get higher quality"""
-    avatar_hd = tweet.user.profile_image_url_https[:-11]
-    extension = tweet.user.profile_image_url_https[-4:]
-    avatar_url = f"{avatar_hd}{extension}"
-    return avatar_url
+def get_avatar_url(tweet) -> str:
+    avatar_url = tweet.user.profile_image_url_https
+    logger.debug(f"Avatar URL: {avatar_url}")
+    return avatar_url.replace("_normal.jpg", ".jpg")
 
 
-def replace_tco_link_with_real_link(tweet, text):
+def replace_tco_link_with_real_link(tweet, text: str) -> str:
     # TODO: Make this work for images too
     try:
         for url in tweet.extended_tweet["entities"]["urls"]:
             text = text.replace(url["url"], url["expanded_url"])
+        logger.debug(f"Replaced t.co URLs with real URLs: {text}")
         return text
     except AttributeError:
         for url in tweet.entities["urls"]:
             text = text.replace(url["url"], url["expanded_url"])
+        logger.debug(f"Replaced t.co URLs with real URLs: {text}")
         return text
 
 
@@ -87,7 +70,7 @@ def _regex_substitutor(pattern: str, replacement: str, string: str) -> str:
     return substitute
 
 
-def twitter_regex(text):
+def twitter_regex(text: str) -> str:
     regex_dict = {  # I have no idea what I am doing so don't judge my regex lol
         # Replace @username with link
         r"@(\w*)": r"[\g<0>](https://twitter.com/\g<1>)",
@@ -104,19 +87,17 @@ def twitter_regex(text):
     for pat, rep in regex_dict.items():
         text = _regex_substitutor(pattern=pat, replacement=rep, string=text)
 
+    logger.debug(f"After we add links to tweet: {text}")
     return text
 
 
-def send_error_webhook(error):
-    logger.error(f"Error: {error}")
-    hook = Webhook(webhook_url_error)
-    hook.send(
-        f"<@{owner_id}> I'm broken again <:PepeHands:461899012136632320>\n{error}"
-    )
-    return False
+def send_text_webhook(text: str):
+    logger.error(f"Webhook text: {text}")
+    hook = Webhook(webhook_url)
+    hook.send(text)
 
 
-def make_webhook_embed(avatar, tweet, link_list, text):
+def send_embed_webhook(avatar: str, tweet, link_list, text: str):
     logger.debug(f"Tweet: {text}")
     hook = Webhook(webhook_url)
     embed = Embed(
@@ -139,90 +120,69 @@ def make_webhook_embed(avatar, tweet, link_list, text):
         if links:
             hook.send(f"I found some links:\n{links}")
 
-    logger.info("Posted.")
+    logger.info("Webhook posted.")
 
 
 def main(tweet):
     logger.debug(f"Raw tweet before any modifications: {tweet}")
 
-    # The text from the tweet
-    text = tweet_text(tweet=tweet)
-    logger.debug(f"Text extracted from the tweet: {text}")
+    media_links = get_media_links(tweet)
+    avatar = get_avatar_url(tweet)
 
-    # Change &amp; to &
-    text_convert_safe_html_unicode = html.unescape(text)
+    text = get_text(tweet)
+    unescaped_text = html.unescape(text)
     logger.debug(f"Safe HTML converted to unsafe HTML: {text}")
+    text_with_links = replace_tco_link_with_real_link(tweet=tweet, text=unescaped_text)
+    regex = twitter_regex(text_with_links)
 
-    # Images from the tweet
-    media_links = tweet_media_links(tweet=tweet)
-    logger.debug(f"Media links found in tweet: {media_links}")
-
-    # Get user avatar
-    avatar = get_avatar_url(tweet=tweet)
-    logger.debug(f"Avatar from tweeter: {avatar}")
-
-    # Replace t.co URL with real URL
-    text_replaced = replace_tco_link_with_real_link(
-        tweet=tweet, text=text_convert_safe_html_unicode
-    )
-    logger.debug(f"Replaced t.co URLs with real URLs: {text_replaced}")
-
-    # Replace username, hashtag and subreddit with links
-    regex = twitter_regex(text=text_replaced)
-    logger.debug("After we add links to tweet: " + str(regex))
-
-    # Send webhook to Discord
-    make_webhook_embed(avatar=avatar, tweet=tweet, text=regex, link_list=media_links)
-    logger.debug("Sent webhook to Discord")
+    send_embed_webhook(avatar=avatar, tweet=tweet, link_list=media_links, text=regex)
 
 
 class MyStreamListener(tweepy.StreamListener):
     def on_connect(self):
-        print("You are now connected to the streaming API.")
+        print("I am now connected to the streaming API.")
 
     def on_status(self, tweet):
         """Called when a new status arrives"""
-        try:
-            if tweet.retweeted or "RT @" in tweet.text:
-                logger.debug(
-                    f"Tweet(https://twitter.com/i/web/status/{tweet.id}) is retweet. Skipping"
-                )
-                return
-            if tweet.in_reply_to_screen_name is not None:
-                logger.debug(
-                    f"Tweet(https://twitter.com/i/web/status/{tweet.id}) is reply. Skipping"
-                )
-                return
-            main(tweet=tweet)
+        if tweet.retweeted or "RT @" in tweet.text:
+            return
 
-        except Exception as error:
-            send_error_webhook(
-                f"on_status failed!\n"
-                f"[{tweet.user.screen_name}](https://twitter.com/i/web/status/{tweet.id}): {tweet.text}\n"
-                f"Error: {error}"
-            )
+        if tweet.in_reply_to_screen_name is not None:
+            return
 
-    def on_error(self, error_code):
+        main(tweet=tweet)
+
+    def on_error(self, error_code: int):
         if error_code == 420:
-            send_error_webhook(
+            logger.critical(
                 "Can't connect to Twitter. Too many login attempts or running too many copies of the same "
                 "credentials. "
             )
             sys.exit(1)
-        send_error_webhook(f"on_error: {error_code}")
+        logger.error(f"on_error: {error_code}")
 
-    def on_delete(self, status_id, user_id):
+    def on_delete(self, status_id: int, user_id: int):
         """Called when a delete notice arrives for a status"""
-        send_error_webhook(
+        send_text_webhook(
             f"[Tweet](https://twitter.com/i/web/status/{status_id}) from {api.get_user(user_id).screen_name} was deleted."
         )
 
     def on_exception(self, exception):
-        send_error_webhook(f"Called when an unhandled exception occurs:\n{exception}")
+        logger.error(f"Unhandled exception occured:\n{exception}")
 
 
 if __name__ == "__main__":
-    print("Bot started.")
+    logger = logging
+    logger.basicConfig(format="%(asctime)s - %(message)s", level=log_level)
+
+    level = logging.getLevelName(log_level)
+
+    logger.debug(f"Consumer key: {consumer_key}")
+    logger.debug(f"Consumer secret: {consumer_secret}")
+    logger.debug(f"Access Token: {access_token}")
+    logger.debug(f"Access Token Secret: {access_token_secret}")
+    logger.debug(f"Users to follow: {users_to_follow}")
+    logger.debug(f"Webhook url: {webhook_url}")
 
     # Authenticate to the Twitter API
     api = tweepy.API(auth)
@@ -233,7 +193,7 @@ if __name__ == "__main__":
 
     user_list = [x.strip() for x in users_to_follow.split(",")]
     for twitter_id in user_list:
-        """ Print users we follow. """
+        # Print the users we have in our config file.
         username = api.get_user(twitter_id)
         print(f"{twitter_id} - {username.screen_name}")
 
