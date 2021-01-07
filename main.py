@@ -50,16 +50,26 @@ def get_avatar_url(tweet) -> str:
 
 
 def replace_tco_link_with_real_link(tweet, text: str) -> str:
-    # TODO: Make this work for images too
     try:
         for url in tweet.extended_tweet["entities"]["urls"]:
             text = text.replace(url["url"], url["expanded_url"])
         logger.debug(f"Replaced t.co URLs with real URLs: {text}")
+
+        for image in tweet.extended_tweet["entities"]["media"]:
+            text = text.replace(image["url"], image["expanded_url"])
+        logger.debug(f"Replaced t.co image URLs with real URLs: {text}")
+
         return text
+
     except AttributeError:
         for url in tweet.entities["urls"]:
             text = text.replace(url["url"], url["expanded_url"])
         logger.debug(f"Replaced t.co URLs with real URLs: {text}")
+
+        for image in tweet.entities["media"]:
+            text = text.replace(image["url"], image["expanded_url"])
+        logger.debug(f"Replaced t.co image URLs with real URLs: {text}")
+
         return text
 
 
@@ -100,11 +110,21 @@ def send_text_webhook(text: str):
 def send_embed_webhook(avatar: str, tweet, link_list, text: str):
     logger.debug(f"Tweet: {text}")
     hook = Webhook(webhook_url)
+
+    if link_list is not None:
+        new_text = text.replace(link_list[0], "")
+
+    else:
+        new_text = text
+
     embed = Embed(
-        description=text,
-        color=0x1E0F3,  # Light blue
-        timestamp="now",  # Set the timestamp to current time
+        description=new_text,
+        color=0x1E0F3,
+        timestamp="now",
     )
+
+    if link_list is not None:
+        embed.set_image(link_list[0])
 
     embed.set_author(
         icon_url=avatar,
@@ -134,7 +154,6 @@ def main(tweet):
     logger.debug(f"Safe HTML converted to unsafe HTML: {text}")
     text_with_links = replace_tco_link_with_real_link(tweet=tweet, text=unescaped_text)
     regex = twitter_regex(text_with_links)
-
     send_embed_webhook(avatar=avatar, tweet=tweet, link_list=media_links, text=regex)
 
 
