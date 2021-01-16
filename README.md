@@ -246,7 +246,7 @@ WantedBy=default.target
 
 ## Privacy
 
-If the tweet has more than 1 image this bot send the tweet ID to [twitter.lovinator.space](https://twitter.lovinator.space/) that combines them into one image that we can use in the embed.
+If the tweet has more than 1 image this bot sends the tweet ID to [twitter.lovinator.space](https://twitter.lovinator.space/) that combines them into one image that we can use in the embed.
 The only information stored is the tweet ID and combined image. No other information will be saved (e.g. IP address)
 You can run [your own version](https://github.com/TheLovinator1/twitter-image-collage-maker) instead of using the default one.
 
