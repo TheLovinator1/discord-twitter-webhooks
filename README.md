@@ -35,6 +35,7 @@ services:
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
       - USERS_TO_FOLLOW=${USERS_TO_FOLLOW}
       - LOG_LEVEL=${LOG_LEVEL}
+      - TWITTER_IMAGE_COLLAGE_API=${TWITTER_IMAGE_COLLAGE_API}
     restart: unless-stopped
 ```
 
@@ -46,24 +47,26 @@ No space should be between the equal sign in your .env.
 
 Right click channel you want the tweets in -> Integrations -> Webhooks -> New Webhook -> Copy Webhook URL
 
-* WEBHOOK_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
+* WEBHOOK\_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
 
-  
 Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. If you don't get one try to fill out as much as possible. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
-* CONSUMER_KEY=ASFkopkoasfPOFkopaf
-* CONSUMER_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
-* ACCESS_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
-* ACCESS_TOKEN_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
+* CONSUMER\_KEY=ASFkopkoasfPOFkopaf
+* CONSUMER\_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
+* ACCESS\_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
+* ACCESS\_TOKEN\_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
 
 List of Twitter users to follow, comma separated list with no spaces.
 
-* USERS_TO_FOLLOW=12549841489201410,18205090125,852185020125098
+* USERS\_TO\_FOLLOW=12549841489201410,18205090125,852185020125098
 
 How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
-* LOG_LEVEL=INFO
+* LOG\_LEVEL=INFO
 
+Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/twitter-image-collage-maker). See [Privacy](#privacy) for more information.
+
+* TWITTER\_IMAGE\_COLLAGE\_API=https://twitter.lovinator.space/add
 
 </details>
 <details>
@@ -79,6 +82,7 @@ docker run -d \
   -e ACCESS_TOKEN_SECRET=VlHAS12FYqkQdASFd5XvyunwPaS12F8zPMTZ6IZASF1No \
   -e USERS_TO_FOLLOW=1114707756,36803580 \
   -e LOG_LEVEL=INFO \
+  -e TWITTER_IMAGE_COLLAGE_API=https://twitter.lovinator.space/add \
   --restart unless-stopped \
   thelovinator/discord-twitter-webhooks
 ```
@@ -91,22 +95,26 @@ No space should be between the equal sign in your .env.
 
 Right click channel you want the tweets in -> Integrations -> Webhooks -> New Webhook -> Copy Webhook URL
 
-* WEBHOOK_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
+* WEBHOOK\_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
   
 Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. If you don't get one try to fill out as much as possible. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
-* CONSUMER_KEY=ASFkopkoasfPOFkopaf
-* CONSUMER_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
-* ACCESS_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
-* ACCESS_TOKEN_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
+* CONSUMER\_KEY=ASFkopkoasfPOFkopaf
+* CONSUMER\_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
+* ACCESS\_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
+* ACCESS\_TOKEN_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
 
 List of Twitter users to follow, comma separated list with no spaces.
 
-* USERS_TO_FOLLOW=12549841489201410,18205090125,852185020125098
+* USERS\_TO\_FOLLOW=12549841489201410,18205090125,852185020125098
 
 How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
-* LOG_LEVEL=INFO
+* LOG\_LEVEL=INFO
+
+Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/twitter-image-collage-maker). See [Privacy](#privacy) for more information.
+
+* TWITTER_IMAGE_COLLAGE_API=https://twitter.lovinator.space/add
 
 </details>
 <details>
@@ -127,22 +135,26 @@ No space should be between the equal sign in your .env.
 
 Right click channel you want the tweets in -> Integrations -> Webhooks -> New Webhook -> Copy Webhook URL
 
-* WEBHOOK_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
+* WEBHOOK\_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
 
 Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. If you don't get one try to fill out as much as possible. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
-* CONSUMER_KEY=ASFkopkoasfPOFkopaf
-* CONSUMER_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
-* ACCESS_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
-* ACCESS_TOKEN_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
+* CONSUMER\_KEY=ASFkopkoasfPOFkopaf
+* CONSUMER\_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
+* ACCESS\_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
+* ACCESS\_TOKEN\_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
 
 List of Twitter users to follow, comma separated list with no spaces.
 
-* USERS_TO_FOLLOW=12549841489201410,18205090125,852185020125098
+* USERS\_TO\_FOLLOW=12549841489201410,18205090125,852185020125098
 
 How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
-* LOG_LEVEL=INFO
+* LOG\_LEVEL=INFO
+
+Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/twitter-image-collage-maker). See [Privacy](#privacy) for more information.
+
+* TWITTER\_IMAGE\_COLLAGE\_API=https://twitter.lovinator.space/add
 
 </details>
 
@@ -168,23 +180,26 @@ No space should be between the equal sign in your .env.
 
 Right click channel you want the tweets in -> Integrations -> Webhooks -> New Webhook -> Copy Webhook URL
 
-* WEBHOOK_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
+* WEBHOOK\_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
   
 Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. If you don't get one try to fill out as much as possible. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
-* CONSUMER_KEY=ASFkopkoasfPOFkopaf
-* CONSUMER_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
-* ACCESS_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
-* ACCESS_TOKEN_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
+* CONSUMER\_KEY=ASFkopkoasfPOFkopaf
+* CONSUMER\_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
+* ACCESS\_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
+* ACCESS\_TOKEN\_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
 
 List of Twitter users to follow, comma separated list with no spaces.
 
-* USERS_TO_FOLLOW=12549841489201410,18205090125,852185020125098
+* USERS\_TO\_FOLLOW=12549841489201410,18205090125,852185020125098
 
 How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
-* LOG_LEVEL=INFO
+* LOG\_LEVEL=INFO
 
+Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/twitter-image-collage-maker). See [Privacy](#privacy) for more information.
+
+* TWITTER\_IMAGE\_COLLAGE\_API=https://twitter.lovinator.space/add
 
 </details>
 
@@ -228,6 +243,12 @@ WantedBy=default.target
   * `journalctl --user-unit discord-twitter-webhooks`
 
 </details>
+
+## Privacy
+
+If the tweet has more than 1 image this bot send the tweet ID to [twitter.lovinator.space](https://twitter.lovinator.space/) that combines them into one image that we can use in the embed.
+The only information stored is the tweet ID and combined image. No other information will be saved (e.g. IP address)
+You can run [your own version](https://github.com/TheLovinator1/twitter-image-collage-maker) instead of using the default one.
 
 ## Need help?
 
