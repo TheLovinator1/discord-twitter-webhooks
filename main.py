@@ -222,6 +222,11 @@ if __name__ == "__main__":
 
     # Authenticate to the Twitter API
     api = tweepy.API(auth)
+    
+    for index, item in enumerate(users_to_follow):
+        users_to_follow[index] = api.get_user(item).id_str
+    users_to_follow = ', '.join(users_to_follow)
+    
     listener = MyStreamListener()
     stream = Stream(auth, listener)
 
