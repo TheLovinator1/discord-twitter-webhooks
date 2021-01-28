@@ -161,7 +161,7 @@ Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/
 <details>
 <summary><b>Get discord-twitter-webhooks with <code>Python</code> with <code>pip</code></b></summary>
 
-* Install latest version of [git](https://git-scm.com/) and [Python 3.9](https://www.python.org/)
+* Install latest version of [git](https://git-scm.com/) and [Python](https://www.python.org/)
 * Download project from GitHub and change directory into it
 * (Optional) Create virtual environment:
   * `python -m venv .venv`
