@@ -15,6 +15,41 @@ This bot is configured with a config file or environment variables and is writte
 *(click to expand the sections below for full setup instructions)*
 
 <details>
+<summary><b>Get discord-twitter-webhooks for <code>Windows</code></b></summary><br/><br/>
+
+* Download [zip-file](https://github.com/TheLovinator1/discord-twitter-webhooks/releases/download/v1.0/discord-twitter-webhooks.zip) and extract.
+* Rename .env.example to .env and fill it out.
+* Run discord-twitter-webhooks.exe
+
+## Environment variables
+
+No space should be between the equal sign in your .env.
+
+Right click channel you want the tweets in -> Integrations -> Webhooks -> New Webhook -> Copy Webhook URL
+
+* WEBHOOK\_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
+
+Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. If you don't get one try to fill out as much as possible. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
+
+* CONSUMER\_KEY=ASFkopkoasfPOFkopaf
+* CONSUMER\_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
+* ACCESS\_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
+* ACCESS\_TOKEN\_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
+
+List of Twitter users to follow, comma separated list with no spaces.
+
+* USERS\_TO\_FOLLOW=12549841489201410,18205090125,852185020125098
+
+How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
+
+* LOG\_LEVEL=INFO
+
+Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/twitter-image-collage-maker). See [Privacy](#privacy) for more information.
+
+* TWITTER\_IMAGE\_COLLAGE\_API=https://twitter.lovinator.space/add
+
+</details>
+<details>
 <summary><b>Get discord-twitter-webhooks with <code>docker-compose</code></b></summary><br/><br/>
 
 docker-compose.yml:
