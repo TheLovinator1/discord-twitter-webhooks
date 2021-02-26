@@ -8,7 +8,7 @@
 
 `discord-twitter-webhooks` is automated tool that checks [Twitter](https://twitter.com) for new tweets and sends them to a [Discord](https://discord.com/) webhook.
 
-This bot is configured with a config file or environment variables and is written in Python 3.
+This bot is configured with a config file or environment variables and is written in Python.
 
 ## Installation
 
@@ -29,7 +29,7 @@ Right click channel you want the tweets in -> Integrations -> Webhooks -> New We
 
 * WEBHOOK\_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
 
-Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. If you don't get one try to fill out as much as possible. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
+Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
 * CONSUMER\_KEY=ASFkopkoasfPOFkopaf
 * CONSUMER\_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
@@ -84,7 +84,7 @@ Right click channel you want the tweets in -> Integrations -> Webhooks -> New We
 
 * WEBHOOK\_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
 
-Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. If you don't get one try to fill out as much as possible. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
+Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
 * CONSUMER\_KEY=ASFkopkoasfPOFkopaf
 * CONSUMER\_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
@@ -132,7 +132,7 @@ Right click channel you want the tweets in -> Integrations -> Webhooks -> New We
 
 * WEBHOOK\_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
   
-Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. If you don't get one try to fill out as much as possible. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
+Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
 * CONSUMER\_KEY=ASFkopkoasfPOFkopaf
 * CONSUMER\_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
@@ -152,47 +152,6 @@ Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/
 * TWITTER_IMAGE_COLLAGE_API=https://twitter.lovinator.space/add
 
 </details>
-<details>
-<summary><b>Get discord-twitter-webhooks with <code>Python</code> with <code>pipenv</code></b></summary>
-
-* Install latest version of [git](https://git-scm.com/) and [Python 3.9](https://www.python.org/).
-* Install pipenv
-  * `pip install pipenv`
-* Install requirements and make virtual environment
-  * `pipenv install`
-* Rename .env.example to .env and fill it with things from [Twitter](https://developer.twitter.com) and [TweeterID](https://tweeterid.com). If you don't want to use the .env-file you can add variables to your environment.
-* Start the bot
-  * `pipenv run python main.py`
-
-## Environment variables
-
-No space should be between the equal sign in your .env.
-
-Right click channel you want the tweets in -> Integrations -> Webhooks -> New Webhook -> Copy Webhook URL
-
-* WEBHOOK\_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
-
-Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. If you don't get one try to fill out as much as possible. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
-
-* CONSUMER\_KEY=ASFkopkoasfPOFkopaf
-* CONSUMER\_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
-* ACCESS\_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
-* ACCESS\_TOKEN\_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
-
-List of Twitter users to follow, comma separated list with no spaces.
-
-* USERS\_TO\_FOLLOW=12549841489201410,18205090125,852185020125098
-
-How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
-
-* LOG\_LEVEL=INFO
-
-Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/twitter-image-collage-maker). See [Privacy](#privacy) for more information.
-
-* TWITTER\_IMAGE\_COLLAGE\_API=https://twitter.lovinator.space/add
-
-</details>
-
 <details>
 <summary><b>Get discord-twitter-webhooks with <code>Python</code> with <code>pip</code></b></summary>
 
@@ -217,7 +176,7 @@ Right click channel you want the tweets in -> Integrations -> Webhooks -> New We
 
 * WEBHOOK\_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
   
-Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. If you don't get one try to fill out as much as possible. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
+Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
 * CONSUMER\_KEY=ASFkopkoasfPOFkopaf
 * CONSUMER\_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
@@ -235,47 +194,6 @@ How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WA
 Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/twitter-image-collage-maker). See [Privacy](#privacy) for more information.
 
 * TWITTER\_IMAGE\_COLLAGE\_API=https://twitter.lovinator.space/add
-
-</details>
-
-<details>
-<summary><b>Automatic start-up on Linux with <code>systemd user services</code></b></summary>
-
-All the user services will be placed in ~/.config/systemd/user/.
-
-User instance of systemd does not inherit any of the environment variables set in places like .bashrc so I recommend you use the .env file.
-
-You may have to modify WorkingDirectory and/or ExecStart. The example have it cloned directly in home.
-
-```ini
-~/.config/systemd/user/discord-twitter-webhooks.service
-
-[Unit]
-Description=discord-twitter-webhooks
-Wants=network-online.target
-After=network-online.target
-
-[Service]
-Type=simple
-WorkingDirectory=%h/discord-twitter-webhooks
-ExecStart=/usr/bin/pipenv run python %h/discord-twitter-webhooks/main.py
-Restart=always
-
-[Install]
-WantedBy=default.target
-```
-
-* Start the bot. (You can also use stop and restart instead of start)
-  * `systemctl --user start discord-twitter-webhooks`
-
-* Start bot automatically at boot. You may need to run `loginctl enable-linger`
-  * `systemctl --user enable discord-twitter-webhooks`
-
-* Check status
-  * `systemctl --user status discord-twitter-webhooks`
-  
-* Reading the journal
-  * `journalctl --user-unit discord-twitter-webhooks`
 
 </details>
 
