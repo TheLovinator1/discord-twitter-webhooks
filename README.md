@@ -6,6 +6,10 @@
 
 <p align="center"><sup> Theme is https://github.com/KillYoy/DiscordNight <sup></p>
 
+![Docker Pulls](https://img.shields.io/docker/pulls/thelovinator/discord-twitter-webhooks)
+
+This bot on [Docker Hub](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).
+
 `discord-twitter-webhooks` is automated tool that checks [Twitter](https://twitter.com) for new tweets and sends them to a [Discord](https://discord.com/) webhook.
 
 This bot is configured with a config file or environment variables and is written in Python.
@@ -74,7 +78,7 @@ services:
     restart: unless-stopped
 ```
 
-This bot on [Docker Hub](https://hub.docker.com/repository/docker/thelovinator/discord-reminder-bot).
+This bot on [Docker Hub](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).
 
 ## Environment variables
 
@@ -122,7 +126,7 @@ docker run -d \
   thelovinator/discord-twitter-webhooks
 ```
 
-This bot on [Docker Hub](https://hub.docker.com/repository/docker/thelovinator/discord-reminder-bot).
+This bot on [Docker Hub](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).
 
 ## Environment variables
 
