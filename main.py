@@ -195,13 +195,6 @@ class MyStreamListener(tweepy.StreamListener):
             sys.exit(msg)
         logger.error(f"on_error: {error_code}")
 
-    def on_delete(self, status_id: int, user_id: int):
-        """Called when a delete notice arrives for a status"""
-        send_text_webhook(
-            f"[Tweet](https://twitter.com/i/web/status/{status_id}) "
-            f"from {api.get_user(user_id).screen_name} was deleted."
-        )
-
     def on_exception(self, exception):
         logger.error(f"Unhandled exception occured:\n{exception}")
 
