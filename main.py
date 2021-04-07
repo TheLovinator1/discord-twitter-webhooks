@@ -142,7 +142,8 @@ def send_embed_webhook(avatar: str, tweet, link_list, text: str):
                 embed.set_image(json_data["url"])
             else:
                 logger.error(
-                    f"Failed to get response from {twitter_image_collage_maker}. Using first image instead."
+                    f"Failed to get response from {twitter_image_collage_maker}. "
+                    "Using first image instead."
                 )
                 embed.set_image(link_list[0])
 
@@ -196,7 +197,7 @@ class MyStreamListener(tweepy.StreamListener):
         logger.error(f"on_error: {error_code}")
 
     def on_exception(self, exception):
-        logger.error(f"Unhandled exception occured:\n{exception}")
+        logger.error(f"Unhandled exception occurred:\n{exception}")
 
 
 if __name__ == "__main__":
