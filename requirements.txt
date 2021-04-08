@@ -4,7 +4,7 @@ attrs==20.3.0
 certifi==2020.12.5
 chardet==4.0.0
 git+git://github.com/kyb3r/dhooks.git#egg=dhooks
-idna==2.10
+idna==3.1
 multidict==5.1.0
 oauthlib==3.1.0
 PySocks==1.7.1
