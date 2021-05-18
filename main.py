@@ -2,10 +2,10 @@
 
 import html
 import json
-import logging.config
+import logging
 import re
 import sys
-import logging
+
 import requests
 import tweepy
 from dhooks import Embed, Webhook
@@ -32,27 +32,32 @@ def get_text(tweet) -> str:
     except AttributeError:
         text = tweet.text
         logger.debug(f"Tweet is not extended: {text}")
-
     return text
 
 
-def get_media_links(tweet, text: str) -> tuple:
+def get_media_links_and_remove_url(tweet, text: str) -> tuple:
     link_list = []
+
+    logger.debug(f"Found image in: https://twitter.com/i/web/status/{tweet.id}")
     try:
-        if "media" in tweet._json["extended_tweet"]["extended_entities"]:
-            for image in tweet._json["extended_tweet"]["extended_entities"]["media"]:
+        # Tweet is more than 140 characters
+        for image in tweet.extended_tweet["extended_entities"]["media"]:
+            link_list.append(image["media_url_https"])
+            text = text.replace(image["url"], "")
+    except KeyError:
+        # Tweet has no links
+        pass
+
+    except AttributeError:
+        # Tweet is less than 140 characters
+        try:
+            for image in tweet.extended_entities["media"]:
                 link_list.append(image["media_url_https"])
                 text = text.replace(image["url"], "")
-            logger.debug("Found image in extended_tweet-extended_entities-media")
-    except KeyError:
-        try:
-            if "media" in tweet._json["extended_entities"]:
-                for image in tweet._json["extended_entities"]["media"]:
-                    link_list.append(image["media_url_https"])
-                    text = text.replace(image["url"], "")
-                logger.debug("Found image in extended_entities-media")
-        except KeyError:
-            logger.debug("Couldn't find any images in tweet")
+        except AttributeError:
+            # Tweet has no links
+            pass
+
     return link_list, text
 
 
@@ -64,21 +69,19 @@ def get_avatar_url(tweet) -> str:
 
 def replace_tco_url_link_with_real_link(tweet, text: str) -> str:
     try:
-        if "urls" in tweet._json["extended_tweet"]["extended_entities"]:
-            for url in tweet._json["extended_tweet"]["extended_entities"]["urls"]:
-                text = text.replace(url["url"], url["expanded_url"])
-            logger.debug("Found url in extended_tweet-extended_entities-urls")
-    except KeyError:
+        # Tweet is more than 140 characters
+        for url in tweet.extended_tweet["entities"]["urls"]:
+            text = text.replace(url["url"], url["expanded_url"])
+
+    except AttributeError:
+        # Tweet is less than 140 characters
         try:
-            if "urls" in tweet._json["extended_entities"]:
-                for url in tweet._json["extended_entities"]["urls"]:
-                    text = text.replace(url["url"], url["expanded_url"])
-                logger.debug("Found url in extended_entities-urls")
-        except KeyError:
-            if "urls" in tweet._json["entities"]:
-                for url in tweet._json["entities"]["urls"]:
-                    text = text.replace(url["url"], url["expanded_url"])
-                logger.debug("Found url in entities-urls")
+
+            for url in tweet.entities["urls"]:
+                text = text.replace(url["url"], url["expanded_url"])
+        except AttributeError:
+            # Tweet has no links
+            pass
     return text
 
 
@@ -127,7 +130,7 @@ def send_embed_webhook(avatar: str, tweet, link_list, text: str):
     )
     if link_list is not None:
         if len(link_list) == 1:
-            logger.debug("Found one image")
+            logger.debug(f"Found one image: {link_list[0]}")
             embed.set_image(link_list[0])
 
         elif len(link_list) > 1:
@@ -161,7 +164,7 @@ def send_embed_webhook(avatar: str, tweet, link_list, text: str):
 def main(tweet):
     logger.debug(f"Raw tweet before any modifications: {tweet}")
     text = get_text(tweet)
-    media_links, text_media_links = get_media_links(tweet, text)
+    media_links, text_media_links = get_media_links_and_remove_url(tweet, text)
     avatar = get_avatar_url(tweet)
 
     unescaped_text = html.unescape(text_media_links)
