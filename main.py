@@ -4,7 +4,6 @@ import html
 import json
 import logging
 import re
-import sys
 
 import requests
 import tweepy
@@ -17,10 +16,10 @@ from settings import (
     auth,
     consumer_key,
     consumer_secret,
-    users_to_follow,  # TODO: Add support for twitter usernames
     log_level,
-    webhook_url,
     twitter_image_collage_maker,
+    users_to_follow,
+    webhook_url,
 )
 
 
@@ -76,7 +75,6 @@ def replace_tco_url_link_with_real_link(tweet, text: str) -> str:
     except AttributeError:
         # Tweet is less than 140 characters
         try:
-
             for url in tweet.entities["urls"]:
                 text = text.replace(url["url"], url["expanded_url"])
         except AttributeError:
@@ -175,10 +173,7 @@ def main(tweet):
     send_embed_webhook(avatar=avatar, tweet=tweet, link_list=media_links, text=regex)
 
 
-class MyStreamListener(tweepy.StreamListener):
-    def on_connect(self):
-        print("I am now connected to the streaming API.")
-
+class MyStreamListener(Stream):
     def on_status(self, tweet):
         """Called when a new status arrives"""
         if tweet.retweeted or "RT @" in tweet.text:
@@ -188,19 +183,6 @@ class MyStreamListener(tweepy.StreamListener):
             return
 
         main(tweet=tweet)
-
-    def on_error(self, error_code: int):
-        if error_code == 420:
-            msg = (
-                "Can't connect to Twitter. "
-                "Too many login attempts or running too many copies of the same credentials."
-            )
-            logger.critical(msg)
-            sys.exit(msg)
-        logger.error(f"on_error: {error_code}")
-
-    def on_exception(self, exception):
-        logger.error(f"Unhandled exception occurred:\n{exception}")
 
 
 if __name__ == "__main__":
@@ -219,17 +201,16 @@ if __name__ == "__main__":
 
     # Authenticate to the Twitter API
     api = tweepy.API(auth)
-    listener = MyStreamListener()
-    stream = Stream(auth, listener)
-
-    logger.info(f"API key belongs to {api.me().screen_name}")
+    stream = MyStreamListener(
+        consumer_key, consumer_secret, access_token, access_token_secret
+    )
 
     user_list = [x.strip() for x in users_to_follow.split(",")]
     for twitter_id in user_list:
         # Print the users we have in our config file.
-        username = api.get_user(twitter_id)
+        username = api.get_user(user_id=twitter_id)
         print(f"{twitter_id} - {username.screen_name}")
 
     # Streams are only terminated if the connection is closed, blocking the
     # thread. The async parameter makes the stream run on a new thread.
-    stream.filter(follow=user_list, stall_warnings=True, is_async=True)
+    stream.filter(follow=user_list, stall_warnings=True)
