@@ -204,11 +204,15 @@ class MyStreamListener(Stream):
                 return
         # Tweet is a reply
         elif tweet.in_reply_to_user_id is not None:
-            if tweet.user.id_str == tweet.in_reply_to_user_id_str:
-                logger.info("We replied to our self")
-                main(tweet=tweet)
-                return
-            elif tweet.user.id_str in user_list_replies_to_other_tweet_split:
+            # FIXME: If somebody else responds to their own reply in our tweet this activates.
+            # We need to check who the original tweet author is.
+            #
+            # if tweet.user.id_str == tweet.in_reply_to_user_id_str:
+            #     logger.info("We replied to our self")
+            #     main(tweet=tweet)
+            #     return
+            #
+            if tweet.user.id_str in user_list_replies_to_other_tweet_split:
                 logger.info("We replied to someone")
                 main(tweet=tweet)
                 return
@@ -218,7 +222,7 @@ class MyStreamListener(Stream):
                 return
             else:
                 logger.info(
-                    "We didn't reply to ourself, someone else or someone replied to us. "
+                    "We didn't reply to our self, someone else or someone replied to us. "
                     "Or it is not active in the environment variables."
                 )
                 return
