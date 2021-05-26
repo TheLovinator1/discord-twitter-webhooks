@@ -44,6 +44,26 @@ List of Twitter users to follow, comma separated list with no spaces.
 
 * USERS\_TO\_FOLLOW=12549841489201410,18205090125,852185020125098
 
+Get replies to other people: (Optional)
+
+* USER_LIST_REPLIES_TO_OTHERS_TWEET=12549841489201410,852185020125098
+
+Get replies from other people on our tweets: (Optional)
+
+* USER_LIST_REPLIES_TO_OUR_TWEET=12549841489201410,852185020125098
+
+Get message when user retweets tweet: (Optional)
+
+* USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET=12549841489201410,18205090125
+
+Get message when users tweet is retweeted by someone else: (Optional)
+
+* USER_LIST_SOMEONE_RETWEETS_OUR_TWEET=18205090125
+
+Should we message when a user retweets their own tweet? True or False
+
+* GET_RETWEET_OF_OWN_TWEET=False
+
 How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
 * LOG\_LEVEL=INFO
@@ -99,6 +119,26 @@ List of Twitter users to follow, comma separated list with no spaces.
 
 * USERS\_TO\_FOLLOW=12549841489201410,18205090125,852185020125098
 
+Get replies to other people: (Optional)
+
+* USER_LIST_REPLIES_TO_OTHERS_TWEET=12549841489201410,852185020125098
+
+Get replies from other people on our tweets: (Optional)
+
+* USER_LIST_REPLIES_TO_OUR_TWEET=12549841489201410,852185020125098
+
+Get message when user retweets tweet: (Optional)
+
+* USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET=12549841489201410,18205090125
+
+Get message when users tweet is retweeted by someone else: (Optional)
+
+* USER_LIST_SOMEONE_RETWEETS_OUR_TWEET=18205090125
+
+Should we message when a user retweets their own tweet? True or False
+
+* GET_RETWEET_OF_OWN_TWEET=False
+
 How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
 * LOG\_LEVEL=INFO
@@ -147,6 +187,26 @@ List of Twitter users to follow, comma separated list with no spaces.
 
 * USERS\_TO\_FOLLOW=12549841489201410,18205090125,852185020125098
 
+Get replies to other people: (Optional)
+
+* USER_LIST_REPLIES_TO_OTHERS_TWEET=12549841489201410,852185020125098
+
+Get replies from other people on our tweets: (Optional)
+
+* USER_LIST_REPLIES_TO_OUR_TWEET=12549841489201410,852185020125098
+
+Get message when user retweets tweet: (Optional)
+
+* USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET=12549841489201410,18205090125
+
+Get message when users tweet is retweeted by someone else: (Optional)
+
+* USER_LIST_SOMEONE_RETWEETS_OUR_TWEET=18205090125
+
+Should we message when a user retweets their own tweet? True or False
+
+* GET_RETWEET_OF_OWN_TWEET=False
+
 How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
 * LOG\_LEVEL=INFO
@@ -190,6 +250,26 @@ Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an 
 List of Twitter users to follow, comma separated list with no spaces.
 
 * USERS\_TO\_FOLLOW=12549841489201410,18205090125,852185020125098
+
+Get replies to other people: (Optional)
+
+* USER_LIST_REPLIES_TO_OTHERS_TWEET=12549841489201410,852185020125098
+
+Get replies from other people on our tweets: (Optional)
+
+* USER_LIST_REPLIES_TO_OUR_TWEET=12549841489201410,852185020125098
+
+Get message when user retweets tweet: (Optional)
+
+* USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET=12549841489201410,18205090125
+
+Get message when users tweet is retweeted by someone else: (Optional)
+
+* USER_LIST_SOMEONE_RETWEETS_OUR_TWEET=18205090125
+
+Should we message when a user retweets their own tweet? True or False
+
+* GET_RETWEET_OF_OWN_TWEET=False
 
 How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 

@@ -1,5 +1,3 @@
-"""This program fetches tweets and writes them in Discord."""
-
 import html
 import json
 import logging
@@ -18,6 +16,11 @@ from settings import (
     consumer_secret,
     log_level,
     twitter_image_collage_maker,
+    user_list_replies_to_other_tweet,
+    user_list_replies_to_our_tweet,
+    user_list_someone_retweets_our_tweet,
+    user_list_we_retweet_someone_elses_tweet,
+    get_retweet_of_own_tweet,
     users_to_follow,
     webhook_url,
 )
@@ -175,17 +178,60 @@ def main(tweet):
 
 class MyStreamListener(Stream):
     def on_status(self, tweet):
+        print(f"on_status: {tweet}")
         """Called when a new status arrives"""
-        if tweet.retweeted or "RT @" in tweet.text:
-            return
 
-        if tweet.in_reply_to_screen_name is not None:
+        # Tweet is retweet
+        if hasattr(tweet, "retweeted_status"):
+            logger.info("Tweet is retweet")
+            if tweet.user.id_str == tweet.retweeted_status.user.id_str:
+                if get_retweet_of_own_tweet.lower() == "true":
+                    logger.info("We replied to our self")
+                    main(tweet=tweet)
+                    return
+            if tweet.retweeted_status.user.id_str in user_list_retweeted_split:
+                logger.info("Someone retweeted our tweet")
+                main(tweet=tweet)
+                return
+            elif tweet.user.id_str in user_list_retweets_split:
+                logger.info("We retweeted a tweet")
+                main(tweet=tweet)
+                return
+            else:
+                logger.info(
+                    "Retweets and retweeted are not active in the environment variables."
+                )
+                return
+        # Tweet is a reply
+        elif tweet.in_reply_to_user_id is not None:
+            if tweet.user.id_str == tweet.in_reply_to_user_id_str:
+                logger.info("We replied to our self")
+                main(tweet=tweet)
+                return
+            elif tweet.user.id_str in user_list_replies_to_other_tweet_split:
+                logger.info("We replied to someone")
+                main(tweet=tweet)
+                return
+            elif tweet.in_reply_to_user_id_str in user_list_replies_to_our_tweet_split:
+                logger.info("Someone replied to us")
+                main(tweet=tweet)
+                return
+            else:
+                logger.info(
+                    "We didn't reply to ourself, someone else or someone replied to us. "
+                    "Or it is not active in the environment variables."
+                )
+                return
+        else:
+            main(tweet=tweet)
             return
-
-        main(tweet=tweet)
 
 
 if __name__ == "__main__":
+    user_list_retweets_split = []
+    user_list_retweeted_split = []
+    user_list_replies_to_our_tweet_split = []
+    user_list_replies_to_other_tweet_split = []
     logger = logging
     logger.basicConfig(format="%(asctime)s - %(message)s", level=log_level)
 
@@ -195,7 +241,9 @@ if __name__ == "__main__":
     logger.debug(f"Consumer secret: {consumer_secret}")
     logger.debug(f"Access Token: {access_token}")
     logger.debug(f"Access Token Secret: {access_token_secret}")
-    logger.debug(f"Users to follow: {users_to_follow}")
+    logger.debug(f"Users we follow: {users_to_follow}")
+    logger.debug(f"Users replies to our tweet: {user_list_replies_to_our_tweet}")
+    logger.debug(f"Users replies to other tweet: {user_list_replies_to_other_tweet}")
     logger.debug(f"Webhook url: {webhook_url}")
     logger.debug(f"Twitter collage maker: {twitter_image_collage_maker}")
 
@@ -205,12 +253,57 @@ if __name__ == "__main__":
         consumer_key, consumer_secret, access_token, access_token_secret
     )
 
-    user_list = [x.strip() for x in users_to_follow.split(",")]
-    for twitter_id in user_list:
-        # Print the users we have in our config file.
-        username = api.get_user(user_id=twitter_id)
-        print(f"{twitter_id} - {username.screen_name}")
+    if users_to_follow is not None:
+        logger.info("Users - Tweets:")
+        user_list = [x.strip() for x in str(users_to_follow).split(",")]
+        for twitter_id in user_list:
+            username = api.get_user(user_id=twitter_id)
+            print(f"{twitter_id} - {username.screen_name}")
+    else:
+        print("It looks like USERS_TO_FOLLOW is empty. Did you forget to fill it out?")
 
-    # Streams are only terminated if the connection is closed, blocking the
-    # thread. The async parameter makes the stream run on a new thread.
+    if user_list_replies_to_our_tweet is not None:
+        logger.info("Users - Comment to us from other:")
+        user_list_replies_to_our_tweet_split = [
+            x.strip() for x in str(user_list_replies_to_our_tweet).split(",")
+        ]
+        for twitter_id in user_list_replies_to_our_tweet_split:
+            username_reply = api.get_user(user_id=twitter_id)
+            logger.info(f"{twitter_id} - {username_reply.screen_name}")
+    else:
+        logger.info("Found no users to get replies from.")
+
+    if user_list_replies_to_other_tweet is not None:
+        logger.info("Users - Comment from us to other:")
+        user_list_replies_to_other_tweet_split = [
+            x.strip() for x in str(user_list_replies_to_other_tweet).split(",")
+        ]
+        for twitter_id in user_list_replies_to_other_tweet_split:
+            username_reply = api.get_user(user_id=twitter_id)
+            logger.info(f"{twitter_id} - {username_reply.screen_name}")
+    else:
+        logger.info("Found no users to get replies to.")
+
+    if user_list_we_retweet_someone_elses_tweet is not None:
+        logger.info("Users - We retweet others tweet:")
+        user_list_retweets_split = [
+            x.strip() for x in str(user_list_we_retweet_someone_elses_tweet).split(",")
+        ]
+        for twitter_id in user_list_retweets_split:
+            username_reply = api.get_user(user_id=twitter_id)
+            logger.info(f"{twitter_id} - {username_reply.screen_name}")
+    else:
+        logger.info("Found no users were we track retweets.")
+
+    if user_list_someone_retweets_our_tweet is not None:
+        logger.info("Users - Other retweets our tweet:")
+        user_list_retweeted_split = [
+            x.strip() for x in str(user_list_someone_retweets_our_tweet).split(",")
+        ]
+        for twitter_id in user_list_retweeted_split:
+            username_reply = api.get_user(user_id=twitter_id)
+            logger.info(f"{twitter_id} - {username_reply.screen_name}")
+    else:
+        logger.info("Found no users were we track tweets that get retweeted.")
+    # Streams are only terminated if the connection is closed, blocking the thread.
     stream.filter(follow=user_list, stall_warnings=True)
