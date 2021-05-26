@@ -19,61 +19,6 @@ This bot is configured with a config file or environment variables and is writte
 *(click to expand the sections below for full setup instructions)*
 
 <details>
-<summary><b>Get discord-twitter-webhooks for <code>Windows</code></b></summary><br/><br/>
-
-* Download [zip-file](https://github.com/TheLovinator1/discord-twitter-webhooks/releases/download/v1.0/discord-twitter-webhooks.zip) and extract.
-* Rename .env.example to .env and fill it out.
-* Run discord-twitter-webhooks.exe
-
-## Environment variables
-
-No space should be between the equal sign in your .env.
-
-Right click channel you want the tweets in -> Integrations -> Webhooks -> New Webhook -> Copy Webhook URL
-
-* WEBHOOK\_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
-
-Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
-
-* CONSUMER\_KEY=ASFkopkoasfPOFkopaf
-* CONSUMER\_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
-* ACCESS\_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
-* ACCESS\_TOKEN\_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
-
-List of Twitter users to follow, comma separated list with no spaces.
-
-* USERS\_TO\_FOLLOW=12549841489201410,18205090125,852185020125098
-
-Get replies to other people: (Optional)
-
-* USER_LIST_REPLIES_TO_OTHERS_TWEET=12549841489201410,852185020125098
-
-Get replies from other people on our tweets: (Optional)
-
-* USER_LIST_REPLIES_TO_OUR_TWEET=12549841489201410,852185020125098
-
-Get message when user retweets tweet: (Optional)
-
-* USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET=12549841489201410,18205090125
-
-Get message when users tweet is retweeted by someone else: (Optional)
-
-* USER_LIST_SOMEONE_RETWEETS_OUR_TWEET=18205090125
-
-Should we message when a user retweets their own tweet? True or False
-
-* GET_RETWEET_OF_OWN_TWEET=False
-
-How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
-
-* LOG\_LEVEL=INFO
-
-Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/twitter-image-collage-maker). See [Privacy](#privacy) for more information.
-
-* TWITTER\_IMAGE\_COLLAGE\_API=https://twitter.lovinator.space/add
-
-</details>
-<details>
 <summary><b>Get discord-twitter-webhooks with <code>docker-compose</code></b></summary><br/><br/>
 
 docker-compose.yml:
