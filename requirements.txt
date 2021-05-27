@@ -7,12 +7,10 @@ chardet==4.0.0
 idna==2.10
 multidict==5.1.0
 oauthlib==3.1.0
-PySocks==1.7.1
 python-dotenv==0.17.1
 requests==2.25.1
 requests-oauthlib==1.3.0
-six==1.16.0
--e git+https://github.com/tweepy/tweepy.git@05664fbf59c263a473fac6fa0d72e95c30920ace#egg=tweepy
+-e git+https://github.com/tweepy/tweepy.git@3bd7da744be23ffb5c48b9365b6cc09005d731bf#egg=tweepy
 typing-extensions==3.10.0.0
-urllib3==1.26.4
+urllib3==1.26.5
 yarl==1.6.3
