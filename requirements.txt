@@ -1,16 +1,16 @@
 aiohttp==3.7.4.post0
 async-timeout==3.0.1
 attrs==21.2.0
-certifi==2020.12.5
+certifi==2021.5.30
 chardet==4.0.0
--e git://github.com/kyb3r/dhooks.git@20a79f42fe799470fe8d079f877316475dc867bc#egg=dhooks
+-e git+https://github.com/kyb3r/dhooks.git@20a79f42fe799470fe8d079f877316475dc867bc#egg=dhooks
 idna==2.10
 multidict==5.1.0
-oauthlib==3.1.0
+oauthlib==3.1.1
 python-dotenv==0.17.1
 requests==2.25.1
 requests-oauthlib==1.3.0
--e git+https://github.com/tweepy/tweepy.git@3bd7da744be23ffb5c48b9365b6cc09005d731bf#egg=tweepy
+-e git+https://github.com/tweepy/tweepy.git@f090f7b2d82b17889bfe7e1c1107f15c8c6cef23#egg=tweepy
 typing-extensions==3.10.0.0
 urllib3==1.26.5
 yarl==1.6.3
