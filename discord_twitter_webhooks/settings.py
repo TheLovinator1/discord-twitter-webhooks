@@ -43,6 +43,11 @@ auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 
+user_list_retweets_split = []
+user_list_retweeted_split = []
+user_list_replies_to_our_tweet_split = []
+user_list_replies_to_other_tweet_split = []
+
 if users_to_follow is not None:
     print("Users - Tweets:")
     user_list = [x.strip() for x in str(users_to_follow).split(",")]

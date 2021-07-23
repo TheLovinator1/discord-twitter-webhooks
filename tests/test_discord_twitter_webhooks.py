@@ -14,6 +14,9 @@ from discord_twitter_webhooks.main import (
 )
 from discord_twitter_webhooks.settings import auth
 
+# TODO: Add check for if retweet/reply check is working
+# TODO: Add check if imports work, e.g user_list_replies_to_other_tweet_split exists
+
 
 class TestTweets:
     api = tweepy.API(auth)
