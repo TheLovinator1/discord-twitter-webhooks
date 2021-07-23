@@ -12,7 +12,7 @@ from discord_twitter_webhooks.main import (
     send_embed_webhook,
     send_text_webhook,
 )
-from discord_twitter_webhooks.settings import auth, user_list
+from discord_twitter_webhooks.settings import auth
 
 
 class TestTweets:

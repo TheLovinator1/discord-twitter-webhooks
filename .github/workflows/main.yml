@@ -82,6 +82,7 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
           USERS_TO_FOLLOW: ${{ secrets.USERS_TO_FOLLOW }}
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
         run: |
           source .venv/bin/activate
           pytest
