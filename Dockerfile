@@ -6,38 +6,7 @@ FROM python:3.9-slim AS compile-image
 
 # We don't want apt-get to interact with us,
 # and we want the default answers to be used for all questions.
-# Is it also completely silent and unobtrusive.
 ARG DEBIAN_FRONTEND=noninteractive
-
-# Update packages and install needed packages to build our requirements.
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends build-essential gcc git
-
-# Create new virtual environment in /opt/venv and change to it.
-ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv $VIRTUAL_ENV
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
-# Copy and install requirements.
-COPY requirements.txt .
-RUN pip install --disable-pip-version-check --no-cache-dir --requirement requirements.txt
-
-# Change to our second stage. This is the one that will run the bot.
-FROM python:3.9-slim AS runtime-image
-
-# Copy Python dependencies from our build image.
-COPY --from=compile-image /opt/venv /opt/venv
-
-# Create user so we don't run as root.
-RUN useradd --create-home botuser
-RUN chown -R botuser:botuser /home/botuser && chmod -R 755 /home/botuser
-USER botuser
-
-# Change directory to where we will run the bot.
-WORKDIR /home/botuser
-
-# Copy our Python bot to our home directory.
-COPY main.py settings.py ./
 
 # Don't generate byte code (.pyc-files). 
 # These are only needed if we run the python-files several times.
@@ -47,11 +16,31 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # Force the stdout and stderr streams to be unbuffered. 
 # Will allow log messages to be immediately dumped instead of being buffered. 
 # This is useful when the bot crashes before writing messages stuck in the buffer.
-# Has a minor performance loss. We don't have many log messages so probably makes zero difference.
 ENV PYTHONUNBUFFERED 1
 
-# Use our virtual environment that we created in the other stage.
-ENV PATH="/opt/venv/bin:$PATH"
+# Update packages and install needed packages to build our requirements.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential gcc git curl
+
+# Create user so we don't run as root.
+RUN useradd --create-home botuser
+RUN chown -R botuser:botuser /home/botuser && chmod -R 755 /home/botuser
+USER botuser
+
+# Install poetry
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+
+# Add poetry to our path
+ENV PATH="/home/botuser/.poetry/bin/:${PATH}"
+
+COPY pyproject.toml poetry.lock README.md /home/botuser/
+
+# Change directory to where we will run the bot.
+WORKDIR /home/botuser
+
+RUN poetry install --no-interaction --no-ansi --no-dev
+
+COPY discord_twitter_webhooks/main.py discord_twitter_webhooks/settings.py /home/botuser/discord_twitter_webhooks/
 
 # Run bot.
-CMD [ "python", "./main.py" ] 
+CMD [ "poetry", "run", "bot" ]

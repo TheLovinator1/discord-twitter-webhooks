@@ -16,7 +16,7 @@ This bot is configured with a config file or environment variables and is writte
 
 ## Installation
 
-*(click to expand the sections below for full setup instructions)*
+_(click to expand the sections below for full setup instructions)_
 
 <details>
 <summary><b>Get discord-twitter-webhooks with <code>docker-compose</code></b></summary><br/><br/>
@@ -51,46 +51,46 @@ No space should be between the equal sign in your .env.
 
 Right click channel you want the tweets in -> Integrations -> Webhooks -> New Webhook -> Copy Webhook URL
 
-* WEBHOOK\_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
+- WEBHOOK_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
 
 Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
-* CONSUMER\_KEY=ASFkopkoasfPOFkopaf
-* CONSUMER\_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
-* ACCESS\_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
-* ACCESS\_TOKEN\_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
+- CONSUMER_KEY=ASFkopkoasfPOFkopaf
+- CONSUMER_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
+- ACCESS_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
+- ACCESS_TOKEN_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
 
 List of Twitter users to follow, comma separated list with no spaces.
 
-* USERS\_TO\_FOLLOW=12549841489201410,18205090125,852185020125098
+- USERS_TO_FOLLOW=12549841489201410,18205090125,852185020125098
 
 Get replies to other people: (Optional)
 
-* USER_LIST_REPLIES_TO_OTHERS_TWEET=12549841489201410,852185020125098
+- USER_LIST_REPLIES_TO_OTHERS_TWEET=12549841489201410,852185020125098
 
 Get replies from other people on our tweets: (Optional)
 
-* USER_LIST_REPLIES_TO_OUR_TWEET=12549841489201410,852185020125098
+- USER_LIST_REPLIES_TO_OUR_TWEET=12549841489201410,852185020125098
 
 Get message when user retweets tweet: (Optional)
 
-* USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET=12549841489201410,18205090125
+- USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET=12549841489201410,18205090125
 
 Get message when users tweet is retweeted by someone else: (Optional)
 
-* USER_LIST_SOMEONE_RETWEETS_OUR_TWEET=18205090125
+- USER_LIST_SOMEONE_RETWEETS_OUR_TWEET=18205090125
 
 Should we message when a user retweets their own tweet? True or False
 
-* GET_RETWEET_OF_OWN_TWEET=False
+- GET_RETWEET_OF_OWN_TWEET=False
 
 How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
-* LOG\_LEVEL=INFO
+- LOG_LEVEL=INFO
 
 Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/twitter-image-collage-maker). See [Privacy](#privacy) for more information.
 
-* TWITTER\_IMAGE\_COLLAGE\_API=https://twitter.lovinator.space/add
+- TWITTER_IMAGE_COLLAGE_API=https://twitter.lovinator.space/add
 
 </details>
 <details>
@@ -119,63 +119,59 @@ No space should be between the equal sign in your .env.
 
 Right click channel you want the tweets in -> Integrations -> Webhooks -> New Webhook -> Copy Webhook URL
 
-* WEBHOOK\_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
-  
+- WEBHOOK_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
+
 Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
-* CONSUMER\_KEY=ASFkopkoasfPOFkopaf
-* CONSUMER\_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
-* ACCESS\_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
-* ACCESS\_TOKEN_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
+- CONSUMER_KEY=ASFkopkoasfPOFkopaf
+- CONSUMER_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
+- ACCESS_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
+- ACCESS_TOKEN_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
 
 List of Twitter users to follow, comma separated list with no spaces.
 
-* USERS\_TO\_FOLLOW=12549841489201410,18205090125,852185020125098
+- USERS_TO_FOLLOW=12549841489201410,18205090125,852185020125098
 
 Get replies to other people: (Optional)
 
-* USER_LIST_REPLIES_TO_OTHERS_TWEET=12549841489201410,852185020125098
+- USER_LIST_REPLIES_TO_OTHERS_TWEET=12549841489201410,852185020125098
 
 Get replies from other people on our tweets: (Optional)
 
-* USER_LIST_REPLIES_TO_OUR_TWEET=12549841489201410,852185020125098
+- USER_LIST_REPLIES_TO_OUR_TWEET=12549841489201410,852185020125098
 
 Get message when user retweets tweet: (Optional)
 
-* USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET=12549841489201410,18205090125
+- USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET=12549841489201410,18205090125
 
 Get message when users tweet is retweeted by someone else: (Optional)
 
-* USER_LIST_SOMEONE_RETWEETS_OUR_TWEET=18205090125
+- USER_LIST_SOMEONE_RETWEETS_OUR_TWEET=18205090125
 
 Should we message when a user retweets their own tweet? True or False
 
-* GET_RETWEET_OF_OWN_TWEET=False
+- GET_RETWEET_OF_OWN_TWEET=False
 
 How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
-* LOG\_LEVEL=INFO
+- LOG_LEVEL=INFO
 
 Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/twitter-image-collage-maker). See [Privacy](#privacy) for more information.
 
-* TWITTER_IMAGE_COLLAGE_API=https://twitter.lovinator.space/add
+- TWITTER_IMAGE_COLLAGE_API=https://twitter.lovinator.space/add
 
 </details>
 <details>
-<summary><b>Get discord-twitter-webhooks with <code>Python</code> with <code>pip</code></b></summary>
+<summary><b>Get discord-twitter-webhooks with <code>poetry</code></b></summary>
 
-* Install latest version of [git](https://git-scm.com/) and [Python](https://www.python.org/)
-* Download project from GitHub and change directory into it
-* (Optional) Create virtual environment:
-  * `python -m venv .venv`
-    * Activate virtual environment:
-      * Windows:  `.\.venv\Scripts\activate`
-      * Not windows:  `source .venv/bin/activate`
-* Install requirements
-  * `pip install -r requirements.txt`
-* Rename .env.example to .env and fill it with things from [Twitter](https://developer.twitter.com) and [TweeterID](https://tweeterid.com). If you don't want to use the .env-file you can add variables to your environment.
-* Start the bot (inside the activated virtual environment if you made one):
-  * `python main.py`
+- Install latest version of [git](https://git-scm.com/), [Python](https://www.python.org/) and [Poetry](https://python-poetry.org/docs/#installation).
+- Download project from GitHub and change directory into it.
+- Open terminal in repository folder.
+- Install requirements:
+  - `poetry install`
+- Rename .env.example to .env and fill it with things from [Twitter](https://developer.twitter.com) and [TweeterID](https://tweeterid.com). If you don't want to use the .env-file you can add variables to your environment.
+- Start the bot:
+  - `poetry run bot`
 
 ## Environment variables
 
@@ -183,46 +179,46 @@ No space should be between the equal sign in your .env.
 
 Right click channel you want the tweets in -> Integrations -> Webhooks -> New Webhook -> Copy Webhook URL
 
-* WEBHOOK\_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
-  
+- WEBHOOK_URL=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
+
 Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an app. After it is created go to Keys and tokens. CONSUMER_KEY = API key, CONSUMER_SECRET = API key secret:
 
-* CONSUMER\_KEY=ASFkopkoasfPOFkopaf
-* CONSUMER\_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
-* ACCESS\_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
-* ACCESS\_TOKEN\_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
+- CONSUMER_KEY=ASFkopkoasfPOFkopaf
+- CONSUMER_SECRET=ASFkopkoasfPOFkopafASFkopkoasfPOFkopafASFkopkoasfPOFkopaf
+- ACCESS_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
+- ACCESS_TOKEN_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
 
 List of Twitter users to follow, comma separated list with no spaces.
 
-* USERS\_TO\_FOLLOW=12549841489201410,18205090125,852185020125098
+- USERS_TO_FOLLOW=12549841489201410,18205090125,852185020125098
 
 Get replies to other people: (Optional)
 
-* USER_LIST_REPLIES_TO_OTHERS_TWEET=12549841489201410,852185020125098
+- USER_LIST_REPLIES_TO_OTHERS_TWEET=12549841489201410,852185020125098
 
 Get replies from other people on our tweets: (Optional)
 
-* USER_LIST_REPLIES_TO_OUR_TWEET=12549841489201410,852185020125098
+- USER_LIST_REPLIES_TO_OUR_TWEET=12549841489201410,852185020125098
 
 Get message when user retweets tweet: (Optional)
 
-* USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET=12549841489201410,18205090125
+- USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET=12549841489201410,18205090125
 
 Get message when users tweet is retweeted by someone else: (Optional)
 
-* USER_LIST_SOMEONE_RETWEETS_OUR_TWEET=18205090125
+- USER_LIST_SOMEONE_RETWEETS_OUR_TWEET=18205090125
 
 Should we message when a user retweets their own tweet? True or False
 
-* GET_RETWEET_OF_OWN_TWEET=False
+- GET_RETWEET_OF_OWN_TWEET=False
 
 How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
-* LOG\_LEVEL=INFO
+- LOG_LEVEL=INFO
 
 Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/twitter-image-collage-maker). See [Privacy](#privacy) for more information.
 
-* TWITTER\_IMAGE\_COLLAGE\_API=https://twitter.lovinator.space/add
+- TWITTER_IMAGE_COLLAGE_API=https://twitter.lovinator.space/add
 
 </details>
 
@@ -234,12 +230,8 @@ You can run [your own version](https://github.com/TheLovinator1/twitter-image-co
 
 ## Need help?
 
-* Email: [tlovinator@gmail.com](mailto:tlovinator@gmail.com)
-* Discord: TheLovinator#9276
-* Steam: [TheLovinator](https://steamcommunity.com/id/TheLovinator/)
-* Send an issue: [discord-twitter-webhooks/issues](https://github.com/TheLovinator1/discord-twitter-webhooks/issues)
-* GitHub Discussions: [discord-twitter-webhooks/discussions](https://github.com/TheLovinator1/discord-twitter-webhooks/discussions)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- Email: [tlovinator@gmail.com](mailto:tlovinator@gmail.com)
+- Discord: TheLovinator#9276
+- Steam: [TheLovinator](https://steamcommunity.com/id/TheLovinator/)
+- Send an issue: [discord-twitter-webhooks/issues](https://github.com/TheLovinator1/discord-twitter-webhooks/issues)
+- GitHub Discussions: [discord-twitter-webhooks/discussions](https://github.com/TheLovinator1/discord-twitter-webhooks/discussions)
