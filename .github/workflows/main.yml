@@ -81,6 +81,7 @@ jobs:
           CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+          USERS_TO_FOLLOW: ${{ secrets.USERS_TO_FOLLOW }}
         run: |
           source .venv/bin/activate
           pytest
