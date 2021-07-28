@@ -162,7 +162,7 @@ Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/
 
 </details>
 <details>
-<summary><b>Get discord-twitter-webhooks with <code>poetry</code></b></summary>
+<summary><b>Install directly on your computer</b></summary>
 
 - Install latest version of [git](https://git-scm.com/), [Python](https://www.python.org/) and [Poetry](https://python-poetry.org/docs/#installation).
 - Download project from GitHub and change directory into it.
