@@ -4,6 +4,7 @@ import logging
 import re
 
 import requests
+from bs4 import BeautifulSoup
 from dhooks import Embed, Webhook
 from tweepy import Stream
 
@@ -70,6 +71,22 @@ def get_avatar_url(tweet) -> str:
     avatar_url = tweet.user.profile_image_url_https
     logger.debug(f"Avatar URL: {avatar_url}")
     return avatar_url.replace("_normal.jpg", ".jpg")
+
+
+def get_urls(tweet) -> list:
+    url_list = []
+    try:
+        for url in tweet.extended_tweet["entities"]["urls"]:
+            url_list.append(url["expanded_url"])
+    except AttributeError:
+        # Tweet is less than 140 characters
+        try:
+            for url in tweet.entities["urls"]:
+                url_list.append(url["expanded_url"])
+        except AttributeError:
+            # Tweet has no links
+            pass
+    return url_list
 
 
 def replace_tco_url_link_with_real_link(tweet, text: str) -> str:
@@ -139,13 +156,35 @@ def change_reddit_username_to_link(text: str) -> str:
     )
 
 
+def get_meta_image(url: str):
+    try:
+        r = requests.get(url[0])
+        soup = BeautifulSoup(r.content, "html.parser")
+        image_url = ""
+
+        # TODO: Which one should be used if both are availabe?
+        # <meta name="twitter:image" content="">
+        twitter_image = soup.find_all("meta", attrs={"name": "twitter:image"})
+        if twitter_image:
+            image_url = twitter_image[0].get("content")
+
+        # <meta property="og:image" content="">
+        og_image = soup.find_all("meta", attrs={"property": "og:image"})
+        if og_image:
+            image_url = og_image[0].get("content")
+
+        return image_url
+    except Exception as e:
+        logger.error(f"Error getting image url: {e}")
+
+
 def send_text_webhook(text: str, webhook: str = webhook_url):
     logger.error(f"Webhook text: {text}")
     hook = Webhook(webhook)
     hook.send(text)
 
 
-def send_embed_webhook(avatar: str, tweet, link_list, text: str, webhook: str = webhook_url):
+def send_embed_webhook(avatar: str, tweet, link_list, text: str, webhook: str = webhook_url, twitter_card_image=None):
     logger.debug(f"Tweet: {text}")
     hook = Webhook(webhook)
 
@@ -154,7 +193,7 @@ def send_embed_webhook(avatar: str, tweet, link_list, text: str, webhook: str = 
         color=0x1E0F3,
         timestamp="now",
     )
-    if link_list is not None:
+    if len(link_list):
         if len(link_list) == 1:
             logger.debug(f"Found one image: {link_list[0]}")
             embed.set_image(link_list[0])
@@ -171,6 +210,12 @@ def send_embed_webhook(avatar: str, tweet, link_list, text: str, webhook: str = 
                 logger.error(f"Failed to get response from {twitter_image_collage_maker}. Using first image instead.")
                 embed.set_image(link_list[0])
 
+    else:
+        if twitter_card_image:
+            try:
+                embed.set_image(twitter_card_image)
+            except Exception as e:
+                logger.error(f"Failed to set Twitter card image: {e}")
     embed.set_author(
         icon_url=avatar,
         name=tweet.user.screen_name,
@@ -187,10 +232,8 @@ def main(tweet):
     text = get_text(tweet)
     media_links, text_media_links = get_media_links_and_remove_url(tweet, text)
     avatar = get_avatar_url(tweet)
-
+    twitter_card_image = get_meta_image(get_urls(tweet))
     unescaped_text = html.unescape(text_media_links)
-    logger.debug(f"Safe HTML converted to unsafe HTML: {text}")
-
     text_url_links = replace_tco_url_link_with_real_link(tweet, unescaped_text)
     text_replace_username = replace_username_with_link(text_url_links)
     text_replace_hashtags = replace_hashtag_with_link(text_replace_username)
@@ -198,7 +241,13 @@ def main(tweet):
     text_subreddit_to_link = change_subreddit_to_clickable_link(text_discord_preview)
     text_reddit_username_to_link = change_reddit_username_to_link(text_subreddit_to_link)
 
-    send_embed_webhook(avatar=avatar, tweet=tweet, link_list=media_links, text=text_reddit_username_to_link)
+    send_embed_webhook(
+        avatar=avatar,
+        tweet=tweet,
+        link_list=media_links,
+        text=text_reddit_username_to_link,
+        twitter_card_image=twitter_card_image,
+    )
 
 
 class MyStreamListener(Stream):
