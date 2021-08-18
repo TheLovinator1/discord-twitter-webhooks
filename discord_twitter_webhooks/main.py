@@ -109,7 +109,7 @@ def replace_tco_url_link_with_real_link(tweet, text: str) -> str:
 def replace_username_with_link(text: str) -> str:
     # Replace @username with link
     return re.sub(
-        r"@(\w*)",
+        r"\B@(\w*)",
         r"[\g<0>](https://twitter.com/\g<1>)",
         text,
         flags=re.MULTILINE,
@@ -119,7 +119,7 @@ def replace_username_with_link(text: str) -> str:
 def replace_hashtag_with_link(text: str) -> str:
     # Replace #hashtag with link
     return re.sub(
-        r"#(\w*)",
+        r"\B#(\w*)",
         r"[\g<0>](https://twitter.com/hashtag/\g<1>)",
         text,
         flags=re.MULTILINE,
