@@ -1,16 +1,16 @@
 # Discord-twitter-webhooks
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/TheLovinator1/discord-twitter-webhooks/master/Bot.png" />
+  <img src="https://raw.githubusercontent.com/TheLovinator1/discord-twitter-webhooks/master/Bot.png"/>
 </p>
 
 <p align="center"><sup> Theme is https://github.com/KillYoy/DiscordNight <sup></p>
 
 ![Docker Pulls](https://img.shields.io/docker/pulls/thelovinator/discord-twitter-webhooks)
 
-This bot on [Docker Hub](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).
+This bot is on [Docker Hub](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).
 
-`discord-twitter-webhooks` is automated tool that checks [Twitter](https://twitter.com) for new tweets and sends them to a [Discord](https://discord.com/) webhook.
+`discord-twitter-webhooks` is an automated tool that checks [Twitter](https://twitter.com) for new tweets and sends them to a [Discord](https://discord.com/) webhook.
 
 This bot is configured with a config file or environment variables and is written in Python.
 
@@ -43,7 +43,7 @@ services:
     restart: unless-stopped
 ```
 
-This bot on [Docker Hub](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).
+This bot is on [Docker Hub](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).
 
 ## Environment variables
 
@@ -60,7 +60,7 @@ Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an 
 - ACCESS_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
 - ACCESS_TOKEN_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
 
-List of Twitter users to follow, comma separated list with no spaces.
+List of Twitter users to follow, a comma-separated list with no spaces.
 
 - USERS_TO_FOLLOW=12549841489201410,18205090125,852185020125098
 
@@ -72,11 +72,11 @@ Get replies from other people on our tweets: (Optional)
 
 - USER_LIST_REPLIES_TO_OUR_TWEET=12549841489201410,852185020125098
 
-Get message when user retweets tweet: (Optional)
+Get a message when a user retweets tweet: (Optional)
 
 - USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET=12549841489201410,18205090125
 
-Get message when users tweet is retweeted by someone else: (Optional)
+Get a message when a users tweet is retweeted by someone else: (Optional)
 
 - USER_LIST_SOMEONE_RETWEETS_OUR_TWEET=18205090125
 
@@ -84,7 +84,7 @@ Should we message when a user retweets their own tweet? True or False
 
 - GET_RETWEET_OF_OWN_TWEET=False
 
-How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
+How much logging should be sent to the terminal? Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
 - LOG_LEVEL=INFO
 
@@ -111,7 +111,7 @@ docker run -d \
   thelovinator/discord-twitter-webhooks
 ```
 
-This bot on [Docker Hub](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).
+This bot is on [Docker Hub](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).
 
 ## Environment variables
 
@@ -128,7 +128,7 @@ Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an 
 - ACCESS_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
 - ACCESS_TOKEN_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
 
-List of Twitter users to follow, comma separated list with no spaces.
+List of Twitter users to follow, a comma-separated list with no spaces.
 
 - USERS_TO_FOLLOW=12549841489201410,18205090125,852185020125098
 
@@ -140,11 +140,11 @@ Get replies from other people on our tweets: (Optional)
 
 - USER_LIST_REPLIES_TO_OUR_TWEET=12549841489201410,852185020125098
 
-Get message when user retweets tweet: (Optional)
+Get a message when a user retweets tweet: (Optional)
 
 - USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET=12549841489201410,18205090125
 
-Get message when users tweet is retweeted by someone else: (Optional)
+Get a message when a users tweet is retweeted by someone else: (Optional)
 
 - USER_LIST_SOMEONE_RETWEETS_OUR_TWEET=18205090125
 
@@ -152,7 +152,7 @@ Should we message when a user retweets their own tweet? True or False
 
 - GET_RETWEET_OF_OWN_TWEET=False
 
-How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
+How much logging should be sent to the terminal? Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
 - LOG_LEVEL=INFO
 
@@ -165,8 +165,8 @@ Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/
 <summary><b>Install directly on your computer</b></summary>
 
 - Install latest version of [git](https://git-scm.com/), [Python](https://www.python.org/) and [Poetry](https://python-poetry.org/docs/#installation).
-- Download project from GitHub and change directory into it.
-- Open terminal in repository folder.
+- Download the project from GitHub and change the directory into it.
+- Open a terminal in the repository folder.
 - Install requirements:
   - `poetry install`
 - Rename .env.example to .env and fill it with things from [Twitter](https://developer.twitter.com) and [TweeterID](https://tweeterid.com). If you don't want to use the .env-file you can add variables to your environment.
@@ -188,7 +188,7 @@ Go to [Twitter](https://developer.twitter.com/en/portal/apps/new) and create an 
 - ACCESS_TOKEN=1294501204821094-kKPOASPKOFpkoaskfpo
 - ACCESS_TOKEN_SECRET=ASKOpokfpkoaspofOPFPO2908iAKOPSFKPO
 
-List of Twitter users to follow, comma separated list with no spaces.
+List of Twitter users to follow, a comma-separated list with no spaces.
 
 - USERS_TO_FOLLOW=12549841489201410,18205090125,852185020125098
 
@@ -200,11 +200,11 @@ Get replies from other people on our tweets: (Optional)
 
 - USER_LIST_REPLIES_TO_OUR_TWEET=12549841489201410,852185020125098
 
-Get message when user retweets tweet: (Optional)
+Get a message when a user retweets tweet: (Optional)
 
 - USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET=12549841489201410,18205090125
 
-Get message when users tweet is retweeted by someone else: (Optional)
+Get a message when a users tweet is retweeted by someone else: (Optional)
 
 - USER_LIST_SOMEONE_RETWEETS_OUR_TWEET=18205090125
 
@@ -212,7 +212,7 @@ Should we message when a user retweets their own tweet? True or False
 
 - GET_RETWEET_OF_OWN_TWEET=False
 
-How much logging that should be sent to the terminal. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
+How much logging should be sent to the terminal? Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 
 - LOG_LEVEL=INFO
 
@@ -225,7 +225,7 @@ Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/
 ## Privacy
 
 If the tweet has more than 1 image this bot sends the tweet ID to [twitter.lovinator.space](https://twitter.lovinator.space/) that combines them into one image that we can use in the embed.
-The only information stored is the tweet ID and combined image. No other information will be saved (e.g. IP address)
+The only information that is stored is the tweet ID and combined image. No other information will be saved (e.g. IP address)
 You can run [your own version](https://github.com/TheLovinator1/twitter-image-collage-maker) instead of using the default one.
 
 ## Need help?
