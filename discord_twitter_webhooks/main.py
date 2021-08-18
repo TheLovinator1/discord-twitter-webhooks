@@ -210,12 +210,11 @@ def send_embed_webhook(avatar: str, tweet, link_list, text: str, webhook: str = 
                 logger.error(f"Failed to get response from {twitter_image_collage_maker}. Using first image instead.")
                 embed.set_image(link_list[0])
 
-    else:
-        if twitter_card_image:
-            try:
-                embed.set_image(twitter_card_image)
-            except Exception as e:
-                logger.error(f"Failed to set Twitter card image: {e}")
+    elif twitter_card_image:
+        try:
+            embed.set_image(twitter_card_image)
+        except Exception as e:
+            logger.error(f"Failed to set Twitter card image: {e}")
     embed.set_author(
         icon_url=avatar,
         name=tweet.user.screen_name,
