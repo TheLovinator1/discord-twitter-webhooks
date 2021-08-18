@@ -173,6 +173,8 @@ Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/
 - Start the bot:
   - `poetry run bot`
 
+You will have to run `poetry install` again if [poetry.lock](poetry.lock) updates.
+
 ## Environment variables
 
 No space should be between the equal sign in your .env.
