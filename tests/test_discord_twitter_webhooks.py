@@ -1,3 +1,5 @@
+import os
+
 import pytest
 import tweepy
 from discord_twitter_webhooks import __version__
@@ -59,10 +61,7 @@ class TestTweets:
     # https://twitter.com/Bot2Lovi/status/1416485664078581761
     retweet_from_somebody_else = api.get_status(1416485664078581761)
 
-    webhook_url = (
-        "https://discord.com/api/webhooks/"
-        + "865712668282060802/N5XK9-eNwPpZXVtZ2lyrli8bVkkSmc6QhvIULr3L1TjIXdYSUBa1__J7M9mZuuhdS2D8"
-    )
+    webhook_url = os.environ["TEST_WEBHOOK"]
 
     def test_version(self):
         assert __version__ == "0.1.0"

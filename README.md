@@ -224,6 +224,14 @@ Server that runs [twitter-image-collage-maker](https://github.com/TheLovinator1/
 
 </details>
 
+## Tests
+
+Add environment variable TEST_WEBHOOK before running tests.
+
+- TEST_WEBHOOK=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
+
+Run tests with `poetry run pytest`
+
 ## Privacy
 
 If the tweet has more than 1 image this bot sends the tweet ID to [twitter.lovinator.space](https://twitter.lovinator.space/) that combines them into one image that we can use in the embed.
