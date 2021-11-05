@@ -1,3 +1,4 @@
+"""Not enough tests here, but it's a good place to start."""
 import os
 
 import pytest
@@ -8,8 +9,10 @@ from discord_twitter_webhooks.main import (
     change_subreddit_to_clickable_link,
     get_avatar_url,
     get_media_links_and_remove_url,
+    get_meta_image,
     get_text,
     replace_hashtag_with_link,
+    replace_tco_url_link_with_real_link,
     replace_username_with_link,
     send_embed_webhook,
     send_text_webhook,
@@ -21,6 +24,8 @@ from discord_twitter_webhooks.settings import auth
 
 
 class TestTweets:
+    """Test tweet stuff"""
+
     api = tweepy.API(auth)
     # https://twitter.com/Bot2Lovi/status/1416158460186611715
     short_tweet_only_text = api.get_status(1416158460186611715)
@@ -61,18 +66,24 @@ class TestTweets:
     # https://twitter.com/Bot2Lovi/status/1416485664078581761
     retweet_from_somebody_else = api.get_status(1416485664078581761)
 
+    # https://twitter.com/Bot2Lovi/status/1456124564698710017
+    link_to_youtube = api.get_status(1456124564698710017)
+
     webhook_url = os.environ["TEST_WEBHOOK"]
 
     def test_version(self):
+        """Test if the version is correct"""
         assert __version__ == "0.1.0"
 
     def test_send_text_webhook(self):
+        """Test if the text webhook is sent correctly"""
         try:
             send_text_webhook("Running pytest!", webhook=self.webhook_url)
-        except Exception as e:
-            pytest.fail(e, pytrace=True)
+        except Exception as exception:  # pylint: disable=broad-except
+            pytest.fail(exception, pytrace=True)
 
     def test_send_embed_webhook_one_image(self):
+        """Test if the embed webhook is sent correctly"""
         try:
             send_embed_webhook(
                 tweet=self.short_tweet_one_image,
@@ -81,10 +92,11 @@ class TestTweets:
                 link_list=["https://pbs.twimg.com/media/E6c309BWYAceCII.jpg"],
                 text="Testing embed with one image!",
             )
-        except Exception as e:
-            pytest.fail(e, pytrace=True)
+        except Exception as exception:  # pylint: disable=broad-except
+            pytest.fail(exception, pytrace=True)
 
     def test_send_embed_webhook_four_images(self):
+        """Test if the embed webhook is sent correctly"""
         try:
             send_embed_webhook(
                 tweet=self.short_tweet_four_image,
@@ -98,10 +110,11 @@ class TestTweets:
                 ],
                 text="Testing embed with four images!",
             )
-        except Exception as e:
-            pytest.fail(e, pytrace=True)
+        except Exception as exception:  # pylint: disable=broad-except
+            pytest.fail(exception, pytrace=True)
 
     def test_get_text(self):
+        """Test if the text is returned correctly"""
         assert get_text(self.short_tweet_only_text) == "Hello I am short Sadge"
         assert get_text(self.short_tweet_one_image) == "Short 1 Image https://t.co/18WctMxOYa"
         assert get_text(self.short_tweet_two_images) == "Short 2 Images https://t.co/SPBV5a6YyA"
@@ -138,6 +151,7 @@ class TestTweets:
         )
 
     def test_get_media_links_and_remove_url(self):
+        """Test if the media links are returned correctly"""
         short_txt = "Hello I am short Sadge"
         short_1_txt = "Short 1 Image"
         short_2_txt = "Short 2 Images"
@@ -186,6 +200,7 @@ class TestTweets:
         )
 
     def test_get_avatar_url(self):
+        """Test if the avatar url is returned correctly"""
         avatar_url = "https://pbs.twimg.com/profile_images/1204100883744796673/l9qoDADJ.jpg"
         assert get_avatar_url(self.short_tweet_only_text) == avatar_url
         assert get_avatar_url(self.short_tweet_one_image) == avatar_url
@@ -196,6 +211,7 @@ class TestTweets:
         assert get_avatar_url(self.gif_tweet) == avatar_url
 
     def test_get_avatar_url_extended(self):
+        """Test if the avatar url is returned correctly"""
         avatar_url = "https://pbs.twimg.com/profile_images/1204100883744796673/l9qoDADJ.jpg"
         assert get_avatar_url(self.long_tweet_only_text) == avatar_url
         assert get_avatar_url(self.long_tweet_one_image) == avatar_url
@@ -204,25 +220,44 @@ class TestTweets:
         assert get_avatar_url(self.long_tweet_four_image) == avatar_url
 
     def test_replace_username_with_link(self):
+        """Test if the username is replaced with a link"""
         assert (
             replace_username_with_link(self.at_hash_reddituser_subreddit.text)
             == "Hello [@TheLovinator1](https://twitter.com/TheLovinator1) #Hello /u/test /r/aww"
         )
 
     def test_replace_hashtag_with_link(self):
+        """Test if the hashtag is replaced with a link"""
         assert (
             replace_hashtag_with_link(self.at_hash_reddituser_subreddit.text)
             == "Hello @TheLovinator1 [#Hello](https://twitter.com/hashtag/Hello) /u/test /r/aww"
         )
 
     def test_change_subreddit_to_clickable_link(self):
+        """Test if the subreddit is replaced with a clickable link"""
         assert (
             change_subreddit_to_clickable_link(self.at_hash_reddituser_subreddit.text)
             == "Hello @TheLovinator1 #Hello /u/test [/r/aww](https://reddit.com/r/aww)"
         )
 
     def test_change_reddit_username_to_link(self):
+        """Test if the reddit username is replaced with a link"""
         assert (
             change_reddit_username_to_link(self.at_hash_reddituser_subreddit.text)
             == "Hello @TheLovinator1 #Hello [/u/test](https://reddit.com/u/test) /r/aww"
+        )
+
+    def test_get_meta_image(self):
+        """Test if the meta image is returned correctly"""
+        assert get_meta_image("https://lovinator.space/") == "https://lovinator.space/KaoFace.png"
+
+    def test_replace_tco_url_link_with_real_link(self):
+        """Test if the tco url is replaced with the real link"""
+        assert (
+            replace_tco_url_link_with_real_link(self.short_tweet_only_text, self.short_tweet_only_text.text)
+            == "Hello I am short Sadge"
+        )
+        assert (
+            replace_tco_url_link_with_real_link(tweet=self.link_to_youtube, text=self.link_to_youtube.text)
+            == "https://www.youtube.com/\nHello, this is Youtube"
         )
