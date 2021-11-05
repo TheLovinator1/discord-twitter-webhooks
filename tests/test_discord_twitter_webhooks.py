@@ -7,7 +7,6 @@ from discord_twitter_webhooks import __version__
 from discord_twitter_webhooks.main import (
     change_reddit_username_to_link,
     change_subreddit_to_clickable_link,
-    get_avatar_url,
     get_media_links_and_remove_url,
     get_meta_image,
     get_text,
@@ -88,7 +87,6 @@ class TestTweets:
             send_embed_webhook(
                 tweet=self.short_tweet_one_image,
                 webhook=self.webhook_url,
-                avatar="https://pbs.twimg.com/profile_images/1204100883744796673/l9qoDADJ.jpg",
                 link_list=["https://pbs.twimg.com/media/E6c309BWYAceCII.jpg"],
                 text="Testing embed with one image!",
             )
@@ -101,7 +99,6 @@ class TestTweets:
             send_embed_webhook(
                 tweet=self.short_tweet_four_image,
                 webhook=self.webhook_url,
-                avatar="https://pbs.twimg.com/profile_images/1204100883744796673/l9qoDADJ.jpg",
                 link_list=[
                     "https://pbs.twimg.com/media/E6c4jCOXoAIgLW9.jpg",
                     "https://pbs.twimg.com/media/E6c4jCQXoAInLOD.jpg",
@@ -198,26 +195,6 @@ class TestTweets:
             ],
             gif_tweet_txt,
         )
-
-    def test_get_avatar_url(self):
-        """Test if the avatar url is returned correctly"""
-        avatar_url = "https://pbs.twimg.com/profile_images/1204100883744796673/l9qoDADJ.jpg"
-        assert get_avatar_url(self.short_tweet_only_text) == avatar_url
-        assert get_avatar_url(self.short_tweet_one_image) == avatar_url
-        assert get_avatar_url(self.short_tweet_two_images) == avatar_url
-        assert get_avatar_url(self.short_tweet_three_images) == avatar_url
-        assert get_avatar_url(self.short_tweet_four_image) == avatar_url
-
-        assert get_avatar_url(self.gif_tweet) == avatar_url
-
-    def test_get_avatar_url_extended(self):
-        """Test if the avatar url is returned correctly"""
-        avatar_url = "https://pbs.twimg.com/profile_images/1204100883744796673/l9qoDADJ.jpg"
-        assert get_avatar_url(self.long_tweet_only_text) == avatar_url
-        assert get_avatar_url(self.long_tweet_one_image) == avatar_url
-        assert get_avatar_url(self.long_tweet_two_images) == avatar_url
-        assert get_avatar_url(self.long_tweet_three_images) == avatar_url
-        assert get_avatar_url(self.long_tweet_four_image) == avatar_url
 
     def test_replace_username_with_link(self):
         """Test if the username is replaced with a link"""
