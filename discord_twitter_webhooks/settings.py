@@ -1,3 +1,14 @@
+"""
+https://developer.twitter.com/en/portal/apps/new
+
+
+consumer_key: Twitter API key
+consumer_secret: Twitter API secret key
+access_token: Twitter API access token
+access_token_secret: Twitter API access token secret
+
+"""
+
 import os
 
 import tweepy

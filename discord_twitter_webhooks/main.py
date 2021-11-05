@@ -1,3 +1,18 @@
+"""Stream tweets to Discord.
+
+Tweepy(https://www.tweepy.org/) is used for connecting to the Twitter API and stream tweets to Discord.
+Dhooks(https://github.com/kyb3r/dhooks) is used for sending tweets to Discord via webhooks.
+BeautifulSoup(https://www.crummy.com/software/BeautifulSoup/) to get images from websites.
+requests(https://requests.readthedocs.io/en/master/) to send images
+to twitter-image-collage-maker(https://github.com/TheLovinator1/twitter-image-collage-maker)
+
+
+Original GitHub: https://github.com/TheLovinator1/discord-twitter-webhooks
+
+Don't be afraid to contact me if you have any questions or suggestions. I'm always happy to help or add new features.
+Send a pull request or open an issue on GitHub if you want to help me improve this code.
+"""
+
 import html
 import json
 import logging
@@ -31,6 +46,16 @@ level = logging.getLevelName(log_level)
 
 
 def get_text(tweet) -> str:
+    """Get the text from the tweet.
+
+    Tweets can be normal(less than 140 characters) or extended(more than 140 characters).
+
+    Args:
+        tweet ([type]): Tweet object
+
+    Returns:
+        str: Text from the tweet
+    """
     try:
         text = tweet.extended_tweet["full_text"]
         logger.debug(f"Tweet is extended: {text}")
@@ -41,7 +66,19 @@ def get_text(tweet) -> str:
     return text
 
 
-def get_media_links_and_remove_url(tweet, text: str) -> tuple:
+def get_media_links_and_remove_url(tweet, text: str) -> tuple[list, str]:
+    """Get the media links from the tweet and remove the links from the tweet text.
+
+    Twitter adds a link at the end of the tweet if the tweet has image, video or gif.
+    We will remove this as it is not needed.
+
+    Args:
+        tweet ([type]): Tweet object
+        text (str): Text from the tweet
+
+    Returns:
+        tuple[list, str]:  Media links and text
+    """
     link_list = []
 
     logger.debug(f"Found image in: https://twitter.com/i/web/status/{tweet.id}")
@@ -67,13 +104,17 @@ def get_media_links_and_remove_url(tweet, text: str) -> tuple:
     return link_list, text
 
 
-def get_avatar_url(tweet) -> str:
-    avatar_url = tweet.user.profile_image_url_https
-    logger.debug(f"Avatar URL: {avatar_url}")
-    return avatar_url.replace("_normal.jpg", ".jpg")
+def get_urls(tweet) -> list[str]:
+    """Get the URLs from the tweet and add them to a list.
 
+    We use this to get the images from websites.
 
-def get_urls(tweet) -> list:
+    Args:
+        tweet ([type]): Tweet object
+
+    Returns:
+        list[str]: Urls from the tweet
+    """
     url_list = []
     try:
         for url in tweet.extended_tweet["entities"]["urls"]:
@@ -90,6 +131,18 @@ def get_urls(tweet) -> list:
 
 
 def replace_tco_url_link_with_real_link(tweet, text: str) -> str:
+    """Replace the t.co url with the real url so users know where the link goes to.
+
+    Before: https://t.co/1YC2hc8iUq
+    After: https://www.youtube.com/
+
+    Args:
+        tweet ([type]): Tweet object
+        text (str): Text from the tweet
+
+    Returns:
+        str: Text with the t.co url replaced with the real url
+    """
     try:
         # Tweet is more than 140 characters
         for url in tweet.extended_tweet["entities"]["urls"]:
@@ -107,7 +160,17 @@ def replace_tco_url_link_with_real_link(tweet, text: str) -> str:
 
 
 def replace_username_with_link(text: str) -> str:
-    # Replace @username with link
+    """Replace @username with link to their twitter profile.
+
+    Before: @TheLovinator1
+    After: [@TheLovinator1](https://twitter.com/TheLovinator1)
+
+    Args:
+        text (str): Text from the tweet
+
+    Returns:
+        str: Text with the username replaced with a link
+    """
     return re.sub(
         r"\B@(\w*)",
         r"[\g<0>](https://twitter.com/\g<1>)",
@@ -117,6 +180,17 @@ def replace_username_with_link(text: str) -> str:
 
 
 def replace_hashtag_with_link(text: str) -> str:
+    """Replace hashtag with link to Twitter search.
+
+    Before: #Hello
+    After: [#Hello](https://twitter.com/hashtag/Hello)
+
+    Args:
+        text (str): Text from the tweet
+
+    Returns:
+        str: Text with the hashtag replaced with a link
+    """
     # Replace #hashtag with link
     return re.sub(
         r"\B#(\w*)",
@@ -127,7 +201,20 @@ def replace_hashtag_with_link(text: str) -> str:
 
 
 def remove_discord_link_previews(text: str) -> str:
-    # Discord makes link previews, can fix this by changing to <url>
+    """Remove the discord link previews.
+
+    We do this because Discord will add link previews after the message.
+    This takes up too much space. We do this by appending a <> before and after the link.
+
+    Before: https://www.example.com/
+    After: <https://www.example.com/>
+
+    Args:
+        text (str): Text from the tweet
+
+    Returns:
+        str: Text with the discord link previews removed
+    """
     return re.sub(
         r"(https://\S*)\)",
         r"<\g<1>>)",
@@ -137,6 +224,17 @@ def remove_discord_link_previews(text: str) -> str:
 
 
 def change_subreddit_to_clickable_link(text: str) -> str:
+    """Change /r/subreddit to clickable link.
+
+    Before: /r/sweden
+    After: [r/sweden](https://www.reddit.com/r/sweden/)
+
+    Args:
+        text (str): Text from the tweet
+
+    Returns:
+        str: Text with the subreddit replaced with a clickable link
+    """
     # Change /r/subreddit to clickable link
     return re.sub(
         r"(/r/)([^\s^\/]*)(/|)",
@@ -147,6 +245,16 @@ def change_subreddit_to_clickable_link(text: str) -> str:
 
 
 def change_reddit_username_to_link(text: str) -> str:
+    """Change /u/username to clickable link.
+
+    Before: /u/username
+    After: [u/username](https://www.reddit.com/u/username/)
+
+    Args:
+        text (str): Text from the tweet
+    Returns:
+        str: Text with the username replaced with a clickable link
+    """
     # Change /u/user to clickable link
     return re.sub(
         r"(/u/|/user/)([^\s^\/]*)(/|)",
@@ -156,11 +264,22 @@ def change_reddit_username_to_link(text: str) -> str:
     )
 
 
-def get_meta_image(url: str):
+def get_meta_image(url: str) -> str:
+    """Get twitter:image meta tag from url.
+
+    Looks for <meta name="twitter:image" content=""> and <meta property="og:image" content="">
+    Right now og:image is prioritized over twitter:image.
+
+    Args:
+        url (str): Url to get the meta image from
+
+    Returns:
+        [type]: twitter:image found in url
+    """
+    image_url = ""
     try:
-        r = requests.get(url[0])
-        soup = BeautifulSoup(r.content, "html.parser")
-        image_url = ""
+        response = requests.get(url)
+        soup = BeautifulSoup(response.content, "html.parser")
 
         # TODO: Which one should be used if both are availabe?
         # <meta name="twitter:image" content="">
@@ -173,18 +292,37 @@ def get_meta_image(url: str):
         if og_image:
             image_url = og_image[0].get("content")
 
-        return image_url
-    except Exception as e:
-        logger.error(f"Error getting image url: {e}")
+    except Exception as exception:  # pylint: disable=broad-except
+        logger.error(f"Error getting image url: {exception}")
+
+    return image_url
 
 
-def send_text_webhook(text: str, webhook: str = webhook_url):
+def send_text_webhook(text: str, webhook: str = webhook_url) -> None:
+    """Send text to webhook.
+
+    Args:
+        text (str): Text to send to webhook
+        webhook (str, optional): Webhook URL. Defaults to environment variable WEBHOOK_URL.
+    """
     logger.error(f"Webhook text: {text}")
     hook = Webhook(webhook)
     hook.send(text)
 
 
-def send_embed_webhook(avatar: str, tweet, link_list, text: str, webhook: str = webhook_url, twitter_card_image=None):
+def send_embed_webhook(
+    tweet, link_list: list[str], text: str, webhook: str = webhook_url, twitter_card_image: str = None
+) -> None:
+    """Send embed to Discord webhook.
+
+    Args:
+        avatar (str): Avatar URL
+        tweet ([type]): Tweet object
+        link_list (list[str]): List of links from the tweet
+        text (str): Text from the tweet
+        webhook (str, optional): Webhook URL. Defaults to environment variable WEBHOOK_URL.
+        twitter_card_image (str, optional): Twitter meta image. Defaults to None.
+    """
     logger.debug(f"Tweet: {text}")
     hook = Webhook(webhook)
 
@@ -193,18 +331,20 @@ def send_embed_webhook(avatar: str, tweet, link_list, text: str, webhook: str = 
         color=0x1E0F3,
         timestamp="now",
     )
+    # Only add image if there is one
     if len(link_list):
         if len(link_list) == 1:
             logger.debug(f"Found one image: {link_list[0]}")
             embed.set_image(link_list[0])
 
         elif len(link_list) > 1:
+            # Send images to twitter-image-collage-maker(e.g https://twitter.lovinator.space/) and get a collage back.
             logger.debug("Found more than one image")
             response = requests.get(url=twitter_image_collage_maker, params={"tweet_id": tweet.id})
 
             if response.status_code == 200:
                 json_data = json.loads(response.text)
-                print(f"json from {twitter_image_collage_maker}: {json_data}")
+                logger.debug(f"JSON from {twitter_image_collage_maker}: {json_data}")
                 embed.set_image(json_data["url"])
             else:
                 logger.error(f"Failed to get response from {twitter_image_collage_maker}. Using first image instead.")
@@ -213,35 +353,60 @@ def send_embed_webhook(avatar: str, tweet, link_list, text: str, webhook: str = 
     elif twitter_card_image:
         try:
             embed.set_image(twitter_card_image)
-        except Exception as e:
-            logger.error(f"Failed to set Twitter card image: {e}")
+        except Exception as exception:  # pylint: disable=broad-except
+            logger.error(f"Failed to set Twitter card image: {exception}")
+
+    avatar_url = tweet.user.profile_image_url_https
+    logger.debug(f"Avatar URL: {avatar_url}")
+    avatar_url = avatar_url.replace("_normal.jpg", ".jpg")
+
     embed.set_author(
-        icon_url=avatar,
+        icon_url=avatar_url,
         name=tweet.user.screen_name,
         url=f"https://twitter.com/i/web/status/{tweet.id}",
     )
 
     hook.send(embed=embed)
 
-    logger.info("Webhook posted.")
+    logger.info(f"Webhook posted for tweet https://twitter.com/i/web/status/{tweet.id}")
 
 
 def main(tweet):
+    """Don't be afraid to contact me if you have any questions about something here."""
     logger.debug(f"Raw tweet before any modifications: {tweet}")
+
+    # Get tweet text.
     text = get_text(tweet)
+
+    # Get media links and remove them from the text. We will use the media links to add images to the embed.
     media_links, text_media_links = get_media_links_and_remove_url(tweet, text)
-    avatar = get_avatar_url(tweet)
+
+    # Get image from website that we can use if no image is found in tweet
     twitter_card_image = get_meta_image(get_urls(tweet))
+
+    # Unescape HTML entities. &gt; becomes > etc.
     unescaped_text = html.unescape(text_media_links)
+
+    # Replace t.co links with clickable links
     text_url_links = replace_tco_url_link_with_real_link(tweet, unescaped_text)
+
+    # Replace /u/username with clickable link
     text_replace_username = replace_username_with_link(text_url_links)
+
+    # Replace hashtags with clickable links
     text_replace_hashtags = replace_hashtag_with_link(text_replace_username)
+
+    # Add < and > to the beginning and end of URLs
     text_discord_preview = remove_discord_link_previews(text_replace_hashtags)
+
+    # Chnge /r/subreddit to clickable link
     text_subreddit_to_link = change_subreddit_to_clickable_link(text_discord_preview)
+
+    # Change /u/username to clickable link
     text_reddit_username_to_link = change_reddit_username_to_link(text_subreddit_to_link)
 
+    # Send embed to Discord
     send_embed_webhook(
-        avatar=avatar,
         tweet=tweet,
         link_list=media_links,
         text=text_reddit_username_to_link,
@@ -250,26 +415,37 @@ def main(tweet):
 
 
 class MyStreamListener(Stream):
-    def on_status(self, tweet):
-        print(f"on_status: {tweet}")
-        """Called when a new status arrives"""
+    """https://docs.tweepy.org/en/latest/streaming.html
 
+    Args:
+        Stream ([type]): Stream tweets in realtime.
+    """
+
+    def on_status(self, status):
+        """This is called when a new tweet is received.
+
+        Args:
+            status ([type]): Twitter status
+        """
         # Tweet is retweet
-        if hasattr(tweet, "retweeted_status"):
+        if hasattr(status, "retweeted_status"):
             logger.info("Tweet is retweet")
-            if tweet.user.id_str == tweet.retweeted_status.user.id_str and get_retweet_of_own_tweet.lower() == "true":
+            if (
+                status.user.id_str == status.retweeted_status.user.id_str
+                and get_retweet_of_own_tweet.lower() == "true"
+            ):
                 logger.info("We replied to our self")
-                main(tweet=tweet)
+                main(tweet=status)
                 return
-            if tweet.retweeted_status.user.id_str in user_list_retweeted_split:
+            if status.retweeted_status.user.id_str in user_list_retweeted_split:
                 logger.info("Someone retweeted our tweet")
-                main(tweet=tweet)
-            elif tweet.user.id_str in user_list_retweets_split:
+                main(tweet=status)
+            elif status.user.id_str in user_list_retweets_split:
                 logger.info("We retweeted a tweet")
-                main(tweet=tweet)
+                main(tweet=status)
             else:
                 logger.info("Retweets and retweeted are not active in the environment variables.")
-        elif tweet.in_reply_to_user_id is not None:
+        elif status.in_reply_to_user_id is not None:
             # FIXME: If somebody else responds to their own reply in our tweet this activates.
             # We need to check who the original tweet author is.
             #
@@ -278,25 +454,25 @@ class MyStreamListener(Stream):
             #     main(tweet=tweet)
             #     return
             #
-            if tweet.user.id_str in user_list_replies_to_other_tweet_split:
+            if status.user.id_str in user_list_replies_to_other_tweet_split:
                 logger.info("We replied to someone")
-                main(tweet=tweet)
-            elif tweet.in_reply_to_user_id_str in user_list_replies_to_our_tweet_split:
+                main(tweet=status)
+            elif status.in_reply_to_user_id_str in user_list_replies_to_our_tweet_split:
                 logger.info("Someone replied to us")
-                main(tweet=tweet)
+                main(tweet=status)
             else:
                 logger.info(
                     "We didn't reply to our self, someone else or someone replied to us. "
                     "Or it is not active in the environment variables."
                 )
         else:
-            main(tweet=tweet)
+            main(tweet=status)
 
         return
 
 
 def start():
-    # Authenticate to the Twitter API
+    """Authenticate to the Twitter API and start the filter."""
     stream = MyStreamListener(consumer_key, consumer_secret, access_token, access_token_secret)
 
     # Streams are only terminated if the connection is closed, blocking the thread.
