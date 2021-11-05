@@ -264,21 +264,21 @@ def change_reddit_username_to_link(text: str) -> str:
     )
 
 
-def get_meta_image(url: str) -> str:
+def get_meta_image(url: list[str]) -> str:
     """Get twitter:image meta tag from url.
 
     Looks for <meta name="twitter:image" content=""> and <meta property="og:image" content="">
     Right now og:image is prioritized over twitter:image.
 
     Args:
-        url (str): Url to get the meta image from
+        url (list[str]): Url to get the meta image from
 
     Returns:
         [type]: twitter:image found in url
     """
     image_url = ""
     try:
-        response = requests.get(url)
+        response = requests.get(url[0])
         soup = BeautifulSoup(response.content, "html.parser")
 
         # TODO: Which one should be used if both are availabe?
