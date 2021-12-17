@@ -291,14 +291,15 @@ def get_meta_image(url: str) -> str:
     Right now og:image is prioritized over twitter:image.
 
     Args:
-        url (list[str]): Url to get the meta image from
+        url (str): Url to get the meta image from
 
     Returns:
         [type]: twitter:image found in url
     """
     image_url = ""
     try:
-        response = requests.get(url[0])
+        response = requests.get(url)
+
         soup = BeautifulSoup(response.content, "html.parser")
 
         # TODO: Which one should be used if both are availabe?
@@ -402,7 +403,8 @@ def main(tweet):
     media_links, text_media_links = get_media_links_and_remove_url(tweet, text)
 
     # Get image from website that we can use if no image is found in tweet
-    twitter_card_image = get_meta_image(get_urls(tweet))
+    urls_found = get_urls(tweet)
+    twitter_card_image = get_meta_image(urls_found[0])
 
     # Unescape HTML entities. &gt; becomes > etc.
     unescaped_text = html.unescape(text_media_links)
