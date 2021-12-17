@@ -264,7 +264,27 @@ def change_reddit_username_to_link(text: str) -> str:
     )
 
 
-def get_meta_image(url: list[str]) -> str:
+def remove_utm_source(text: str) -> str:
+    """Remove the utm_source parameter from the url.
+
+    Before: https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter
+    After: https://store.steampowered.com/app/457140/Oxygen_Not_Included/
+
+    Args:
+        text (str): Text from the tweet
+
+    Returns:
+        str: Text with the utm_source parameter removed
+    """
+    return re.sub(
+        r"(\?utm_source)\S*",
+        r"",
+        text,
+        flags=re.MULTILINE,
+    )
+
+
+def get_meta_image(url: str) -> str:
     """Get twitter:image meta tag from url.
 
     Looks for <meta name="twitter:image" content=""> and <meta property="og:image" content="">
@@ -405,11 +425,14 @@ def main(tweet):
     # Change /u/username to clickable link
     text_reddit_username_to_link = change_reddit_username_to_link(text_subreddit_to_link)
 
+    # Remove ?utm_source in URLs
+    text_remove_utm_source = remove_utm_source(text_reddit_username_to_link)
+
     # Send embed to Discord
     send_embed_webhook(
         tweet=tweet,
         link_list=media_links,
-        text=text_reddit_username_to_link,
+        text=text_remove_utm_source,
         twitter_card_image=twitter_card_image,
     )
 

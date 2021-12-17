@@ -10,6 +10,7 @@ from discord_twitter_webhooks.main import (
     get_media_links_and_remove_url,
     get_meta_image,
     get_text,
+    remove_utm_source,
     replace_hashtag_with_link,
     replace_tco_url_link_with_real_link,
     replace_username_with_link,
@@ -237,4 +238,13 @@ class TestTweets:
         assert (
             replace_tco_url_link_with_real_link(tweet=self.link_to_youtube, text=self.link_to_youtube.text)
             == "https://www.youtube.com/\nHello, this is Youtube"
+        )
+
+    def test_remove_utm_source(self):
+        """Test if the utm source is removed"""
+        assert (
+            remove_utm_source(
+                "https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter"
+            )
+            == "https://store.steampowered.com/app/457140/Oxygen_Not_Included/"
         )
