@@ -399,7 +399,7 @@ def main(tweet):
     # Add < and > to the beginning and end of URLs
     text_discord_preview = remove_discord_link_previews(text_replace_hashtags)
 
-    # Chnge /r/subreddit to clickable link
+    # Change /r/subreddit to clickable link
     text_subreddit_to_link = change_subreddit_to_clickable_link(text_discord_preview)
 
     # Change /u/username to clickable link
