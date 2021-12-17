@@ -226,7 +226,7 @@ class TestTweets:
 
     def test_get_meta_image(self):
         """Test if the meta image is returned correctly"""
-        assert get_meta_image("https://lovinator.space/") == "https://lovinator.space/KaoFace.png"
+        assert get_meta_image("https://lovinator.space/") == "https://lovinator.space/KaoFace.webp"
 
     def test_replace_tco_url_link_with_real_link(self):
         """Test if the tco url is replaced with the real link"""
