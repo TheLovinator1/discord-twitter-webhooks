@@ -1,18 +1,3 @@
-"""Stream tweets to Discord.
-
-Tweepy(https://www.tweepy.org/) is used for connecting to the Twitter API and stream tweets to Discord.
-Dhooks(https://github.com/kyb3r/dhooks) is used for sending tweets to Discord via webhooks.
-BeautifulSoup(https://www.crummy.com/software/BeautifulSoup/) to get images from websites.
-requests(https://requests.readthedocs.io/en/master/) to send images
-to twitter-image-collage-maker(https://github.com/TheLovinator1/twitter-image-collage-maker)
-
-
-Original GitHub: https://github.com/TheLovinator1/discord-twitter-webhooks
-
-Don't be afraid to contact me if you have any questions or suggestions. I'm always happy to help or add new features.
-Send a pull request or open an issue on GitHub if you want to help me improve this code.
-"""
-
 import html
 import json
 import logging
