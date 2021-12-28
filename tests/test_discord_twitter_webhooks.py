@@ -4,25 +4,24 @@ import os
 import pytest
 import tweepy
 from discord_twitter_webhooks import __version__
-from discord_twitter_webhooks.main import (
-    change_reddit_username_to_link,
-    change_subreddit_to_clickable_link,
-    get_media_links_and_remove_url,
-    get_meta_image,
-    get_text,
-    remove_utm_source,
-    replace_hashtag_with_link,
-    replace_tco_url_link_with_real_link,
-    replace_username_with_link,
-    send_embed_webhook,
-    send_text_webhook,
-)
+from discord_twitter_webhooks.change_reddit_username_to_link import change_reddit_username_to_link
+from discord_twitter_webhooks.change_subreddit_to_clickable_link import change_subreddit_to_clickable_link
+from discord_twitter_webhooks.get_media_links_and_remove_url import get_media_links_and_remove_url
+from discord_twitter_webhooks.get_meta_image import get_meta_image
+from discord_twitter_webhooks.get_text import get_text
+from discord_twitter_webhooks.remote_utm_source import remove_utm_source
+from discord_twitter_webhooks.replace_hashtag_with_link import replace_hashtag_with_link
+from discord_twitter_webhooks.replace_tco_url_link_with_real_link import replace_tco_url_link_with_real_link
+from discord_twitter_webhooks.replace_username_with_link import replace_username_with_link
+from discord_twitter_webhooks.send_embed_webhook import send_embed_webhook
+from discord_twitter_webhooks.send_text_webhook import send_text_webhook
 from discord_twitter_webhooks.settings import auth
+
 
 # TODO: Add check for if retweet/reply check is working
 # TODO: Add check if imports work, e.g user_list_replies_to_other_tweet_split exists
-
-
+# TODO: Add from discord_twitter_webhooks.remove_discord_link_previews import remove_discord_link_previews
+# TODO: Add from discord_twitter_webhooks.get_urls import get_urls
 class TestTweets:
     """Test tweet stuff"""
 

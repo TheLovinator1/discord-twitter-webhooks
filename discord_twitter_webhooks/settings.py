@@ -1,14 +1,4 @@
-"""
-https://developer.twitter.com/en/portal/apps/new
-
-
-consumer_key: Twitter API key
-consumer_secret: Twitter API secret key
-access_token: Twitter API access token
-access_token_secret: Twitter API access token secret
-
-"""
-
+import logging
 import os
 
 import tweepy
@@ -58,6 +48,11 @@ user_list_retweets_split = []
 user_list_retweeted_split = []
 user_list_replies_to_our_tweet_split = []
 user_list_replies_to_other_tweet_split = []
+
+logger = logging
+logger.basicConfig(format="%(asctime)s - %(message)s", level=log_level)
+
+level = logging.getLevelName(log_level)
 
 if users_to_follow is not None:
     print("Users - Tweets:")
