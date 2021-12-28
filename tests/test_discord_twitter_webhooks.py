@@ -89,6 +89,7 @@ class TestTweets:
                 webhook=self.webhook_url,
                 link_list=["https://pbs.twimg.com/media/E6c309BWYAceCII.jpg"],
                 text="Testing embed with one image!",
+                twitter_card_image="",
             )
         except Exception as exception:  # pylint: disable=broad-except
             pytest.fail(exception, pytrace=True)
@@ -106,6 +107,7 @@ class TestTweets:
                     "https://pbs.twimg.com/media/E6c4jCyXMAA4_I9.jpg",
                 ],
                 text="Testing embed with four images!",
+                twitter_card_image="",
             )
         except Exception as exception:  # pylint: disable=broad-except
             pytest.fail(exception, pytrace=True)
@@ -243,7 +245,7 @@ class TestTweets:
         """Test if the utm source is removed"""
         assert (
             remove_utm_source(
-                "https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter"
+                "https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter"  # noqa
             )
             == "https://store.steampowered.com/app/457140/Oxygen_Not_Included/"
         )

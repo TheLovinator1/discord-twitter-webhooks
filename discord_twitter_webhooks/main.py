@@ -38,11 +38,15 @@ def main(tweet) -> None:
     media_links, text_media_links = get_media_links_and_remove_url(tweet, text)
 
     urls_found = get_urls(tweet)
-    twitter_card_image = get_meta_image(urls_found[0])
 
-    unescaped_text = html.unescape(text_media_links)
+    if urls_found:
+        twitter_card_image = get_meta_image(urls_found[0])
+    else:
+        twitter_card_image = ""
 
-    text_url_links = replace_tco_url_link_with_real_link(tweet, unescaped_text)
+    text_unescaped = html.unescape(text_media_links)
+
+    text_url_links = replace_tco_url_link_with_real_link(tweet, text_unescaped)
 
     text_replace_username = replace_username_with_link(text_url_links)
 

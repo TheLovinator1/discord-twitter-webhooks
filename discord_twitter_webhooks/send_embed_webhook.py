@@ -7,7 +7,7 @@ from discord_twitter_webhooks.settings import logger, twitter_image_collage_make
 
 
 def send_embed_webhook(
-    tweet, link_list: list[str], text: str, webhook: str = webhook_url, twitter_card_image: str = None
+    tweet, link_list: list[str], text: str, twitter_card_image: str, webhook: str = webhook_url
 ) -> None:
     """Send embed to Discord webhook.
 
@@ -17,7 +17,7 @@ def send_embed_webhook(
         link_list (list[str]): List of links from the tweet
         text (str): Text from the tweet
         webhook (str, optional): Webhook URL. Defaults to environment variable WEBHOOK_URL.
-        twitter_card_image (str, optional): Twitter meta image. Defaults to None.
+        twitter_card_image (str, optional): Twitter meta image.
     """
     logger.debug(f"Tweet: {text}")
     hook = Webhook(webhook)
@@ -27,6 +27,10 @@ def send_embed_webhook(
         color=0x1E0F3,
         timestamp="now",
     )
+
+    if twitter_card_image:
+        embed.set_image(twitter_card_image)
+
     # Only add image if there is one
     if len(link_list):
         if len(link_list) == 1:
@@ -45,9 +49,6 @@ def send_embed_webhook(
             else:
                 logger.error(f"Failed to get response from {twitter_image_collage_maker}. Using first image instead.")
                 embed.set_image(link_list[0])
-
-    if twitter_card_image:
-        embed.set_image(twitter_card_image)
 
     avatar_url = tweet.user.profile_image_url_https
     logger.debug(f"Avatar URL: {avatar_url}")
