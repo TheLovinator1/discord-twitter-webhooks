@@ -19,12 +19,14 @@ def get_meta_image(url: str) -> str:
     image_url = ""
     try:
         response = requests.get(url)
+        logger.debug(f"Response {response.status_code} from {url}")
 
         soup = BeautifulSoup(response.content, "html.parser")
 
         # TODO: Which one should be used if both are availabe?
         # <meta name="twitter:image" content="">
         twitter_image = soup.find_all("meta", attrs={"name": "twitter:image"})
+        logger.debug(f"twitter_image: {twitter_image}")
         if twitter_image:
             image_url = twitter_image[0].get("content")
 
@@ -36,4 +38,5 @@ def get_meta_image(url: str) -> str:
     except Exception as exception:  # pylint: disable=broad-except
         logger.error(f"Error getting image url: {exception}")
 
+    logger.debug(f"image_url: {image_url}")
     return image_url

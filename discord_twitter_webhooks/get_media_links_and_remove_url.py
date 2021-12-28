@@ -16,15 +16,14 @@ def get_media_links_and_remove_url(tweet, text: str) -> tuple[list, str]:
     """
     link_list = []
 
-    logger.debug(f"Found image in: https://twitter.com/i/web/status/{tweet.id}")
     try:
         # Tweet is more than 140 characters
         for image in tweet.extended_tweet["extended_entities"]["media"]:
             link_list.append(image["media_url_https"])
             text = text.replace(image["url"], "")
+            logger.debug(f"Found image in: https://twitter.com/i/web/status/{tweet.id}: {image['url']}")
     except KeyError:
-        # Tweet has no links
-        pass
+        logger.debug(f"No extended_entities in https://twitter.com/i/web/status/{tweet.id}")
 
     except AttributeError:
         # Tweet is less than 140 characters
@@ -32,8 +31,8 @@ def get_media_links_and_remove_url(tweet, text: str) -> tuple[list, str]:
             for image in tweet.extended_entities["media"]:
                 link_list.append(image["media_url_https"])
                 text = text.replace(image["url"], "")
+                logger.debug(f"Found image in: https://twitter.com/i/web/status/{tweet.id}: {image['url']}")
         except AttributeError:
-            # Tweet has no links
-            pass
+            logger.debug(f"No extended_entities in https://twitter.com/i/web/status/{tweet.id}")
 
     return link_list, text

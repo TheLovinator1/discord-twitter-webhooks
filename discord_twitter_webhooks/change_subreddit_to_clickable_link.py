@@ -1,5 +1,7 @@
 import re
 
+from discord_twitter_webhooks.settings import logger
+
 
 def change_subreddit_to_clickable_link(text: str) -> str:
     """Change /r/subreddit to clickable link.
@@ -13,10 +15,12 @@ def change_subreddit_to_clickable_link(text: str) -> str:
     Returns:
         str: Text with the subreddit replaced with a clickable link
     """
-    # Change /r/subreddit to clickable link
-    return re.sub(
+    logger.debug(f"change_subreddit_to_clickable_link: text={text}")
+    new_text = re.sub(
         r"(/r/)([^\s^\/]*)(/|)",
         r"[/r/\g<2>](https://reddit.com/r/\g<2>)",
         text,
         flags=re.MULTILINE,
     )
+    logger.debug(f"change_subreddit_to_clickable_link: new_text={new_text}")
+    return new_text

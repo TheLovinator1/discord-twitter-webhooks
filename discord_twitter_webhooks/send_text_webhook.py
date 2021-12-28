@@ -10,6 +10,6 @@ def send_text_webhook(text: str, webhook: str = webhook_url) -> None:
         text (str): Text to send to webhook
         webhook (str, optional): Webhook URL. Defaults to environment variable WEBHOOK_URL.
     """
-    logger.error(f"Webhook text: {text}")
+    logger.debug(f"Webhook text: {text} sent to {webhook}")
     hook = Webhook(webhook)
     hook.send(text)

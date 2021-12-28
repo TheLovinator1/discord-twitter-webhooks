@@ -1,5 +1,7 @@
 import re
 
+from discord_twitter_webhooks.settings import logger
+
 
 def remove_utm_source(text: str) -> str:
     """Remove the utm_source parameter from the url.
@@ -13,9 +15,12 @@ def remove_utm_source(text: str) -> str:
     Returns:
         str: Text with the utm_source parameter removed
     """
-    return re.sub(
+    logger.debug(f"remove_utm_source: text={text}")
+    new_text = re.sub(
         r"(\?utm_source)\S*",
         r"",
         text,
         flags=re.MULTILINE,
     )
+    logger.debug(f"remove_utm_source: new_text={new_text}")
+    return new_text

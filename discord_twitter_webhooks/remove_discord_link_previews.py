@@ -1,5 +1,7 @@
 import re
 
+from discord_twitter_webhooks.settings import logger
+
 
 def remove_discord_link_previews(text: str) -> str:
     """Remove the discord link previews.
@@ -16,9 +18,12 @@ def remove_discord_link_previews(text: str) -> str:
     Returns:
         str: Text with the discord link previews removed
     """
-    return re.sub(
+    logger.debug(f"remove_discord_link_previews: text={text}")
+    new_text = re.sub(
         r"(https://\S*)\)",
         r"<\g<1>>)",
         text,
         flags=re.MULTILINE,
     )
+    logger.debug(f"remove_discord_link_previews: new_text={new_text}")
+    return new_text
