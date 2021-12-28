@@ -60,8 +60,13 @@ def main(tweet) -> None:
 
     text_remove_utm_source = remove_utm_source(text_reddit_username_to_link)
 
+    text_remove_whitespace = text_remove_utm_source.rstrip()
+
     send_embed_webhook(
-        tweet=tweet, link_list=media_links, text=text_remove_utm_source, twitter_card_image=twitter_card_image
+        tweet=tweet,
+        link_list=media_links,
+        text=text_remove_whitespace,
+        twitter_card_image=twitter_card_image,
     )
 
 
