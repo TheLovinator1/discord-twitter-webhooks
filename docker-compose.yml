@@ -2,6 +2,7 @@ version: "3"
 services:
   discord-twitter-webhooks:
     image: thelovinator/discord-twitter-webhooks
+    build: .
     env_file:
       - .env
     container_name: discord-twitter-webhooks

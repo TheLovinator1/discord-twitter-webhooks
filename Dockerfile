@@ -1,11 +1,6 @@
-# We need gcc, build-essential and git to install our requirements but we 
-# don't need them when run the bot so we can selectively copy artifacts
-# from this stage (compile-image) to second one (runtime-image), leaving 
-# behind everything we don't need in the final build. 
-FROM python:3.9-slim AS compile-image
+FROM python:3.9-slim
 
-# We don't want apt-get to interact with us,
-# and we want the default answers to be used for all questions.
+# We don't want apt-get to interact with us and we want the default answers to be used for all questions.
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Don't generate byte code (.pyc-files). 
@@ -19,8 +14,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Update packages and install needed packages to build our requirements.
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends build-essential gcc git curl
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc git curl
 
 # Create user so we don't run as root.
 RUN useradd --create-home botuser
@@ -33,14 +27,14 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-
 # Add poetry to our path
 ENV PATH="/home/botuser/.poetry/bin/:${PATH}"
 
-COPY pyproject.toml poetry.lock README.md /home/botuser/
+COPY pyproject.toml poetry.lock README.md /home/botuser/discord-twitter-webhooks/
 
 # Change directory to where we will run the bot.
-WORKDIR /home/botuser
+WORKDIR /home/botuser/discord-twitter-webhooks
 
 RUN poetry install --no-interaction --no-ansi --no-dev
 
-COPY discord_twitter_webhooks/main.py discord_twitter_webhooks/settings.py /home/botuser/discord_twitter_webhooks/
+ADD discord_twitter_webhooks /home/botuser/discord-twitter-webhooks/discord_twitter_webhooks/
 
 # Run bot.
 CMD [ "poetry", "run", "bot" ]
