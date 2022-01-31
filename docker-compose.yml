@@ -1,4 +1,3 @@
-version: "3"
 services:
   discord-twitter-webhooks:
     image: thelovinator/discord-twitter-webhooks
