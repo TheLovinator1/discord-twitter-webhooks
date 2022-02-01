@@ -3,7 +3,7 @@ import os
 
 import tweepy
 from dotenv import load_dotenv
-from tweepy import OAuthHandler
+from tweepy import OAuth1UserHandler
 
 # Parse the .env file and then load all the variables found as environment variables
 load_dotenv(verbose=True)
@@ -40,7 +40,7 @@ log_level = os.getenv("LOG_LEVEL", default="INFO")
 twitter_image_collage_maker = os.getenv("TWITTER_IMAGE_COLLAGE_API", default="https://twitter.lovinator.space/add")
 
 # Authenticate to the Twitter API
-auth = OAuthHandler(consumer_key, consumer_secret)
+auth = OAuth1UserHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 
