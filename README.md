@@ -6,8 +6,6 @@
 
 <p align="center"><sup> Theme is https://github.com/KillYoy/DiscordNight <sup></p>
 
-![Docker Pulls](https://img.shields.io/docker/pulls/thelovinator/discord-twitter-webhooks)
-
 `discord-twitter-webhooks` is an automated tool that checks [Twitter](https://twitter.com) for new tweets and sends them to a [Discord](https://discord.com/) webhook.
 
 This bot is configured with a config file (.env) or environment variables and is written in Python.
