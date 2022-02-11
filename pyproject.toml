@@ -27,7 +27,7 @@ dhooks = { git = "https://github.com/kyb3r/dhooks.git" }
 requests = "^2.26.0"
 python-dotenv = "^0.18.0"
 beautifulsoup4 = "^4.9.3"
-tweepy = "^4.1.0"
+tweepy = "^4.5.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.1"
