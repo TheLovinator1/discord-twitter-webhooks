@@ -34,7 +34,7 @@ pytest = "^6.2.5"
 black = {version = "^22.1.0", allow-prereleases = true}
 mypy = "^0.931"
 flake8 = "^4.0.1"
-types-requests = "^2.27.8"
+types-requests = "^2.27.9"
 bandit = "^1.7.2"
 
 [build-system]
