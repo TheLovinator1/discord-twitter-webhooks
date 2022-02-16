@@ -98,18 +98,3 @@ if user_list_someone_retweets_our_tweet is not None:
         print(f"\t{twitter_id} - {username_reply.screen_name}")
 else:
     print("Found no users were we track tweets that get retweeted.")
-
-
-if __name__ == "__main__":
-    print(f"Consumer key: {consumer_key}")
-    print(f"Consumer secret: {consumer_secret}")
-    print(f"Access Token: {access_token}")
-    print(f"Access Token Secret: {access_token_secret}")
-    print(f"Users to follow - tweets: {users_to_follow}")
-    print(f"Users to follow - replies to our: {user_list_replies_to_our_tweet}")
-    print(f"Users to follow - replies to others: {user_list_replies_to_our_tweet}")
-    print(f"Users to follow - retweets: {user_list_we_retweet_someone_elses_tweet}")
-    print(f"Users to follow - retweeted: {user_list_someone_retweets_our_tweet}")
-    print(f"Get self retweets: {get_retweet_of_own_tweet}")
-    print(f"Webhook url: {webhook_url}")
-    print(f"Twitter collage maker: {twitter_image_collage_maker}")
