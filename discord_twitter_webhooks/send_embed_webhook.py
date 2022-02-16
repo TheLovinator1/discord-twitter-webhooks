@@ -3,7 +3,11 @@ import json
 import requests
 from dhooks import Embed, Webhook
 
-from discord_twitter_webhooks.settings import logger, twitter_image_collage_maker, webhook_url
+from discord_twitter_webhooks.settings import (
+    logger,
+    twitter_image_collage_maker,
+    webhook_url,
+)
 
 
 def send_embed_webhook(
