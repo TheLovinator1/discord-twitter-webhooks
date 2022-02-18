@@ -5,27 +5,22 @@ import pytest
 import tweepy
 
 from discord_twitter_webhooks import __version__
-from discord_twitter_webhooks.change_reddit_username_to_link import (
-    change_reddit_username_to_link,
+from discord_twitter_webhooks.change import (
+    reddit_username_to_link,
+    subreddit_to_clickable_link,
 )
-from discord_twitter_webhooks.change_subreddit_to_clickable_link import (
-    change_subreddit_to_clickable_link,
+from discord_twitter_webhooks.get import (
+    media_links_and_remove_url,
+    meta_image,
+    tweet_text,
 )
-from discord_twitter_webhooks.get_media_links_and_remove_url import (
-    get_media_links_and_remove_url,
-)
-from discord_twitter_webhooks.get_meta_image import get_meta_image
-from discord_twitter_webhooks.get_text import get_text
-from discord_twitter_webhooks.remote_utm_source import remove_utm_source
-from discord_twitter_webhooks.replace_hashtag_with_link import replace_hashtag_with_link
-from discord_twitter_webhooks.replace_tco_url_link_with_real_link import (
-    replace_tco_url_link_with_real_link,
-)
-from discord_twitter_webhooks.replace_username_with_link import (
-    replace_username_with_link,
+from discord_twitter_webhooks.remove import utm_source
+from discord_twitter_webhooks.replace import (
+    hashtag_with_link,
+    tco_url_link_with_real_link,
+    username_with_link,
 )
 from discord_twitter_webhooks.send_embed_webhook import send_embed_webhook
-from discord_twitter_webhooks.send_text_webhook import send_text_webhook
 from discord_twitter_webhooks.settings import auth
 
 
@@ -85,13 +80,6 @@ class TestTweets:
         """Test if the version is correct"""
         assert __version__ == "0.1.0"
 
-    def test_send_text_webhook(self):
-        """Test if the text webhook is sent correctly"""
-        try:
-            send_text_webhook("Running pytest!", webhook=self.webhook_url)
-        except Exception as exception:  # pylint: disable=broad-except
-            pytest.fail(exception, pytrace=True)
-
     def test_send_embed_webhook_one_image(self):
         """Test if the embed webhook is sent correctly"""
         try:
@@ -123,44 +111,44 @@ class TestTweets:
         except Exception as exception:  # pylint: disable=broad-except
             pytest.fail(exception, pytrace=True)
 
-    def test_get_text(self):
+    def test_tweet_text(self):
         """Test if the text is returned correctly"""
-        assert get_text(self.short_tweet_only_text) == "Hello I am short Sadge"
-        assert get_text(self.short_tweet_one_image) == "Short 1 Image https://t.co/18WctMxOYa"
-        assert get_text(self.short_tweet_two_images) == "Short 2 Images https://t.co/SPBV5a6YyA"
-        assert get_text(self.short_tweet_three_images) == "Short 3 Images https://t.co/dWPPTQWbHB"
-        assert get_text(self.short_tweet_four_image) == "Short 4 Images https://t.co/OGwDRJCMJF"
+        assert tweet_text(self.short_tweet_only_text) == "Hello I am short Sadge"
+        assert tweet_text(self.short_tweet_one_image) == "Short 1 Image https://t.co/18WctMxOYa"
+        assert tweet_text(self.short_tweet_two_images) == "Short 2 Images https://t.co/SPBV5a6YyA"
+        assert tweet_text(self.short_tweet_three_images) == "Short 3 Images https://t.co/dWPPTQWbHB"
+        assert tweet_text(self.short_tweet_four_image) == "Short 4 Images https://t.co/OGwDRJCMJF"
 
-        assert get_text(self.retweet_from_somebody_else) == "RT @Bot2Lovi: f saf sasaf sa"
+        assert tweet_text(self.retweet_from_somebody_else) == "RT @Bot2Lovi: f saf sasaf sa"
 
         # TODO: This is not the full text.
         assert (
-            get_text(self.long_tweet_only_text)
+            tweet_text(self.long_tweet_only_text)
             == "Hello I am longlanglonglonglonglonglonglonglonglonglonglonglonglonglonglonglong"
             + "longlonglonglonglonglonglonglonglong… https://t.co/WuuOFm4xMk"
         )
         assert (
-            get_text(self.long_tweet_one_image)
+            tweet_text(self.long_tweet_one_image)
             == "Long 1 Image Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
             + "tempor incididunt ut labore et… https://t.co/2uafrdmqgg"
         )
         assert (
-            get_text(self.long_tweet_two_images)
+            tweet_text(self.long_tweet_two_images)
             == "Long 2 Image Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
             + "tempor incididunt ut labore et… https://t.co/DH28OdNtsx"
         )
         assert (
-            get_text(self.long_tweet_three_images)
+            tweet_text(self.long_tweet_three_images)
             == "Long 3 Image Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
             + "tempor incididunt ut labore et… https://t.co/b1a55tQWAZ"
         )
         assert (
-            get_text(self.long_tweet_four_image)
+            tweet_text(self.long_tweet_four_image)
             == "Long 4 Image Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
             + "tempor incididunt ut labore et… https://t.co/ehh3OWHbqd"
         )
 
-    def test_get_media_links_and_remove_url(self):
+    def test_media_links_and_remove_url(self):
         """Test if the media links are returned correctly"""
         short_txt = "Hello I am short Sadge"
         short_1_txt = "Short 1 Image"
@@ -170,21 +158,21 @@ class TestTweets:
 
         gif_tweet_txt = "Gif"
 
-        assert get_media_links_and_remove_url(tweet=self.short_tweet_only_text, text=short_txt) == ([], short_txt)
-        assert get_media_links_and_remove_url(tweet=self.short_tweet_one_image, text=short_1_txt) == (
+        assert media_links_and_remove_url(tweet=self.short_tweet_only_text, text=short_txt) == ([], short_txt)
+        assert media_links_and_remove_url(tweet=self.short_tweet_one_image, text=short_1_txt) == (
             [
                 "https://pbs.twimg.com/media/E6c309BWYAceCII.jpg",
             ],
             short_1_txt,
         )
-        assert get_media_links_and_remove_url(tweet=self.short_tweet_two_images, text=short_2_txt) == (
+        assert media_links_and_remove_url(tweet=self.short_tweet_two_images, text=short_2_txt) == (
             [
                 "https://pbs.twimg.com/media/E6c4BpyXIAIvvdW.jpg",
                 "https://pbs.twimg.com/media/E6c4BqSXMAQq1Fe.jpg",
             ],
             short_2_txt,
         )
-        assert get_media_links_and_remove_url(tweet=self.short_tweet_three_images, text=short_3_txt) == (
+        assert media_links_and_remove_url(tweet=self.short_tweet_three_images, text=short_3_txt) == (
             [
                 "https://pbs.twimg.com/media/E6c4Zw0WQAQHA6h.jpg",
                 "https://pbs.twimg.com/media/E6c4Zw-WUAIr0pJ.jpg",
@@ -192,7 +180,7 @@ class TestTweets:
             ],
             short_3_txt,
         )
-        assert get_media_links_and_remove_url(tweet=self.short_tweet_four_image, text=short_4_txt) == (
+        assert media_links_and_remove_url(tweet=self.short_tweet_four_image, text=short_4_txt) == (
             [
                 "https://pbs.twimg.com/media/E6c4jCOXoAIgLW9.jpg",
                 "https://pbs.twimg.com/media/E6c4jCQXoAInLOD.jpg",
@@ -202,60 +190,60 @@ class TestTweets:
             short_4_txt,
         )
 
-        assert get_media_links_and_remove_url(tweet=self.gif_tweet, text=gif_tweet_txt) == (
+        assert media_links_and_remove_url(tweet=self.gif_tweet, text=gif_tweet_txt) == (
             [
                 "https://pbs.twimg.com/tweet_video_thumb/E6daSHUX0AYR9ap.jpg",
             ],
             gif_tweet_txt,
         )
 
-    def test_replace_username_with_link(self):
+    def test_username_with_link(self):
         """Test if the username is replaced with a link"""
         assert (
-            replace_username_with_link(self.at_hash_reddituser_subreddit.text)
+            username_with_link(self.at_hash_reddituser_subreddit.text)
             == "Hello [@TheLovinator1](https://twitter.com/TheLovinator1) #Hello /u/test /r/aww"
         )
 
-    def test_replace_hashtag_with_link(self):
+    def test_hashtag_with_link(self):
         """Test if the hashtag is replaced with a link"""
         assert (
-            replace_hashtag_with_link(self.at_hash_reddituser_subreddit.text)
+            hashtag_with_link(self.at_hash_reddituser_subreddit.text)
             == "Hello @TheLovinator1 [#Hello](https://twitter.com/hashtag/Hello) /u/test /r/aww"
         )
 
-    def test_change_subreddit_to_clickable_link(self):
+    def test_subreddit_to_clickable_link(self):
         """Test if the subreddit is replaced with a clickable link"""
         assert (
-            change_subreddit_to_clickable_link(self.at_hash_reddituser_subreddit.text)
+            subreddit_to_clickable_link(self.at_hash_reddituser_subreddit.text)
             == "Hello @TheLovinator1 #Hello /u/test [/r/aww](https://reddit.com/r/aww)"
         )
 
-    def test_change_reddit_username_to_link(self):
+    def test_reddit_username_to_link(self):
         """Test if the reddit username is replaced with a link"""
         assert (
-            change_reddit_username_to_link(self.at_hash_reddituser_subreddit.text)
+            reddit_username_to_link(self.at_hash_reddituser_subreddit.text)
             == "Hello @TheLovinator1 #Hello [/u/test](https://reddit.com/u/test) /r/aww"
         )
 
-    def test_get_meta_image(self):
+    def test_meta_image(self):
         """Test if the meta image is returned correctly"""
-        assert get_meta_image("https://lovinator.space/") == "https://lovinator.space/KaoFace.webp"
+        assert meta_image("https://lovinator.space/") == "https://lovinator.space/KaoFace.webp"
 
-    def test_replace_tco_url_link_with_real_link(self):
+    def test_tco_url_link_with_real_link(self):
         """Test if the tco url is replaced with the real link"""
         assert (
-            replace_tco_url_link_with_real_link(self.short_tweet_only_text, self.short_tweet_only_text.text)
+            tco_url_link_with_real_link(self.short_tweet_only_text, self.short_tweet_only_text.text)
             == "Hello I am short Sadge"
         )
         assert (
-            replace_tco_url_link_with_real_link(tweet=self.link_to_youtube, text=self.link_to_youtube.text)
+            tco_url_link_with_real_link(tweet=self.link_to_youtube, text=self.link_to_youtube.text)
             == "https://www.youtube.com/\nHello, this is Youtube"
         )
 
-    def test_remove_utm_source(self):
+    def test_utm_source(self):
         """Test if the utm source is removed"""
         assert (
-            remove_utm_source(
+            utm_source(
                 "https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter"  # noqa
             )
             == "https://store.steampowered.com/app/457140/Oxygen_Not_Included/"
