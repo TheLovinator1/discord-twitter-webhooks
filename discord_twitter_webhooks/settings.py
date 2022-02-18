@@ -34,8 +34,7 @@ log_level = os.getenv("LOG_LEVEL", default="INFO")
 
 # Where https://github.com/TheLovinator1/twitter-image-collage-maker is running.
 # You can run your own version or use the default https://twitter.lovinator.space/
-# The only information I have about you are the images that are generated.
-twitter_image_collage_maker = os.getenv("TWITTER_IMAGE_COLLAGE_API", default="https://twitter.lovinator.space/add")
+collage_maker_url = os.getenv("TWITTER_IMAGE_COLLAGE_API", default="https://twitter.lovinator.space/add")
 
 # Authenticate to the Twitter API
 auth = OAuth1UserHandler(consumer_key, consumer_secret)
