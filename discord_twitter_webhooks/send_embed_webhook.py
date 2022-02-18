@@ -28,7 +28,6 @@ def send_embed_webhook(tweet, link_list: list[str], text: str, twitter_card_imag
     # Only add image if there is one
     if len(link_list):
         if len(link_list) == 1:
-            logger.debug(f"Found one image: {link_list[0]}")
             embed.set_image(link_list[0])
 
         elif len(link_list) > 1:
@@ -43,7 +42,6 @@ def send_embed_webhook(tweet, link_list: list[str], text: str, twitter_card_imag
                 embed.set_image(link_list[0])
 
     avatar_url = tweet.user.profile_image_url_https
-    logger.debug(f"Avatar URL: {avatar_url}")
     avatar_url = avatar_url.replace("_normal.jpg", ".jpg")
 
     embed.set_author(
