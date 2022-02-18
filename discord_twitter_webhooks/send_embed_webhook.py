@@ -3,16 +3,10 @@ import json
 import requests
 from dhooks import Embed, Webhook
 
-from discord_twitter_webhooks.settings import (
-    logger,
-    twitter_image_collage_maker,
-    webhook_url,
-)
+from discord_twitter_webhooks.settings import collage_maker_url, logger, webhook_url
 
 
-def send_embed_webhook(
-    tweet, link_list: list[str], text: str, twitter_card_image: str, webhook: str = webhook_url
-) -> None:
+def send_embed_webhook(tweet, link_list: list[str], text: str, twitter_card_image: str, webhook: str = webhook_url):
     """Send embed to Discord webhook.
 
     Args:
@@ -26,11 +20,7 @@ def send_embed_webhook(
     logger.debug(f"Tweet: {text}")
     hook = Webhook(webhook)
 
-    embed = Embed(
-        description=text,
-        color=0x1E0F3,
-        timestamp="now",
-    )
+    embed = Embed(description=text, color=0x1E0F3, timestamp="now")
 
     if twitter_card_image:
         embed.set_image(twitter_card_image)
