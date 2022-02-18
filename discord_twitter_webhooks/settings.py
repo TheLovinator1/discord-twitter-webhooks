@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 
 import tweepy
 from dotenv import load_dotenv
@@ -56,7 +57,8 @@ if users_to_follow is not None:
         username = api.get_user(user_id=twitter_id)
         print(f"\t{twitter_id} - {username.screen_name}")
 else:
-    print("It looks like USERS_TO_FOLLOW is empty. Did you forget to fill it out?")
+    sys.exit("It looks like USERS_TO_FOLLOW is empty. Did you forget to fill it out?")
+
 
 if user_list_replies_to_our_tweet is not None:
     print("Users - Replies to our tweet:")
