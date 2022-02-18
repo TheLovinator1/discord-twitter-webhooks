@@ -78,7 +78,7 @@ class TestTweets:
 
     def test_version(self):
         """Test if the version is correct"""
-        assert __version__ == "0.1.0"
+        assert __version__ == "0.2.0"
 
     def test_send_embed_webhook_one_image(self):
         """Test if the embed webhook is sent correctly"""
