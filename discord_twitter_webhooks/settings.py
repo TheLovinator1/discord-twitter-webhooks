@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from tweepy import OAuth1UserHandler
 
 # Parse the .env file and then load all the variables found as environment variables
-load_dotenv(verbose=True)
+load_dotenv()
 
 # Environment variables
 # https://developer.twitter.com/en/apps
