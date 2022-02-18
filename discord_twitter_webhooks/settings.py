@@ -49,8 +49,6 @@ user_list_replies_to_other_tweet_split = []
 logger = logging
 logger.basicConfig(format="%(asctime)s - %(message)s", level=log_level)
 
-level = logging.getLevelName(log_level)
-
 if users_to_follow is not None:
     print("Users - Tweets:")
     user_list = [x.strip() for x in str(users_to_follow).split(",")]
