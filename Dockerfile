@@ -3,13 +3,13 @@ FROM python:3.9-slim
 # We don't want apt-get to interact with us and we want the default answers to be used for all questions.
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Don't generate byte code (.pyc-files). 
+# Don't generate byte code (.pyc-files).
 # These are only needed if we run the python-files several times.
 # Docker doesn't keep the data between runs so this adds nothing.
 ENV PYTHONDONTWRITEBYTECODE 1
 
-# Force the stdout and stderr streams to be unbuffered. 
-# Will allow log messages to be immediately dumped instead of being buffered. 
+# Force the stdout and stderr streams to be unbuffered.
+# Will allow log messages to be immediately dumped instead of being buffered.
 # This is useful when the bot crashes before writing messages stuck in the buffer.
 ENV PYTHONUNBUFFERED 1
 
@@ -27,7 +27,7 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-
 # Add poetry to our path
 ENV PATH="/home/botuser/.poetry/bin/:${PATH}"
 
-COPY pyproject.toml poetry.lock README.md /home/botuser/discord-twitter-webhooks/
+COPY pyproject.toml poetry.lock README.md LICENSE /home/botuser/discord-twitter-webhooks/
 
 # Change directory to where we will run the bot.
 WORKDIR /home/botuser/discord-twitter-webhooks
