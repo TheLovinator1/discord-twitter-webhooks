@@ -34,9 +34,6 @@ log_level = os.getenv("LOG_LEVEL", default="INFO")
 # Where https://github.com/TheLovinator1/twitter-image-collage-maker is running.
 # You can run your own version or use the default https://twitter.lovinator.space/
 # The only information I have about you are the images that are generated.
-# Nothing (e.g IP address) is connected to those images.
-# Email tlovinator@gmail.com or go to https://github.com/TheLovinator1/discord-twitter-webhooks#need-help
-# and give me the id of the tweet if you want me to delete the image.
 twitter_image_collage_maker = os.getenv("TWITTER_IMAGE_COLLAGE_API", default="https://twitter.lovinator.space/add")
 
 # Authenticate to the Twitter API
@@ -64,37 +61,30 @@ else:
     print("It looks like USERS_TO_FOLLOW is empty. Did you forget to fill it out?")
 
 if user_list_replies_to_our_tweet is not None:
-    print("Users - Comment to us from other:")
+    print("Users - Replies to our tweet:")
     user_list_replies_to_our_tweet_split = [x.strip() for x in str(user_list_replies_to_our_tweet).split(",")]
     for twitter_id in user_list_replies_to_our_tweet_split:
         username_reply = api.get_user(user_id=twitter_id)
         print(f"\t{twitter_id} - {username_reply.screen_name}")
-else:
-    print("Found no users to get replies from.")
 
 if user_list_replies_to_other_tweet is not None:
-    print("Users - Comment from us to other:")
+    print("Users - Reply to others tweet:")
     user_list_replies_to_other_tweet_split = [x.strip() for x in str(user_list_replies_to_other_tweet).split(",")]
     for twitter_id in user_list_replies_to_other_tweet_split:
         username_reply = api.get_user(user_id=twitter_id)
         print(f"\t{twitter_id} - {username_reply.screen_name}")
-else:
-    print("Found no users to get replies to.")
 
 if user_list_we_retweet_someone_elses_tweet is not None:
-    print("Users - We retweet others tweet:")
+    print("Users - Retweets others tweet:")
     user_list_retweets_split = [x.strip() for x in str(user_list_we_retweet_someone_elses_tweet).split(",")]
     for twitter_id in user_list_retweets_split:
         username_reply = api.get_user(user_id=twitter_id)
         print(f"\t{twitter_id} - {username_reply.screen_name}")
-else:
-    print("Found no users were we track retweets.")
+
 
 if user_list_someone_retweets_our_tweet is not None:
-    print("Users - Other retweets our tweet:")
+    print("Users - Retweet on our tweet:")
     user_list_retweeted_split = [x.strip() for x in str(user_list_someone_retweets_our_tweet).split(",")]
     for twitter_id in user_list_retweeted_split:
         username_reply = api.get_user(user_id=twitter_id)
         print(f"\t{twitter_id} - {username_reply.screen_name}")
-else:
-    print("Found no users were we track tweets that get retweeted.")
