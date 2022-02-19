@@ -12,7 +12,7 @@ This bot is configured with a config file (.env) or environment variables and is
 
 ## Installation
 
-You have two choices, [install directly on your computer](#Install-directly-on-your-computer) or using [Docker](#docker-compose-with-env-file).
+You have two choices, [install directly on your computer](#Install-directly-on-your-computer) or using [Docker](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).
 
 ### Install directly on your computer
 
