@@ -25,7 +25,7 @@ USER botuser
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 # Add poetry to our path
-ENV PATH="/home/botuser/.poetry/bin/:${PATH}"
+ENV PATH="/home/botuser/.local/bin/:${PATH}"
 
 COPY pyproject.toml poetry.lock README.md LICENSE /home/botuser/discord-twitter-webhooks/
 
