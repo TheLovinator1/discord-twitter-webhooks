@@ -481,18 +481,19 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "tweepy"
-version = "4.5.0"
+version = "4.6.0"
 description = "Twitter library for Python"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
+oauthlib = ">=3.2.0,<4"
 requests = ">=2.27.0,<3"
-requests-oauthlib = ">=1.0.0,<2"
+requests-oauthlib = ">=1.2.0,<2"
 
 [package.extras]
-async = ["aiohttp (>=3.7.3,<4)", "oauthlib (>=3.1.0,<4)"]
+async = ["aiohttp (>=3.7.3,<4)"]
 dev = ["coveralls (>=2.1.0)", "tox (>=3.14.0)"]
 socks = ["requests[socks] (>=2.27.0,<3)"]
 test = ["vcrpy (>=1.10.3)"]
@@ -552,7 +553,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "e03c02902c2873c45e340acdaa9e03585081dd8f9f75a6c847780a6bfa24d9b3"
+content-hash = "f11496deee9e92449c366dc23be8154f570252519f11ba6f9219acdb25c97b2e"
 
 [metadata.files]
 aiohttp = [
@@ -975,8 +976,8 @@ tomli = [
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
 tweepy = [
-    {file = "tweepy-4.5.0-py2.py3-none-any.whl", hash = "sha256:1efe228d5994e0d996577bd052b73c59dada96ff8045e176bf46c175afe61859"},
-    {file = "tweepy-4.5.0.tar.gz", hash = "sha256:12cc4b0a3d7b745928b08c3eb55a992236895e00028584d11fa41258f07df1b9"},
+    {file = "tweepy-4.6.0-py2.py3-none-any.whl", hash = "sha256:bd1f06755ed0a115b106bff0f8c8df0a85f9431b898de555abb9ef96aa65439f"},
+    {file = "tweepy-4.6.0.tar.gz", hash = "sha256:87f7ea18bdaf5896158b17e677b271c9b9772eb8917ae895895d77783b6d3176"},
 ]
 types-requests = [
     {file = "types-requests-2.27.11.tar.gz", hash = "sha256:6a7ed24b21780af4a5b5e24c310b2cd885fb612df5fd95584d03d87e5f2a195a"},
