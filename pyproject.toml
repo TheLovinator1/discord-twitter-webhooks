@@ -35,7 +35,7 @@ black = "^22.1.0"
 mypy = "^0.931"
 flake8 = "^4.0.1"
 types-requests = "^2.27.11"
-bandit = "^1.7.2"
+bandit = "^1.7.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
