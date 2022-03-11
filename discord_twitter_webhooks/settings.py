@@ -10,6 +10,7 @@ from tweepy import OAuth1UserHandler
 # environment variables
 load_dotenv()
 
+# TODO: Check if API keys are V2, and tell user how to get V1 instead
 # Environment variables
 # https://developer.twitter.com/en/apps
 consumer_key = os.environ["CONSUMER_KEY"]

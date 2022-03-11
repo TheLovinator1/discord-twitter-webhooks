@@ -47,6 +47,7 @@ class MyStreamListener(Stream):
         # Tweet is retweet
         if hasattr(status, "retweeted_status"):
             settings.logger.info("Tweet is retweet")
+            # TODO: Merge every main(tweet=status)
             if (
                 status.user.id_str == status.retweeted_status.user.id_str
                 and settings.get_retweet_of_own_tweet.lower() == "true"  # noqa
