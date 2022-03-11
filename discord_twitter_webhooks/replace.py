@@ -21,7 +21,8 @@ def username_with_link(text: str) -> str:
 
 
 def tco_url_link_with_real_link(tweet, text: str) -> str:
-    """Replace the t.co url with the real url so users know where the link goes to.
+    """Replace the t.co url with the real url so users know where the
+    link goes to.
 
     Before: https://t.co/1YC2hc8iUq
     After: https://www.youtube.com/

@@ -6,7 +6,13 @@ from dhooks import Embed, Webhook
 from discord_twitter_webhooks.settings import collage_maker_url, logger, webhook_url
 
 
-def send_embed_webhook(tweet, link_list: list[str], text: str, twitter_card_image: str, webhook: str = webhook_url):
+def send_embed_webhook(
+    tweet,
+    link_list: list[str],
+    text: str,
+    twitter_card_image: str,
+    webhook: str = webhook_url,
+):
     """Send embed to Discord webhook.
 
     Args:
@@ -14,7 +20,8 @@ def send_embed_webhook(tweet, link_list: list[str], text: str, twitter_card_imag
         tweet ([type]): Tweet object
         link_list (list[str]): List of links from the tweet
         text (str): Text from the tweet
-        webhook (str, optional): Webhook URL. Defaults to environment variable WEBHOOK_URL.
+        webhook (str, optional): Webhook URL. Defaults to environment
+        variable WEBHOOK_URL.
         twitter_card_image (str, optional): Twitter meta image.
     """
     logger.debug(f"Tweet: {text}")
@@ -31,14 +38,19 @@ def send_embed_webhook(tweet, link_list: list[str], text: str, twitter_card_imag
             embed.set_image(link_list[0])
 
         elif len(link_list) > 1:
-            # Send images to twitter-image-collage-maker(e.g https://twitter.lovinator.space/) and get a collage back.
-            response = requests.get(url=collage_maker_url, params={"tweet_id": tweet.id})
+            # Send images to twitter-image-collage-maker
+            # (e.g https://twitter.lovinator.space/) and get a collage back.
+            response = requests.get(
+                url=collage_maker_url, params={"tweet_id": tweet.id}
+            )
 
             if response.status_code == 200:
                 json_data = json.loads(response.text)
                 embed.set_image(json_data["url"])
             else:
-                logger.error(f"Failed to get response from {collage_maker_url}. Using first image instead.")
+                logger.error(
+                    f"Failed to get response from {collage_maker_url}. Using first image instead."
+                )
                 embed.set_image(link_list[0])
 
     avatar_url = tweet.user.profile_image_url_https

@@ -5,7 +5,8 @@ def discord_link_previews(text: str) -> str:
     """Remove the discord link previews.
 
     We do this because Discord will add link previews after the message.
-    This takes up too much space. We do this by appending a <> before and after the link.
+    This takes up too much space. We do this by appending a <> before
+    and after the link.
 
     Before: https://www.example.com/
     After: <https://www.example.com/>

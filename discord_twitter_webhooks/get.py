@@ -3,10 +3,11 @@ from bs4 import BeautifulSoup
 
 
 def media_links_and_remove_url(tweet, text: str) -> tuple[list, str]:
-    """Get the media links from the tweet and remove the links from the tweet text.
+    """Get the media links from the tweet and remove the links from the
+    tweet text.
 
-    Twitter adds a link at the end of the tweet if the tweet has image, video or gif.
-    We will remove this as it is not needed.
+    Twitter adds a link at the end of the tweet if the tweet has image,
+    video or gif. We will remove this as it is not needed.
 
     Args:
         tweet ([type]): Tweet object
@@ -40,8 +41,9 @@ def media_links_and_remove_url(tweet, text: str) -> tuple[list, str]:
 def meta_image(url: str) -> str:
     """Get twitter:image meta tag from url.
 
-    Looks for <meta name="twitter:image" content=""> and <meta property="og:image" content="">
-    Right now og:image is prioritized over twitter:image.
+    Looks for <meta name="twitter:image" content=""> and
+    <meta property="og:image" content=""> Right now og:image is prioritized
+    over twitter:image.
 
     Args:
         url (str): Url to get the meta image from
@@ -75,7 +77,8 @@ def meta_image(url: str) -> str:
 def tweet_text(tweet) -> str:
     """Get the text from the tweet.
 
-    Tweets can be normal(less than 140 characters) or extended(more than 140 characters).
+    Tweets can be normal(less than 140 characters) or extended(more than
+    140 characters).
 
     Args:
         tweet ([type]): Tweet object

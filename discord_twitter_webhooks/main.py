@@ -22,7 +22,9 @@ def main(tweet) -> None:
     text_replace_hashtags = replace.hashtag_with_link(text_replace_username)
     text_discord_preview = remove.discord_link_previews(text_replace_hashtags)
     text_subreddit_to_link = change.subreddit_to_clickable_link(text_discord_preview)
-    text_reddit_username_to_link = change.reddit_username_to_link(text_subreddit_to_link)
+    text_reddit_username_to_link = change.reddit_username_to_link(
+        text_subreddit_to_link
+    )
     text_remove_utm_source = remove.utm_source(text_reddit_username_to_link)
     text_remove_whitespace = text_remove_utm_source.rstrip()
 
@@ -51,23 +53,27 @@ class MyStreamListener(Stream):
             ):
                 main(tweet=status)
                 return
-            if status.retweeted_status.user.id_str in settings.user_list_retweeted_split:
+            if (
+                status.retweeted_status.user.id_str
+                in settings.user_list_retweeted_split
+            ):
                 main(tweet=status)
             elif status.user.id_str in settings.user_list_retweets_split:
                 main(tweet=status)
             else:
-                settings.logger.info("Retweets and retweeted are not active in the environment variables.")
+                settings.logger.info(
+                    "Retweets and retweeted are not active in the environment variables."
+                )
         elif status.in_reply_to_user_id is not None:
             if status.user.id_str in settings.user_list_replies_to_other_tweet_split:
                 main(tweet=status)
-            elif status.in_reply_to_user_id_str in settings.user_list_replies_to_our_tweet_split:
+            elif (
+                status.in_reply_to_user_id_str
+                in settings.user_list_replies_to_our_tweet_split
+            ):
                 main(tweet=status)
-            else:
-                pass
         else:
             main(tweet=status)
-
-        return
 
 
 def start() -> None:
@@ -79,7 +85,8 @@ def start() -> None:
         settings.access_token_secret,
     )
 
-    # Streams are only terminated if the connection is closed, blocking the thread.
+    # Streams are only terminated if the connection is closed, blocking
+    # the thread.
     stream.filter(follow=settings.user_list, stall_warnings=True)
 
 

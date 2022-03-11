@@ -114,12 +114,27 @@ class TestTweets:
     def test_tweet_text(self):
         """Test if the text is returned correctly"""
         assert tweet_text(self.short_tweet_only_text) == "Hello I am short Sadge"
-        assert tweet_text(self.short_tweet_one_image) == "Short 1 Image https://t.co/18WctMxOYa"
-        assert tweet_text(self.short_tweet_two_images) == "Short 2 Images https://t.co/SPBV5a6YyA"
-        assert tweet_text(self.short_tweet_three_images) == "Short 3 Images https://t.co/dWPPTQWbHB"
-        assert tweet_text(self.short_tweet_four_image) == "Short 4 Images https://t.co/OGwDRJCMJF"
+        assert (
+            tweet_text(self.short_tweet_one_image)
+            == "Short 1 Image https://t.co/18WctMxOYa"
+        )
+        assert (
+            tweet_text(self.short_tweet_two_images)
+            == "Short 2 Images https://t.co/SPBV5a6YyA"
+        )
+        assert (
+            tweet_text(self.short_tweet_three_images)
+            == "Short 3 Images https://t.co/dWPPTQWbHB"
+        )
+        assert (
+            tweet_text(self.short_tweet_four_image)
+            == "Short 4 Images https://t.co/OGwDRJCMJF"
+        )
 
-        assert tweet_text(self.retweet_from_somebody_else) == "RT @Bot2Lovi: f saf sasaf sa"
+        assert (
+            tweet_text(self.retweet_from_somebody_else)
+            == "RT @Bot2Lovi: f saf sasaf sa"
+        )
 
         # TODO: This is not the full text.
         assert (
@@ -158,21 +173,29 @@ class TestTweets:
 
         gif_tweet_txt = "Gif"
 
-        assert media_links_and_remove_url(tweet=self.short_tweet_only_text, text=short_txt) == ([], short_txt)
-        assert media_links_and_remove_url(tweet=self.short_tweet_one_image, text=short_1_txt) == (
+        assert media_links_and_remove_url(
+            tweet=self.short_tweet_only_text, text=short_txt
+        ) == ([], short_txt)
+        assert media_links_and_remove_url(
+            tweet=self.short_tweet_one_image, text=short_1_txt
+        ) == (
             [
                 "https://pbs.twimg.com/media/E6c309BWYAceCII.jpg",
             ],
             short_1_txt,
         )
-        assert media_links_and_remove_url(tweet=self.short_tweet_two_images, text=short_2_txt) == (
+        assert media_links_and_remove_url(
+            tweet=self.short_tweet_two_images, text=short_2_txt
+        ) == (
             [
                 "https://pbs.twimg.com/media/E6c4BpyXIAIvvdW.jpg",
                 "https://pbs.twimg.com/media/E6c4BqSXMAQq1Fe.jpg",
             ],
             short_2_txt,
         )
-        assert media_links_and_remove_url(tweet=self.short_tweet_three_images, text=short_3_txt) == (
+        assert media_links_and_remove_url(
+            tweet=self.short_tweet_three_images, text=short_3_txt
+        ) == (
             [
                 "https://pbs.twimg.com/media/E6c4Zw0WQAQHA6h.jpg",
                 "https://pbs.twimg.com/media/E6c4Zw-WUAIr0pJ.jpg",
@@ -180,7 +203,9 @@ class TestTweets:
             ],
             short_3_txt,
         )
-        assert media_links_and_remove_url(tweet=self.short_tweet_four_image, text=short_4_txt) == (
+        assert media_links_and_remove_url(
+            tweet=self.short_tweet_four_image, text=short_4_txt
+        ) == (
             [
                 "https://pbs.twimg.com/media/E6c4jCOXoAIgLW9.jpg",
                 "https://pbs.twimg.com/media/E6c4jCQXoAInLOD.jpg",
@@ -227,16 +252,23 @@ class TestTweets:
 
     def test_meta_image(self):
         """Test if the meta image is returned correctly"""
-        assert meta_image("https://lovinator.space/") == "https://lovinator.space/KaoFace.webp"
+        assert (
+            meta_image("https://lovinator.space/")
+            == "https://lovinator.space/KaoFace.webp"
+        )
 
     def test_tco_url_link_with_real_link(self):
         """Test if the tco url is replaced with the real link"""
         assert (
-            tco_url_link_with_real_link(self.short_tweet_only_text, self.short_tweet_only_text.text)
+            tco_url_link_with_real_link(
+                self.short_tweet_only_text, self.short_tweet_only_text.text
+            )
             == "Hello I am short Sadge"
         )
         assert (
-            tco_url_link_with_real_link(tweet=self.link_to_youtube, text=self.link_to_youtube.text)
+            tco_url_link_with_real_link(
+                tweet=self.link_to_youtube, text=self.link_to_youtube.text
+            )
             == "https://www.youtube.com/\nHello, this is Youtube"
         )
 
