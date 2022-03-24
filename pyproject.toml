@@ -25,7 +25,7 @@ bot = "discord_twitter_webhooks.main:start"
 python = "^3.9"
 dhooks = { git = "https://github.com/kyb3r/dhooks.git" }
 requests = "^2.27.1"
-python-dotenv = "^0.19.2"
+python-dotenv = "^0.20.0"
 beautifulsoup4 = "^4.10.0"
 tweepy = "^4.6.0"
 
