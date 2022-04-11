@@ -10,6 +10,14 @@
 
 This bot is configured with a config file (.env) or environment variables and is written in Python.
 
+## Features
+
+- Change Reddit username and subreddits to clickable links
+- Change Twitter username and hashtags to clickable links
+- Change t.co url to the actual url
+- If the tweet has more than one image, it will merge them into one
+  image in the embed
+
 ## Installation
 
 You have two choices, [install directly on your computer](#Install-directly-on-your-computer) or using [Docker](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).

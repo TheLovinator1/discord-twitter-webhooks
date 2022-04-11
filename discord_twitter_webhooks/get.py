@@ -1,3 +1,6 @@
+import contextlib
+from typing import List
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -28,13 +31,10 @@ def media_links_and_remove_url(tweet, text: str) -> tuple[list, str]:
 
     except AttributeError:
         # Tweet is less than 140 characters
-        try:
+        with contextlib.suppress(AttributeError):
             for image in tweet.extended_entities["media"]:
                 link_list.append(image["media_url_https"])
                 text = text.replace(image["url"], "")
-        except AttributeError:
-            pass
-
     return link_list, text
 
 
@@ -49,23 +49,18 @@ def meta_image(url: str) -> str:
         url (str): Url to get the meta image from
 
     Returns:
-        [type]: twitter:image found in url
+        str: twitter:image found in url
     """
-    image_url = ""
+    image_url: str = ""
     try:
         response = requests.get(url)
 
         soup = BeautifulSoup(response.content, "html.parser")
 
-        # TODO: Which one should be used if both are availabe?
-        # <meta property="og:image" content="">
-        og_image = soup.find_all("meta", attrs={"property": "og:image"})
-        if og_image:
+        if og_image := soup.find_all("meta", attrs={"property": "og:image"}):
             image_url = og_image[0].get("content")
 
-        # <meta name="twitter:image" content="">
-        twitter_image = soup.find_all("meta", attrs={"name": "twitter:image"})
-        if twitter_image:
+        if twitter_image := soup.find_all("meta", attrs={"name": "twitter:image"}):
             image_url = twitter_image[0].get("content")
 
     except Exception:
@@ -105,16 +100,14 @@ def tweet_urls(tweet) -> list[str]:
     Returns:
         list[str]: Urls from the tweet
     """
-    url_list = []
+    url_list: List["str"] = []
     try:
-        for url in tweet.extended_tweet["entities"]["urls"]:
-            url_list.append(url["expanded_url"])
+        url_list.extend(
+            url["expanded_url"] for url in tweet.extended_tweet["entities"]["urls"]
+        )
+
     except AttributeError:
         # Tweet is less than 140 characters
-        try:
-            for url in tweet.entities["urls"]:
-                url_list.append(url["expanded_url"])
-        except AttributeError:
-            pass
-
+        with contextlib.suppress(AttributeError):
+            url_list.extend(url["expanded_url"] for url in tweet.entities["urls"])
     return url_list

@@ -20,7 +20,7 @@ def reddit_username_to_link(text: str) -> str:
     )
 
 
-def subreddit_to_clickable_link(text: str) -> str:
+def subreddit_to_link(text: str) -> str:
     """Change /r/subreddit to clickable link.
 
     Before: /r/sweden

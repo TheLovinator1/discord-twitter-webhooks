@@ -1,3 +1,4 @@
+import contextlib
 import re
 
 
@@ -41,12 +42,9 @@ def tco_url_link_with_real_link(tweet, text: str) -> str:
 
     except AttributeError:
         # Tweet is less than 140 characters
-        try:
+        with contextlib.suppress(AttributeError):
             for url in tweet.entities["urls"]:
                 text = text.replace(url["url"], url["expanded_url"])
-        except AttributeError:
-            pass
-
     return text
 
 

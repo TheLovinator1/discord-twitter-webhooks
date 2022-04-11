@@ -5,10 +5,7 @@ import pytest
 import tweepy
 
 from discord_twitter_webhooks import __version__
-from discord_twitter_webhooks.change import (
-    reddit_username_to_link,
-    subreddit_to_clickable_link,
-)
+from discord_twitter_webhooks.change import reddit_username_to_link, subreddit_to_link
 from discord_twitter_webhooks.get import (
     media_links_and_remove_url,
     meta_image,
@@ -239,7 +236,7 @@ class TestTweets:
     def test_subreddit_to_clickable_link(self):
         """Test if the subreddit is replaced with a clickable link"""
         assert (
-            subreddit_to_clickable_link(self.at_hash_reddituser_subreddit.text)
+            subreddit_to_link(self.at_hash_reddituser_subreddit.text)
             == "Hello @TheLovinator1 #Hello /u/test [/r/aww](https://reddit.com/r/aww)"
         )
 

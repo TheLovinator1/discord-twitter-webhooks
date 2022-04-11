@@ -1,9 +1,11 @@
+"""This file has only one function and that function helps with
+embedding the tweet and sending it to Discord."""
 import json
 
 import requests
-from dhooks import Embed, Webhook
+from discord_webhook import DiscordEmbed, DiscordWebhook
 
-from discord_twitter_webhooks.settings import collage_maker_url, logger, webhook_url
+from discord_twitter_webhooks import settings
 
 
 def send_embed_webhook(
@@ -11,7 +13,7 @@ def send_embed_webhook(
     link_list: list[str],
     text: str,
     twitter_card_image: str,
-    webhook: str = webhook_url,
+    webhook: str = settings.webhook_url,
 ):
     """Send embed to Discord webhook.
 
@@ -24,34 +26,36 @@ def send_embed_webhook(
         variable WEBHOOK_URL.
         twitter_card_image (str, optional): Twitter meta image.
     """
-    logger.debug(f"Tweet: {text}")
-    hook = Webhook(webhook)
+    settings.logger.debug(f"Tweet: {text}")
 
-    embed = Embed(description=text, color=0x1E0F3, timestamp="now")
+    hook = DiscordWebhook(url=webhook)
+    embed = DiscordEmbed(description=text, color="03b2f8")
 
     if twitter_card_image:
-        embed.set_image(twitter_card_image)
+        embed.set_image(url=twitter_card_image)
 
     # Only add image if there is one
     if len(link_list):
         if len(link_list) == 1:
-            embed.set_image(link_list[0])
+            embed.set_image(url=link_list[0])
 
         elif len(link_list) > 1:
             # Send images to twitter-image-collage-maker
             # (e.g https://twitter.lovinator.space/) and get a collage back.
             response = requests.get(
-                url=collage_maker_url, params={"tweet_id": tweet.id}
+                url=settings.collage_maker_url, params={"tweet_id": tweet.id}
             )
 
             if response.status_code == 200:
                 json_data = json.loads(response.text)
-                embed.set_image(json_data["url"])
+                embed.set_image(url=json_data["url"])
             else:
-                logger.error(
-                    f"Failed to get response from {collage_maker_url}. Using first image instead."
+                settings.logger.error(
+                    "Failed to get response from"
+                    f" {settings.collage_maker_url}."
+                    " Using first image instead."
                 )
-                embed.set_image(link_list[0])
+                embed.set_image(url=link_list[0])
 
     avatar_url = tweet.user.profile_image_url_https
     avatar_url = avatar_url.replace("_normal.jpg", ".jpg")
@@ -61,7 +65,12 @@ def send_embed_webhook(
         name=tweet.user.screen_name,
         url=f"https://twitter.com/i/web/status/{tweet.id}",
     )
+    # add embed object to webhook
+    hook.add_embed(embed)
 
-    hook.send(embed=embed)
+    response = hook.execute()
 
-    logger.info(f"Webhook posted for tweet https://twitter.com/i/web/status/{tweet.id}")
+    settings.logger.info(
+        f"Webhook posted for tweet https://twitter.com/i/web/status/{tweet.id}"
+    )  # noqa: E501
+    settings.logger.debug(f"Webhook response: {response}")
