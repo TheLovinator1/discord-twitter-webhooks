@@ -5,12 +5,12 @@ import pytest
 import tweepy
 
 from discord_twitter_webhooks import __version__
-from discord_twitter_webhooks.change import reddit_username_to_link, subreddit_to_link
 from discord_twitter_webhooks.get import (
     media_links_and_remove_url,
     meta_image,
     tweet_text,
 )
+from discord_twitter_webhooks.reddit import subreddit_to_link, username_to_link
 from discord_twitter_webhooks.remove import utm_source
 from discord_twitter_webhooks.replace import (
     hashtag_with_link,
@@ -243,7 +243,7 @@ class TestTweets:
     def test_reddit_username_to_link(self):
         """Test if the reddit username is replaced with a link"""
         assert (
-            reddit_username_to_link(self.at_hash_reddituser_subreddit.text)
+            username_to_link(self.at_hash_reddituser_subreddit.text)
             == "Hello @TheLovinator1 #Hello [/u/test](https://reddit.com/u/test) /r/aww"
         )
 

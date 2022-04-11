@@ -1,7 +1,7 @@
 import re
 
 
-def reddit_username_to_link(text: str) -> str:
+def username_to_link(text: str) -> str:
     """Change /u/username to clickable link.
 
     Before: /u/username
@@ -12,9 +12,10 @@ def reddit_username_to_link(text: str) -> str:
     Returns:
         str: Text with the username replaced with a clickable link
     """
+    # TODO: This doesn't work for URLs without https or http
     return re.sub(
-        r"(/u/|/user/)([^\s^\/]*)(/|)",
-        r"[/u/\g<2>](https://reddit.com/u/\g<2>)",
+        r"((https|http):?//(www\.?)reddit\.com|^)((/|)(user|u)/)([^\s^\/]*)(/|)",
+        r"[\g<1>/u/\g<7>](https://reddit.com/u/\g<7>)",
         text,
         flags=re.MULTILINE,
     )
@@ -32,9 +33,10 @@ def subreddit_to_link(text: str) -> str:
     Returns:
         str: Text with the subreddit replaced with a clickable link
     """
+    # TODO: This doesn't work for URLs without https or http
     return re.sub(
-        r"(/r/)([^\s^\/]*)(/|)",
-        r"[/r/\g<2>](https://reddit.com/r/\g<2>)",
+        r"((https|http):?//(www\.?)reddit\.com|^)(/r|^r)/([^\s^\/]*)(/|)",
+        r"[\g<1>/r/\g<5>](https://reddit.com/r/\g<5>)",
         text,
         flags=re.MULTILINE,
     )

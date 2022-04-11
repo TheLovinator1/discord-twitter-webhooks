@@ -2,7 +2,7 @@ import html
 
 from tweepy import Stream
 
-from discord_twitter_webhooks import change, get, remove, replace, settings
+from discord_twitter_webhooks import get, reddit, remove, replace, settings
 from discord_twitter_webhooks.send_embed_webhook import send_embed_webhook
 
 
@@ -34,12 +34,10 @@ def main(tweet) -> None:
     text_discord_preview = remove.discord_link_previews(text_replace_hashtags)
 
     # Change /r/subreddit to the subreddit URL
-    text_subreddit_to_link = change.subreddit_to_link(text_discord_preview)
+    text_subreddit_to_link = reddit.subreddit_to_link(text_discord_preview)
 
     # Change /u/username to the user URL
-    text_reddit_username_to_link = change.reddit_username_to_link(
-        text_subreddit_to_link
-    )
+    text_reddit_username_to_link = reddit.username_to_link(text_subreddit_to_link)
 
     # Remove UTM parameters, this cleans up the URL
     text_remove_utm_source = remove.utm_source(text_reddit_username_to_link)
@@ -58,8 +56,7 @@ def main(tweet) -> None:
 class MyStreamListener(Stream):
     """https://docs.tweepy.org/en/latest/streaming.html
 
-    Args:
-        Stream ([type]): Stream tweets in realtime.
+    Stream tweets in realtime.
     """
 
     def on_status(self, status) -> None:
