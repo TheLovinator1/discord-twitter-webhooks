@@ -10,7 +10,11 @@ from discord_twitter_webhooks.get import (
     tweet_text,
 )
 from discord_twitter_webhooks.reddit import subreddit_to_link, username_to_link
-from discord_twitter_webhooks.remove import utm_source
+from discord_twitter_webhooks.remove import (
+    copyright_symbols,
+    discord_link_previews,
+    utm_source,
+)
 from discord_twitter_webhooks.replace import (
     hashtag_with_link,
     tco_url_link_with_real_link,
@@ -253,9 +257,17 @@ class TestTweets:
 
         # One link in the tweet
         assert (
-            tco_url_link_with_real_link(self.link_to_youtube, self.link_to_youtube.text)
+            tco_url_link_with_real_link(
+                self.link_to_youtube,
+                self.link_to_youtube.text,
+            )
             == "https://www.youtube.com/\nHello, this is Youtube"
         )
+
+    def test_discord_link_previews(self):
+        before = "https://pbs.twimg.com/tweet_video_thumb/E6daSHUX0AYR9ap.jpg"
+        after = "<https://pbs.twimg.com/tweet_video_thumb/E6daSHUX0AYR9ap.jpg>"
+        assert discord_link_previews(before) == after
 
     def test_utm_source(self):
         """Test if the utm source is removed"""

@@ -2,7 +2,7 @@ import re
 
 
 def discord_link_previews(text: str) -> str:
-    """Remove the discord link previews.
+    """Remove the Discord link previews.
 
     We do this because Discord will add link previews after the message.
     This takes up too much space. We do this by appending a <> before
@@ -15,11 +15,11 @@ def discord_link_previews(text: str) -> str:
         text (str): Text from the tweet
 
     Returns:
-        str: Text with the discord link previews removed
+        str: Text with the Discord link previews removed
     """
     return re.sub(
-        r"(https://\S*)\)",
-        r"<\g<1>>)",
+        r"(^(https:|http:|www\.)\S*)",
+        r"<\g<1>>",
         text,
     )
 
