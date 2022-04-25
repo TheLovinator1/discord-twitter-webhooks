@@ -1,0 +1,12 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "dependencyDashboard": false,
+  "labels": [
+    "dependencies"
+  ],
+  "reviewers": [
+    "thelovinator1"
+  ]
+}
