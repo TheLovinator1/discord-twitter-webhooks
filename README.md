@@ -8,7 +8,7 @@
 
 `discord-twitter-webhooks` is an automated tool that checks [Twitter](https://twitter.com) for new tweets and sends them to a [Discord](https://discord.com/) webhook.
 
-This bot is configured with a config file (.env) or environment variables and is written in Python.
+This bot is configured with a config file (.env) or environment variables.
 
 ## Features
 
@@ -17,6 +17,7 @@ This bot is configured with a config file (.env) or environment variables and is
 - Change t.co url to the actual url
 - If the tweet has more than one image, it will merge them into one
   image in the embed
+- Remove ®, ™ and © from the tweet text
 
 ## Installation
 
@@ -67,8 +68,6 @@ Docker Hub: [thelovinator/discord-twitter-webhooks](https://hub.docker.com/r/the
     - If you want to run the bot in the background, you can run `docker-compose up -d`.
 
 ## Tests
-
-There are not enough tests yet. But we have a few.
 
 Add environment variable TEST_WEBHOOK to your environment or the .env before running tests.
 
