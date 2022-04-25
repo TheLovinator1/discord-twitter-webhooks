@@ -65,12 +65,13 @@ def send_embed_webhook(
         name=tweet.user.screen_name,
         url=f"https://twitter.com/i/web/status/{tweet.id}",
     )
-    # add embed object to webhook
+
+    # Add embed object to webhook
     hook.add_embed(embed)
 
     response = hook.execute()
 
     settings.logger.info(
         f"Webhook posted for tweet https://twitter.com/i/web/status/{tweet.id}"
-    )  # noqa: E501
+    )
     settings.logger.debug(f"Webhook response: {response}")
