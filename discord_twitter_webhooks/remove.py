@@ -27,7 +27,8 @@ def discord_link_previews(text: str) -> str:
 def utm_source(text: str) -> str:
     """Remove the utm_source parameter from the url.
 
-    Before: https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter # noqa
+    Before: https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter # noqa, pylint: disable=line-too-long
+
     After: https://store.steampowered.com/app/457140/Oxygen_Not_Included/
 
     Args:
