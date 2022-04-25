@@ -12,10 +12,9 @@ def username_to_link(text: str) -> str:
     Returns:
         str: Text with the username replaced with a clickable link
     """
-    # TODO: This doesn't work for URLs without https or http
     return re.sub(
-        r"((https|http):?//(www\.?)reddit\.com|^)((/|)(user|u)/)([^\s^\/]*)(/|)",
-        r"[\g<1>/u/\g<7>](https://reddit.com/u/\g<7>)",
+        r"(\B|^)(/u/|u/)([^\s^/]*)/?",
+        r"[/u/\g<3>](https://reddit.com/u/\g<3>)",
         text,
         flags=re.MULTILINE,
     )
@@ -33,10 +32,9 @@ def subreddit_to_link(text: str) -> str:
     Returns:
         str: Text with the subreddit replaced with a clickable link
     """
-    # TODO: This doesn't work for URLs without https or http
     return re.sub(
-        r"((https|http):?//(www\.?)reddit\.com|^)(/r|^r)/([^\s^\/]*)(/|)",
-        r"[\g<1>/r/\g<5>](https://reddit.com/r/\g<5>)",
+        r"(\B|^)(/r/|r/)([^\s^/]*)/?",
+        r"[/r/\g<3>](https://reddit.com/r/\g<3>)",
         text,
         flags=re.MULTILINE,
     )
