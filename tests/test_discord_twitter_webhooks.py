@@ -262,3 +262,9 @@ class TestTweets:
         before = "https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter"  # noqa, pylint: disable=line-too-long
         after = "https://store.steampowered.com/app/457140/Oxygen_Not_Included/"  # noqa
         assert utm_source(before) == after
+
+    def test_remove_copyright_symbols(self):
+        """Test if ®, ™ and © are removed"""
+        before = "Hello, © 2020 and I have trademarked ®, ™ and © symbols"
+        after = "Hello,  2020 and I have trademarked ,  and  symbols"
+        assert copyright_symbols(before) == after

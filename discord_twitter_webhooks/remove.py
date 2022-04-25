@@ -42,3 +42,18 @@ def utm_source(text: str) -> str:
         r"",
         text,
     )
+
+
+def copyright_symbols(text: str) -> str:
+    """Remove ®, ™ and © symbols.
+
+    Args:
+        text (str): Text from the tweet
+
+    Returns:
+        str: Text with the copyright symbols removed
+    """
+    text = text.replace("®", "")
+    text = text.replace("™", "")
+    text = text.replace("©", "")
+    return text

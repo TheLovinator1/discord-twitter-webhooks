@@ -45,10 +45,13 @@ def main(tweet) -> None:
     # Remove trailing whitespace
     text_remove_whitespace = text_remove_utm_source.rstrip()
 
+    # Remove copyright symbols
+    text_remove_copyright = remove.copyright_symbols(text_remove_whitespace)
+
     send_embed_webhook(
         tweet=tweet,
         link_list=media_links,
-        text=text_remove_whitespace,
+        text=text_remove_copyright,
         twitter_card_image=twitter_card_image,
     )
 
