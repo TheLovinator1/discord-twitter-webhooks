@@ -43,10 +43,11 @@ You have two choices, [install directly on your computer](#Install-directly-on-y
   - Windows 10: <kbd>Shift</kbd> + <kbd>right-click</kbd> in the folder and select `Open PowerShell window here`
   - Windows 11: <kbd>Shift</kbd> + <kbd>right-click</kbd> in the folder and Show more options and `Open PowerShell window here`
 - Install requirements:
-  - `poetry install`
+  - Type `poetry install` into the PowerShell window. Make sure you are
+    in the repository folder with the [pyproject.toml](pyproject.toml) file.
     - (You may have to restart your terminal if it can't find the `poetry` command. Also double check that it's in your PATH.)
 - Start the bot:
-  - `poetry run bot`
+  - Type `poetry run bot` into the PowerShell window.
     - You can stop the bot with <kbd>Ctrl</kbd> + <kbd>c</kbd>.
 
 Note: You will need to run `poetry install` again if [poetry.lock](poetry.lock) has been modified.
@@ -74,6 +75,29 @@ Add environment variable TEST_WEBHOOK to your environment or the .env before run
 - TEST_WEBHOOK=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
 
 Run tests with `poetry run pytest`
+
+## FAQ
+
+- `453 - You currently have Essential access which includes access to Twitter API v2 enpoints only` when starting the bot
+  - This bot was created before V2 of Twitter's API so you need to apply
+    ([here](https://developer.twitter.com/en/portal/apps/new))
+    for Elevated API access to get the V1 API keys. After you have applied
+    you can go to Projects & Apps -> Create App under Standalone Apps
+- `Poetry could not find a pyproject.toml file in the current directory.`
+  - You are probably in the wrong directory. Go to root of the project
+    where README.md, .env, and pyproject.toml are located.
+- `python` or `poetry` is not recognized as an internal or external command
+  - You need to install Python and Poetry if not installed or add them
+    to your PATH.
+    - When installing Python, you should check the box that says
+      `Add Python 3.10 to PATH`
+  - System Properties -> Environment Variables -> Double-click Path ->
+    Add if missing:
+    - `%localappdata%\Programs\Python\Python310\Scripts` (Change to your
+      Python version)
+    - `%localappdata%\Programs\Python\Python310\` (Change to your Python
+      version)
+    - `%appdata%\Python\Scripts`
 
 ## Need help?
 
