@@ -75,6 +75,9 @@ class TestTweets:
 
     # Used for testing username/hashtag/reddit user/subreddit regex
     hello_txt = "Hello @TheLovinator1 #Hello /u/test /r/aww"
+    hello2_txt = (
+        "/r/hello r/hello hello/r/hello /u/hello u/hello hello/u/hello"  # noqa: E501
+    )
 
     short = "Hello I am short Sadge"
 
@@ -233,11 +236,19 @@ class TestTweets:
         after = "Hello @TheLovinator1 #Hello /u/test [/r/aww](https://reddit.com/r/aww)"  # noqa
         assert subreddit_to_link(text) == after
 
+        text2 = self.hello2_txt
+        after2 = "[/r/hello](https://reddit.com/r/hello) r/hello hello/r/hello /u/hello u/hello hello/u/hello"
+        assert subreddit_to_link(text2) == after2
+
     def test_reddit_username_to_link(self):
         """Test if the reddit username is replaced with a link"""
         text = self.hello_txt
         after = "Hello @TheLovinator1 #Hello [/u/test](https://reddit.com/u/test) /r/aww"  # noqa
         assert username_to_link(text) == after
+
+        text2 = self.hello2_txt
+        after2 = "/r/hello r/hello hello/r/hello [/u/hello](https://reddit.com/u/hello) u/hello hello/u/hello"
+        assert username_to_link(text2) == after2
 
     def test_meta_image(self):
         """Test if the meta image is returned correctly"""
@@ -265,6 +276,8 @@ class TestTweets:
         )
 
     def test_discord_link_previews(self):
+        """Test if the discord link previews are removed, aka < and >
+        are added"""
         before = "https://pbs.twimg.com/tweet_video_thumb/E6daSHUX0AYR9ap.jpg"
         after = "<https://pbs.twimg.com/tweet_video_thumb/E6daSHUX0AYR9ap.jpg>"
         assert discord_link_previews(before) == after

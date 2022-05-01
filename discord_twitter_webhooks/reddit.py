@@ -13,8 +13,8 @@ def username_to_link(text: str) -> str:
         str: Text with the username replaced with a clickable link
     """
     return re.sub(
-        r"(\B|^)(/u/|u/)([^\s^/]*)/?",
-        r"[/u/\g<3>](https://reddit.com/u/\g<3>)",
+        r"(\B/u/|^/u/)([^\s^/]*)/?",
+        r"[/u/\g<2>](https://reddit.com/u/\g<2>)",
         text,
         flags=re.MULTILINE,
     )
@@ -33,8 +33,8 @@ def subreddit_to_link(text: str) -> str:
         str: Text with the subreddit replaced with a clickable link
     """
     return re.sub(
-        r"(\B|^)(/r/|r/)([^\s^/]*)/?",
-        r"[/r/\g<3>](https://reddit.com/r/\g<3>)",
+        r"(\B/r/|^/r/)([^\s^/]*)/?",
+        r"[/r/\g<2>](https://reddit.com/r/\g<2>)",
         text,
         flags=re.MULTILINE,
     )
