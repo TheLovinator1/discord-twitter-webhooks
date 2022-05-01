@@ -26,16 +26,16 @@ You have two choices, [install directly on your computer](#Install-directly-on-y
 ### Install directly on your computer
 
 - Install the latest version of needed software:
-  - [git](https://git-scm.com/)
-    - Default installation is fine.
   - [Python](https://www.python.org/)
     - You should use the latest version.
     - You want to add Python to your PATH.
   - [Poetry](https://python-poetry.org/docs/master/#installation)
-    - Windows: You have to add `\AppData\Roaming\Python\Scripts` to your PATH for Poetry to work.
+    - Windows: You have to add `%appdata%\Python\Scripts` to your PATH for Poetry to work.
 - Download the project from GitHub with git or download the [ZIP](https://github.com/TheLovinator1/discord-twitter-webhooks/archive/refs/heads/master.zip).
   - If you want to update the bot, you can run `git pull` in the project folder or download the ZIP again.
-- Rename .env.example to .env and open it in a text editor (e.g., VSCode, Notepad++, Notepad).
+- Rename .env.example to .env and open it in a text editor (e.g.,
+  VSCode, Notepad++, Notepad).
+  - Your settings will be stored in the .env file, not settings.py.
   - If you can't see the file extension:
     - Windows 10: Click the View Tab in File Explorer and click the box next to File name extensions.
     - Windows 11: Click View -> Show -> File name extensions.
