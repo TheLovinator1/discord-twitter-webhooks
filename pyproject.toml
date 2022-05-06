@@ -27,7 +27,7 @@ requests = "^2.27.1"
 python-dotenv = "^0.20.0"
 beautifulsoup4 = "^4.11.1"
 tweepy = "^4.8.0"
-discord-webhook = "^0.15.0"
+discord-webhook = "^0.16.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
