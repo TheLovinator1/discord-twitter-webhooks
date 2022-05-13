@@ -21,14 +21,9 @@ access_token_secret = os.environ["ACCESS_TOKEN_SECRET"]
 # https://tweeterid.com/
 users_to_follow = os.environ["USERS_TO_FOLLOW"]
 user_list_replies_to_our_tweet = os.getenv("USER_LIST_REPLIES_TO_OUR_TWEET")
-user_list_replies_to_other_tweet = os.getenv("USER_LIST_REPLIES_TO_OTHERS_TWEET")
-user_list_someone_retweets_our_tweet = os.getenv("USER_LIST_SOMEONE_RETWEETS_OUR_TWEET")
-user_list_we_retweet_someone_elses_tweet = os.getenv(
-    "USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET"
-)
-
-# Should we message when a tracked user retweets his own tweet? True or False
-get_retweet_of_own_tweet = os.getenv("GET_RETWEET_OF_OWN_TWEET", default="False")
+user_list_replies_to_other_tweet = os.getenv("USER_LIST_REPLIES_TO_OTHERS_TWEET")  # noqa: E501, pylint: disable=line-too-long
+user_list_someone_retweets_our_tweet = os.getenv("USER_LIST_SOMEONE_RETWEETS_OUR_TWEET")  # noqa: E501, pylint: disable=line-too-long
+user_list_we_retweet_someone_elses_tweet = os.getenv("USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET")  # noqa: E501, pylint: disable=line-too-long
 
 # https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
 webhook_url = os.environ["WEBHOOK_URL"]
@@ -39,9 +34,7 @@ log_level = os.getenv("LOG_LEVEL", default="INFO")
 # Where https://github.com/TheLovinator1/twitter-image-collage-maker is
 # running. You can run your own version or use the default
 # https://twitter.lovinator.space/
-collage_maker_url = os.getenv(
-    "TWITTER_IMAGE_COLLAGE_API", default="https://twitter.lovinator.space/add"
-)
+collage_maker_url = os.getenv("TWITTER_IMAGE_COLLAGE_API", default="https://twitter.lovinator.space/add")  # noqa: E501, pylint: disable=line-too-long
 
 # Authenticate to the Twitter API
 auth = OAuth1UserHandler(consumer_key, consumer_secret)
@@ -63,32 +56,26 @@ if users_to_follow is not None:
         username = api.get_user(user_id=twitter_id)
         print(f"\t{twitter_id} - {username.screen_name}")
 else:
-    sys.exit("It looks like USERS_TO_FOLLOW is empty. Did you forget to fill it out?")
+    sys.exit("It looks like USERS_TO_FOLLOW is empty. Did you forget to fill it out?")  # noqa: E501, pylint: disable=line-too-long
 
 
 if user_list_replies_to_our_tweet is not None:
     print("Users - Replies to our tweet:")
-    user_list_replies_to_our_tweet_split = [
-        x.strip() for x in str(user_list_replies_to_our_tweet).split(",")
-    ]
+    user_list_replies_to_our_tweet_split = [x.strip() for x in str(user_list_replies_to_our_tweet).split(",")]  # noqa: E501, pylint: disable=line-too-long
     for twitter_id in user_list_replies_to_our_tweet_split:
         username_reply = api.get_user(user_id=twitter_id)
         print(f"\t{twitter_id} - {username_reply.screen_name}")
 
 if user_list_replies_to_other_tweet is not None:
     print("Users - Reply to others tweet:")
-    user_list_replies_to_other_tweet_split = [
-        x.strip() for x in str(user_list_replies_to_other_tweet).split(",")
-    ]
+    user_list_replies_to_other_tweet_split = [x.strip() for x in str(user_list_replies_to_other_tweet).split(",")]  # noqa: E501, pylint: disable=line-too-long
     for twitter_id in user_list_replies_to_other_tweet_split:
         username_reply = api.get_user(user_id=twitter_id)
         print(f"\t{twitter_id} - {username_reply.screen_name}")
 
 if user_list_we_retweet_someone_elses_tweet is not None:
     print("Users - Retweets others tweet:")
-    user_list_retweets_split = [
-        x.strip() for x in str(user_list_we_retweet_someone_elses_tweet).split(",")
-    ]
+    user_list_retweets_split = [x.strip() for x in str(user_list_we_retweet_someone_elses_tweet).split(",")]  # noqa: E501, pylint: disable=line-too-long
     for twitter_id in user_list_retweets_split:
         username_reply = api.get_user(user_id=twitter_id)
         print(f"\t{twitter_id} - {username_reply.screen_name}")
@@ -96,9 +83,7 @@ if user_list_we_retweet_someone_elses_tweet is not None:
 
 if user_list_someone_retweets_our_tweet is not None:
     print("Users - Retweet on our tweet:")
-    user_list_retweeted_split = [
-        x.strip() for x in str(user_list_someone_retweets_our_tweet).split(",")
-    ]
+    user_list_retweeted_split = [x.strip() for x in str(user_list_someone_retweets_our_tweet).split(",")]  # noqa: E501, pylint: disable=line-too-long
     for twitter_id in user_list_retweeted_split:
         username_reply = api.get_user(user_id=twitter_id)
         print(f"\t{twitter_id} - {username_reply.screen_name}")

@@ -4,6 +4,8 @@ from typing import List
 import requests
 from bs4 import BeautifulSoup
 
+from discord_twitter_webhooks import settings
+
 
 def media_links_and_remove_url(tweet, text: str) -> tuple[list, str]:
     """Get the media links from the tweet and remove the links from the
@@ -26,15 +28,29 @@ def media_links_and_remove_url(tweet, text: str) -> tuple[list, str]:
         for image in tweet.extended_tweet["extended_entities"]["media"]:
             link_list.append(image["media_url_https"])
             text = text.replace(image["url"], "")
+            settings.logger.debug(
+                f"media_links_and_remove_url - image: {image}",
+            )
     except KeyError:
-        pass
+        settings.logger.debug("Got KeyError in media_links_and_remove_url")
 
     except AttributeError:
         # Tweet is less than 140 characters
+        settings.logger.debug(
+            "Got AttributeError in media_links_and_remove_url",
+        )
+
         with contextlib.suppress(AttributeError):
             for image in tweet.extended_entities["media"]:
                 link_list.append(image["media_url_https"])
                 text = text.replace(image["url"], "")
+                settings.logger.debug(
+                    f"media_links_and_remove_url - image: {image}",
+                )
+
+    settings.logger.debug(
+        f"Text after media_links_and_remove_url: {text}",
+    )
     return link_list, text
 
 
@@ -54,18 +70,29 @@ def meta_image(url: str) -> str:
     image_url: str = ""
     try:
         response = requests.get(url)
+        settings.logger.debug(f"meta_image - response: {response}")
 
         soup = BeautifulSoup(response.content, "html.parser")
 
         if og_image := soup.find_all("meta", attrs={"property": "og:image"}):
             image_url = og_image[0].get("content")
+            settings.logger.debug(f"meta_image - og_image: {og_image}")
 
-        if twitter_image := soup.find_all("meta", attrs={"name": "twitter:image"}):
+        if twitter_image := soup.find_all(
+            "meta",
+            attrs={"name": "twitter:image"},
+        ):
             image_url = twitter_image[0].get("content")
+            settings.logger.debug(
+                f"meta_image - twitter_image: {twitter_image}",
+            )
 
     except Exception:
+        # TODO: Remove general exception
+        settings.logger.debug(f"meta_image - Exception: {Exception}")
         image_url = ""
 
+    settings.logger.debug(f"meta_image - image_url: {image_url}")
     return image_url
 
 
@@ -83,8 +110,10 @@ def tweet_text(tweet) -> str:
     """
     try:
         text = tweet.extended_tweet["full_text"]
+        settings.logger.debug(f"tweet_text - text: {text}")
     except AttributeError:
         text = tweet.text
+        settings.logger.debug(f"tweet_text - extended -text: {text}")
 
     return text
 
@@ -102,12 +131,15 @@ def tweet_urls(tweet) -> list[str]:
     """
     url_list: List["str"] = []
     try:
-        url_list.extend(
-            url["expanded_url"] for url in tweet.extended_tweet["entities"]["urls"]
-        )
+        url_list.extend(url["expanded_url"] for url in tweet.extended_tweet["entities"]["urls"])  # noqa: E501, pylint: disable=line-too-long
+        settings.logger.debug(f"tweet_urls - url_list: {url_list}")
 
     except AttributeError:
         # Tweet is less than 140 characters
         with contextlib.suppress(AttributeError):
-            url_list.extend(url["expanded_url"] for url in tweet.entities["urls"])
+            url_list.extend(url["expanded_url"] for url in tweet.entities["urls"])  # noqa: E501, pylint: disable=line-too-long
+            settings.logger.debug(
+                f"tweet_urls - AttributeError - url_list: {url_list}",
+            )
+
     return url_list

@@ -1,5 +1,7 @@
 import re
 
+from discord_twitter_webhooks import settings
+
 
 def discord_link_previews(text: str) -> str:
     """Remove the Discord link previews.
@@ -17,17 +19,22 @@ def discord_link_previews(text: str) -> str:
     Returns:
         str: Text with the Discord link previews removed
     """
-    return re.sub(
+    regex = re.sub(
         r"(^(https:|http:|www\.)\S*)",
         r"<\g<1>>",
         text,
     )
 
+    settings.logger.debug(f"Text before username_to_link: {text}")
+    settings.logger.debug(f"Text after username_to_link: {regex}")
+    return regex
+
 
 def utm_source(text: str) -> str:
     """Remove the utm_source parameter from the url.
 
-    Before: https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter # noqa, pylint: disable=line-too-long
+    Before:
+    https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter
 
     After: https://store.steampowered.com/app/457140/Oxygen_Not_Included/
 
@@ -37,11 +44,15 @@ def utm_source(text: str) -> str:
     Returns:
         str: Text with the utm_source parameter removed
     """
-    return re.sub(
+    regex = re.sub(
         r"(\?utm_source)\S*",
         r"",
         text,
     )
+
+    settings.logger.debug(f"Text before username_to_link: {text}")
+    settings.logger.debug(f"Text after username_to_link: {regex}")
+    return regex
 
 
 def copyright_symbols(text: str) -> str:
@@ -53,7 +64,15 @@ def copyright_symbols(text: str) -> str:
     Returns:
         str: Text with the copyright symbols removed
     """
+    settings.logger.debug(f"Text before copyright_symbols: {text}")
+
     text = text.replace("®", "")
+    settings.logger.debug(f"Text after removed ®: {text}")
+
     text = text.replace("™", "")
+    settings.logger.debug(f"Text after removed ™: {text}")
+
     text = text.replace("©", "")
+    settings.logger.debug(f"Text after removed ©: {text}")
+
     return text

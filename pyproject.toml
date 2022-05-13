@@ -38,3 +38,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.isort]
 profile = "black"
+
+[tool.black]
+line-length = 1337
+preview = true

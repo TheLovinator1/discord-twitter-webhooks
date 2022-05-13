@@ -75,9 +75,7 @@ class TestTweets:
 
     # Used for testing username/hashtag/reddit user/subreddit regex
     hello_txt = "Hello @TheLovinator1 #Hello /u/test /r/aww"
-    hello2_txt = (
-        "/r/hello r/hello hello/r/hello /u/hello u/hello hello/u/hello"  # noqa: E501
-    )
+    hello2_txt = "/r/hello r/hello hello/r/hello /u/hello u/hello hello/u/hello"  # noqa: E501, pylint: disable=line-too-long
 
     short = "Hello I am short Sadge"
 
@@ -237,7 +235,7 @@ class TestTweets:
         assert subreddit_to_link(text) == after
 
         text2 = self.hello2_txt
-        after2 = "[/r/hello](https://reddit.com/r/hello) r/hello hello/r/hello /u/hello u/hello hello/u/hello"
+        after2 = "[/r/hello](https://reddit.com/r/hello) r/hello hello/r/hello /u/hello u/hello hello/u/hello"  # noqa: E501, pylint: disable=line-too-long
         assert subreddit_to_link(text2) == after2
 
     def test_reddit_username_to_link(self):
@@ -247,7 +245,7 @@ class TestTweets:
         assert username_to_link(text) == after
 
         text2 = self.hello2_txt
-        after2 = "/r/hello r/hello hello/r/hello [/u/hello](https://reddit.com/u/hello) u/hello hello/u/hello"
+        after2 = "/r/hello r/hello hello/r/hello [/u/hello](https://reddit.com/u/hello) u/hello hello/u/hello"  # noqa: E501, pylint: disable=line-too-long
         assert username_to_link(text2) == after2
 
     def test_meta_image(self):
@@ -259,12 +257,7 @@ class TestTweets:
         """Test if the tco url is replaced with the real link"""
 
         # No link in the tweet
-        assert (
-            tco_url_link_with_real_link(
-                self.short_tweet_only_text, self.short_tweet_only_text.text
-            )
-            == self.short
-        )
+        assert tco_url_link_with_real_link(self.short_tweet_only_text, self.short_tweet_only_text.text) == self.short  # noqa: E501, pylint: disable=line-too-long
 
         # One link in the tweet
         assert (
@@ -285,7 +278,7 @@ class TestTweets:
     def test_utm_source(self):
         """Test if the utm source is removed"""
         before = "https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter"  # noqa, pylint: disable=line-too-long
-        after = "https://store.steampowered.com/app/457140/Oxygen_Not_Included/"  # noqa
+        after = "https://store.steampowered.com/app/457140/Oxygen_Not_Included/"  # noqa: E501, pylint: disable=line-too-long
         assert utm_source(before) == after
 
     def test_remove_copyright_symbols(self):
