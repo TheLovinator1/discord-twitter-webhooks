@@ -60,24 +60,19 @@ def meta_image(url: str) -> str:
         str: twitter:image found in url
     """
     image_url: str = ""
-    try:
-        response = requests.get(url)
-        settings.logger.debug(f"Response: {response}")
 
-        soup = BeautifulSoup(response.content, "html.parser")
+    response = requests.get(url)
+    settings.logger.debug(f"Response: {response}")
 
-        if og_image := soup.find_all("meta", attrs={"property": "og:image"}):
-            image_url = og_image[0].get("content")
-            settings.logger.debug(f"og_image: {og_image}")
+    soup = BeautifulSoup(response.content, "html.parser")
 
-        if twitter_image := soup.find_all("meta", attrs={"name": "twitter:image"}):  # noqa: E501, pylint: disable=line-too-long
-            image_url = twitter_image[0].get("content")
-            settings.logger.debug(f"twitter_image: {twitter_image}")
+    if og_image := soup.find_all("meta", attrs={"property": "og:image"}):
+        image_url = og_image[0].get("content")
+        settings.logger.debug(f"og_image: {og_image}")
 
-    except Exception:
-        # TODO: Remove general exception
-        settings.logger.exception(f"Exception: {Exception}")
-        image_url = ""
+    if twitter_image := soup.find_all("meta", attrs={"name": "twitter:image"}):  # noqa: E501, pylint: disable=line-too-long
+        image_url = twitter_image[0].get("content")
+        settings.logger.debug(f"twitter_image: {twitter_image}")
 
     settings.logger.debug(f"image_url: {image_url}")
     return image_url
