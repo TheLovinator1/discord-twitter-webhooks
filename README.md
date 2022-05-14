@@ -78,7 +78,7 @@ Run tests with `poetry run pytest`
 
 ## FAQ
 
-- `453 - You currently have Essential access which includes access to Twitter API v2 enpoints only` when starting the bot
+- `453 - You currently have Essential access which includes access to Twitter API v2 endpoints only` when starting the bot
   - This bot was created before V2 of Twitter's API so you need to apply
     ([here](https://developer.twitter.com/en/portal/apps/new))
     for Elevated API access to get the V1 API keys. After you have applied
