@@ -1,4 +1,5 @@
 import html
+import sys
 
 from tweepy import Stream
 
@@ -93,10 +94,11 @@ def start() -> None:
         settings.access_token,
         settings.access_token_secret,
     )
-
-    # Streams are only terminated if the connection is closed, blocking
-    # the thread.
-    stream.filter(follow=settings.user_list, stall_warnings=True)
+    try:
+        stream.filter(follow=settings.user_list, stall_warnings=True)
+    except KeyboardInterrupt:
+        stream.disconnect()
+        sys.exit(0)
 
 
 if __name__ == "__main__":
