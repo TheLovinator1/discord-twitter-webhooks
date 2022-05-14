@@ -47,13 +47,15 @@ def send_embed_webhook(
 
             if response.status_code == 200:
                 json_data = json.loads(response.text)
+                settings.logger.debug(f"JSON data from twitter-image-collage-maker: {json_data}")  # noqa: E501, pylint: disable=line-too-long
                 embed.set_image(url=json_data["url"])
             else:
-                settings.logger.error(f"Failed to get response from {settings.collage_maker_url}. Using first image instead.")  # noqa: E501, pylint: disable=line-too-long
+                settings.logger.error(f"Failed to get response from {settings.collage_maker_url}")  # noqa: E501, pylint: disable=line-too-long
                 embed.set_image(url=link_list[0])
 
     avatar_url = tweet.user.profile_image_url_https
     avatar_url = avatar_url.replace("_normal.jpg", ".jpg")
+    settings.logger.debug(f"Avatar URL: {avatar_url}")
 
     embed.set_author(
         icon_url=avatar_url,

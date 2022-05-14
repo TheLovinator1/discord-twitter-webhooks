@@ -47,7 +47,11 @@ user_list_replies_to_our_tweet_split = []
 user_list_replies_to_other_tweet_split = []
 
 logger = logging
-logger.basicConfig(format="%(asctime)s - %(message)s", level=log_level)
+logger.basicConfig(
+    format="%(asctime)s | %(levelname)-11s | %(funcName)-21s | %(message)s",
+    datefmt="%H:%M:%S",
+    level=log_level,
+)
 
 if users_to_follow is not None:
     print("Users - Tweets:")

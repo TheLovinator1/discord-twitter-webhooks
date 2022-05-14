@@ -22,8 +22,8 @@ def username_with_link(text: str) -> str:
         text,
     )
 
-    settings.logger.debug(f"Text before username_with_link: {text}")
-    settings.logger.debug(f"Text after username_with_link: {regex}")
+    settings.logger.debug(f"Text - before: {text}")
+    settings.logger.debug(f"Text - after: {regex}")
     return regex
 
 
@@ -44,20 +44,16 @@ def tco_url_link_with_real_link(tweet, text: str) -> str:
     try:
         # Tweet is more than 140 characters
         for url in tweet.extended_tweet["entities"]["urls"]:
-            settings.logger.debug(f"tco_url_link_with_real_link - Extended tweet - url: {url}")  # noqa: E501, pylint: disable=line-too-long
+            settings.logger.debug(f"Extended tweet - URL: {url}")
             text = text.replace(url["url"], url["expanded_url"])
-            settings.logger.debug(f"tco_url_link_with_real_link - Extended tweet - text: {text}")  # noqa: E501, pylint: disable=line-too-long
+            settings.logger.debug(f"Extended tweet - text: {text}")
     except AttributeError:
         # Tweet is less than 140 characters
         with contextlib.suppress(AttributeError):
             for url in tweet.entities["urls"]:
-                settings.logger.debug(
-                    f"tco_url_link_with_real_link - url: {url}",
-                )
+                settings.logger.debug(f"Normal tweet - URL: {url}")
                 text = text.replace(url["url"], url["expanded_url"])
-                settings.logger.debug(
-                    f"tco_url_link_with_real_link - text: {text}",
-                )
+                settings.logger.debug(f"Normal tweet - text: {text}")
     return text
 
 
@@ -79,6 +75,6 @@ def hashtag_with_link(text: str) -> str:
         text,
     )
 
-    settings.logger.debug(f"Text before hashtag_with_link: {text}")
-    settings.logger.debug(f"Text after hashtag_with_link: {regex}")
+    settings.logger.debug(f"Text - before: {text}")
+    settings.logger.debug(f"Text - after: {regex}")
     return regex

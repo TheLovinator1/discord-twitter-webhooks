@@ -20,8 +20,8 @@ def username_to_link(text: str) -> str:
         text,
         flags=re.MULTILINE,
     )
-    settings.logger.debug(f"Text before username_to_link: {text}")
-    settings.logger.debug(f"Text after username_to_link: {regex}")
+    settings.logger.debug(f"Text - before: {text}")
+    settings.logger.debug(f"Text - after: {regex}")
     return regex
 
 
@@ -43,6 +43,6 @@ def subreddit_to_link(text: str) -> str:
         text,
         flags=re.MULTILINE,
     )
-    settings.logger.debug(f"Text before subreddit_to_link: {text}")
-    settings.logger.debug(f"Text after subreddit_to_link: {regex}")
+    settings.logger.debug(f"Text - before: {text}")
+    settings.logger.debug(f"Text - after: {regex}")
     return regex
