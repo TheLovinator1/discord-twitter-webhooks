@@ -1,4 +1,3 @@
-"""Not enough tests here, but it's a good place to start."""
 import os
 
 import tweepy
@@ -151,19 +150,13 @@ class TestTweets:
         short_tweet = self.short_tweet_only_text
         short_txt = self.short
         short_1_list = []
-        assert media_links_and_remove_url(short_tweet, short_txt) == (
-            short_1_list,
-            short_txt,
-        )
+        assert media_links_and_remove_url(short_tweet, short_txt) == (short_1_list, short_txt)  # noqa: E501, pylint: disable=line-too-long
 
         # Short tweet, one image
         short_1_tweet = self.short_tweet_one_image
         short_1_txt = "Short 1 Image"
         short_1_list = ["https://pbs.twimg.com/media/E6c309BWYAceCII.jpg"]
-        assert media_links_and_remove_url(short_1_tweet, short_1_txt) == (
-            short_1_list,
-            short_1_txt,
-        )
+        assert media_links_and_remove_url(short_1_tweet, short_1_txt) == (short_1_list, short_1_txt)  # noqa: E501, pylint: disable=line-too-long
 
         # Short tweet, two images
         short_2_tweet = self.short_tweet_two_images
@@ -172,10 +165,7 @@ class TestTweets:
             "https://pbs.twimg.com/media/E6c4BpyXIAIvvdW.jpg",
             "https://pbs.twimg.com/media/E6c4BqSXMAQq1Fe.jpg",
         ]
-        assert media_links_and_remove_url(short_2_tweet, short_2_txt) == (
-            short_2_list,
-            short_2_txt,
-        )
+        assert media_links_and_remove_url(short_2_tweet, short_2_txt) == (short_2_list, short_2_txt)  # noqa: E501, pylint: disable=line-too-long
 
         # Short tweet, three images
         short_3_tweet = self.short_tweet_three_images
@@ -185,10 +175,7 @@ class TestTweets:
             "https://pbs.twimg.com/media/E6c4Zw-WUAIr0pJ.jpg",
             "https://pbs.twimg.com/media/E6c4Zx4WUAALtpv.jpg",
         ]
-        assert media_links_and_remove_url(short_3_tweet, short_3_txt) == (
-            short_3_list,
-            short_3_txt,
-        )
+        assert media_links_and_remove_url(short_3_tweet, short_3_txt) == (short_3_list, short_3_txt)  # noqa: E501, pylint: disable=line-too-long
 
         # Short tweet, four images
         short_4_tweet = self.short_tweet_four_image
@@ -199,10 +186,7 @@ class TestTweets:
             "https://pbs.twimg.com/media/E6c4jCNXsAAsiYY.jpg",
             "https://pbs.twimg.com/media/E6c4jCyXMAA4_I9.jpg",
         ]
-        assert media_links_and_remove_url(short_4_tweet, short_4_txt) == (
-            short_4_list,
-            short_4_txt,
-        )
+        assert media_links_and_remove_url(short_4_tweet, short_4_txt) == (short_4_list, short_4_txt)  # noqa: E501, pylint: disable=line-too-long
 
         # Short tweet, one gif
         # Returns the thumbnail of the gif, not the gif itself
@@ -211,10 +195,7 @@ class TestTweets:
             "https://pbs.twimg.com/tweet_video_thumb/E6daSHUX0AYR9ap.jpg",
         ]
         gif_tweet_txt = "Gif"
-        assert media_links_and_remove_url(gif_tweet, gif_tweet_txt) == (
-            gif_list,
-            gif_tweet_txt,
-        )
+        assert media_links_and_remove_url(gif_tweet, gif_tweet_txt) == (gif_list, gif_tweet_txt)  # noqa: E501, pylint: disable=line-too-long
 
     def test_username_with_link(self):
         """Test if the username is replaced with a link"""
@@ -260,13 +241,7 @@ class TestTweets:
         assert tco_url_link_with_real_link(self.short_tweet_only_text, self.short_tweet_only_text.text) == self.short  # noqa: E501, pylint: disable=line-too-long
 
         # One link in the tweet
-        assert (
-            tco_url_link_with_real_link(
-                self.link_to_youtube,
-                self.link_to_youtube.text,
-            )
-            == "https://www.youtube.com/\nHello, this is Youtube"
-        )
+        assert tco_url_link_with_real_link(self.link_to_youtube, self.link_to_youtube.text) == "https://www.youtube.com/\nHello, this is Youtube"  # noqa: E501, pylint: disable=line-too-long
 
     def test_discord_link_previews(self):
         """Test if the discord link previews are removed, aka < and >
