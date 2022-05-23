@@ -222,7 +222,7 @@ at tlovinator@gmail.com if you have any questions.
 Thanks,
 TheLovinator#9276"""  # noqa: E501, pylint: disable=line-too-long
 
-    if os.getenv("USERS_TO_FOLLOW"):
+    if "USERS_TO_FOLLOW" in os.environ:
         # Send a message to the channel to let the user know that the
         # configuration file has been updated
         send_normal_webhook(msg=MESSAGE)
