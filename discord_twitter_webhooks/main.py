@@ -237,5 +237,9 @@ TheLovinator#9276"""  # noqa: E501, pylint: disable=line-too-long
         settings.logger.critical("No bearer token found, exiting")
         sys.exit(1)
 
+    if not settings.rule:
+        settings.logger.critical("No rule found, exiting")
+        sys.exit(1)
+
     else:
         start()

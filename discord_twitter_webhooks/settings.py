@@ -23,7 +23,7 @@ log_level: str = os.getenv("LOG_LEVEL", default="INFO")
 collage_maker_url: str = os.getenv("TWITTER_IMAGE_COLLAGE_API", default="https://twitter.lovinator.space/add")  # noqa: E501, pylint: disable=line-too-long
 
 # https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule
-rule: str = os.environ["RULE"]
+rule: str = os.getenv("RULE", default="")
 
 # TODO: Add logging config file so you can customize the logging
 logger = logging
