@@ -232,5 +232,10 @@ TheLovinator#9276"""  # noqa: E501, pylint: disable=line-too-long
             sleep(4 * 60 * 60)
         except KeyboardInterrupt:
             sys.exit(1)
+
+    if not settings.bearer_token:
+        settings.logger.critical("No bearer token found, exiting")
+        sys.exit(1)
+
     else:
         start()

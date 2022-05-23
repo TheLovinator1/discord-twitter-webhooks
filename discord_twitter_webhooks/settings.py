@@ -9,7 +9,7 @@ load_dotenv()
 
 # Environment variables
 # https://developer.twitter.com/en/portal/projects-and-apps
-bearer_token: str = os.environ["BEARER_TOKEN"]
+bearer_token: str = os.getenv("BEARER_TOKEN", default="")
 
 # https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
 webhook_url: str = os.environ["WEBHOOK_URL"]
