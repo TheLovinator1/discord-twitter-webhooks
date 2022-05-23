@@ -115,80 +115,6 @@ class MyStreamListener(tweepy.StreamingClient):
 
 def start() -> None:
     """Authenticate to the Twitter API and start the filter."""
-    # TODO: Add proxy support?
-    stream = MyStreamListener(
-        settings.bearer_token,
-        wait_on_rate_limit=True,
-    )
-
-    # Check Twitter app for rules that already have been created
-    old_rules = stream.get_rules()
-
-    # Get rules and add to list so we can delete them later
-    rules_to_delete = []
-    if old_rules.data and len(old_rules.data) > 0:
-        for old_rule in old_rules.data:
-            settings.logger.debug(
-                f"Added {old_rule.value} - {old_rule.id} for deletion",
-            )
-            rules_to_delete.append(old_rule.id)
-
-    # TODO: Only remove rule if the user list has changed?
-    # If the app already has rules, delete them first before adding our own
-    if rules_to_delete:
-        settings.logger.info(f"Deleting rules: {rules_to_delete}")
-        stream.delete_rules(rules_to_delete)
-    else:
-        settings.logger.info("App had no rules to delete")
-
-    # TODO: dry_run before to make sure everything works?
-    try:
-        rule_response = stream.add_rules(
-            add=tweepy.StreamRule(value=settings.rule),
-        )
-
-        if rule_response.errors:
-            for error in rule_response.errors:
-                settings.logger.error(f"\nFound error for: {error['value']}")
-                settings.logger.error(
-                    f"{error['title']} - Error details: {error['details'][0]}",
-                )
-            sys.exit(1)
-
-        settings.logger.info("Starting stream!")
-
-        stream.filter(
-            expansions=[
-                "author_id",
-                "referenced_tweets.id",
-                "in_reply_to_user_id",
-                "attachments.media_keys",
-                "attachments.poll_ids",
-                "entities.mentions.username",
-                "referenced_tweets.id.author_id",
-            ],
-            media_fields=[
-                "url",
-                "preview_image_url",
-            ],
-            tweet_fields=[
-                "attachments",
-                "author_id",
-                "entities",
-                "in_reply_to_user_id",
-                "referenced_tweets",
-            ],
-            user_fields=[
-                "profile_image_url",
-            ],
-        )
-
-    except KeyboardInterrupt:
-        stream.disconnect()
-        sys.exit(0)
-
-
-if __name__ == "__main__":
     MESSAGE = """Hello!
 
 [discord-twitter-webhooks](https://github.com/TheLovinator1/discord-twitter-webhooks) has been updated to version 2.0.0.
@@ -242,4 +168,78 @@ TheLovinator#9276"""  # noqa: E501, pylint: disable=line-too-long
         sys.exit(1)
 
     else:
-        start()
+        # TODO: Add proxy support?
+        stream = MyStreamListener(
+            settings.bearer_token,
+            wait_on_rate_limit=True,
+        )
+
+        # Check Twitter app for rules that already have been created
+        old_rules = stream.get_rules()
+
+        # Get rules and add to list so we can delete them later
+        rules_to_delete = []
+        if old_rules.data and len(old_rules.data) > 0:
+            for old_rule in old_rules.data:
+                settings.logger.debug(
+                    f"Added {old_rule.value} - {old_rule.id} for deletion",
+                )
+                rules_to_delete.append(old_rule.id)
+
+        # TODO: Only remove rule if the user list has changed?
+        # If the app already has rules, delete them first before adding our own
+        if rules_to_delete:
+            settings.logger.info(f"Deleting rules: {rules_to_delete}")
+            stream.delete_rules(rules_to_delete)
+        else:
+            settings.logger.info("App had no rules to delete")
+
+        # TODO: dry_run before to make sure everything works?
+        try:
+            rule_response = stream.add_rules(
+                add=tweepy.StreamRule(value=settings.rule),
+            )
+
+            if rule_response.errors:
+                for error in rule_response.errors:
+                    settings.logger.error(f"\nFound error for: {error['value']}")
+                    settings.logger.error(
+                        f"{error['title']} - Error details: {error['details'][0]}",
+                    )
+                sys.exit(1)
+
+            settings.logger.info("Starting stream!")
+
+            stream.filter(
+                expansions=[
+                    "author_id",
+                    "referenced_tweets.id",
+                    "in_reply_to_user_id",
+                    "attachments.media_keys",
+                    "attachments.poll_ids",
+                    "entities.mentions.username",
+                    "referenced_tweets.id.author_id",
+                ],
+                media_fields=[
+                    "url",
+                    "preview_image_url",
+                ],
+                tweet_fields=[
+                    "attachments",
+                    "author_id",
+                    "entities",
+                    "in_reply_to_user_id",
+                    "referenced_tweets",
+                ],
+                user_fields=[
+                    "profile_image_url",
+                ],
+            )
+
+        except KeyboardInterrupt:
+            stream.disconnect()
+            sys.exit(0)
+
+
+if __name__ == "__main__":
+    start()
