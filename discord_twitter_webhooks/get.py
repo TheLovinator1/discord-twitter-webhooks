@@ -1,4 +1,3 @@
-import contextlib
 from typing import List
 
 import requests
@@ -7,43 +6,21 @@ from bs4 import BeautifulSoup
 from discord_twitter_webhooks import settings
 
 
-def media_links_and_remove_url(tweet, text: str) -> tuple[list, str]:
-    """Get the media links from the tweet and remove the links from the
-    tweet text.
-
-    Twitter adds a link at the end of the tweet if the tweet has image,
-    video or gif. We will remove this as it is not needed.
-
-    Args:
-        tweet ([type]): Tweet object
-        text (str): Text from the tweet
-
-    Returns:
-        tuple[list, str]:  Media links and text
-    """
+def media_links(media) -> list[str]:
     link_list = []
+    for image in media:
+        # Get the media links from the tweet
+        if image["type"] == "photo":
+            link_list.append(image["url"])
+        elif image["type"] in ["animated_gif", "video"]:
+            link_list.append(image["preview_image_url"])
+            # TODO: Add actual .mp4 or add play button overlay so you
+            # can see that it's a video
+        else:
+            return []
+        settings.logger.debug(f"Image: {image}")
 
-    try:
-        # Tweet is more than 140 characters
-        for image in tweet.extended_tweet["extended_entities"]["media"]:
-            link_list.append(image["media_url_https"])
-            text = text.replace(image["url"], "")
-            settings.logger.debug(f"Image: {image}")
-    except KeyError:
-        settings.logger.debug("KeyError")
-
-    except AttributeError:
-        # Tweet is less than 140 characters
-        settings.logger.debug("AttributeError")
-
-        with contextlib.suppress(AttributeError):
-            for image in tweet.extended_entities["media"]:
-                link_list.append(image["media_url_https"])
-                text = text.replace(image["url"], "")
-                settings.logger.debug(f"Image: {image}")
-
-    settings.logger.debug(f"Text: {text}")
-    return link_list, text
+    return link_list
 
 
 def meta_image(url: str) -> str:
@@ -78,50 +55,27 @@ def meta_image(url: str) -> str:
     return image_url
 
 
-def tweet_text(tweet) -> str:
-    """Get the text from the tweet.
-
-    Tweets can be normal(less than 140 characters) or extended(more than
-    140 characters).
+def tweet_urls(entities) -> list[str]:
+    """Get URLs in the tweet.
 
     Args:
-        tweet ([type]): Tweet object
+        entities (_type_): __description__
 
     Returns:
-        str: Text from the tweet
+        list[str]: List of URLs found in the tweet
     """
-    try:
-        text = tweet.extended_tweet["full_text"]
-        settings.logger.debug(f"Text: {text}")
-    except AttributeError:
-        text = tweet.text
-        settings.logger.debug(f"Extended text: {text}")
+    url_list: List[str] = []
 
-    return text
+    for url in entities["urls"]:
+        settings.logger.debug(f"url found in tweet: {url['expanded_url']}")
 
+        # We only want to add external links to the list and
+        # entities["urls"] has URLs for images, videos that are uploaded
+        # with the tweet.
+        if "status" in url:
+            settings.logger.debug(f"{url['expanded_url']} has a HTTP status code - adding to tweet_urls")  # noqa: E501, pylint: disable=line-too-long
+            url_list.append(url["expanded_url"])
 
-def tweet_urls(tweet) -> list[str]:
-    """Get the URLs from the tweet and add them to a list.
-
-    We use this to get the images from websites.
-
-    Args:
-        tweet ([type]): Tweet object
-
-    Returns:
-        list[str]: Urls from the tweet
-    """
-    url_list: List["str"] = []
-    try:
-        url_list.extend(url["expanded_url"] for url in tweet.extended_tweet["entities"]["urls"])  # noqa: E501, pylint: disable=line-too-long
-        settings.logger.debug(f"url_list: {url_list}")
-
-    except AttributeError:
-        # Tweet is less than 140 characters
-        with contextlib.suppress(AttributeError):
-            url_list.extend(url["expanded_url"] for url in tweet.entities["urls"])  # noqa: E501, pylint: disable=line-too-long
-            settings.logger.debug(
-                f"AttributeError - url_list: {url_list}",
-            )
+    settings.logger.debug(f"url_list: {url_list}")
 
     return url_list

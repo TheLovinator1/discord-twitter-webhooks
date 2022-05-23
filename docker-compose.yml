@@ -6,11 +6,15 @@ services:
     container_name: discord-twitter-webhooks
     environment:
       - WEBHOOK_URL=${WEBHOOK_URL}
-      - CONSUMER_KEY=${CONSUMER_KEY}
-      - CONSUMER_SECRET=${CONSUMER_SECRET}
-      - ACCESS_TOKEN=${ACCESS_TOKEN}
-      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
-      - USERS_TO_FOLLOW=${USERS_TO_FOLLOW}
+      - BEARER_TOKEN=${BEARER_TOKEN}
+      - RULE=${RULE}
       - LOG_LEVEL=${LOG_LEVEL}
       - TWITTER_IMAGE_COLLAGE_API=${TWITTER_IMAGE_COLLAGE_API}
+
+    # The bot will only stop after we get a keep-alive signal from the
+    # Twitter API, this can take 20 seconds.
+    # By default, stop waits 10 seconds for the container to exit before
+    # sending SIGKILL. Uncomment this if you are okay with waiting longer.
+    #
+    # stop_grace_period: 1m
     restart: unless-stopped

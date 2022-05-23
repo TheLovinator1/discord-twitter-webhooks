@@ -1,19 +1,13 @@
 [tool.poetry]
 name = "discord-twitter-webhooks"
-version = "0.3.0"
+version = "2.0.0"
 description = "Stream tweets to Discord"
 authors = ["Joakim Hellsén <tlovinator@gmail.com>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
 homepage = "https://github.com/TheLovinator1/discord-twitter-webhooks"
 repository = "https://github.com/TheLovinator1/discord-twitter-webhooks"
-keywords = [
-  "bot",
-  "discord",
-  "discord-twitter-webhooks",
-  "tweepy",
-  "discord-py-slash-command",
-]
+keywords = ["bot", "discord", "discord-twitter-webhooks", "tweepy"]
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/TheLovinator1/discord-twitter-webhooks/issues"
@@ -26,8 +20,8 @@ python = "^3.9"
 requests = "^2.27.1"
 python-dotenv = "^0.20.0"
 beautifulsoup4 = "^4.11.1"
-tweepy = "^4.8.0"
-discord-webhook = "^0.16.0"
+tweepy = "^4.10.0"
+discord-webhook = "^0.16.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"

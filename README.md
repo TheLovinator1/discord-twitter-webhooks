@@ -68,36 +68,111 @@ Docker Hub: [thelovinator/discord-twitter-webhooks](https://hub.docker.com/r/the
     - You can stop the bot with <kbd>Ctrl</kbd> + <kbd>c</kbd>.
     - If you want to run the bot in the background, you can run `docker-compose up -d`.
 
-## Tests
+## Rules
 
-Add environment variable TEST_WEBHOOK to your environment or the .env before running tests.
+More information about the rules can be found [here](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule).
 
-- TEST_WEBHOOK=https://discordapp.com/api/webhooks/582694/a3hmHAXItB_lzSYBx0-CeVeUDqac1vT
+### Boolean operators and grouping
 
-Run tests with `poetry run pytest`
+If you want to string together multiple operators, you can use the
+following:
 
-## FAQ
+| Operator           | Description                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AND logic          | Successive operators **with a space between them** will result in boolean "AND" logic, meaning that Tweets will match only if both conditions are met. For example, `RULE="snow day #NoSchool"` will match Tweets containing the terms snow and day and the hashtag #NoSchool.                                                                                                                                                                 |
+| OR logic           | Successive operators with OR between them will result in OR logic, meaning that Tweets will match if either condition is met. For example, specifying `RULE="grumpy OR cat OR #meme"` will match any Tweets containing at least the terms grumpy or cat, or the hashtag #meme.                                                                                                                                                                 |
+| NOT logic/negation | Prepend a dash (-) to a keyword (or any operator) to negate it. For example, `RULE="cat #meme -grumpy"` will match Tweets containing the hashtag #meme and the term cat, but only if they do not contain the term grumpy. One common rule clause is -is:retweet, which will not match on Retweets, thus matching only on original Tweets, Quote Tweets, and replies. All operators can be negated, but negated operators cannot be used alone. |
+| Grouping           | You can use parentheses to group operators together. For example, `RULE="(grumpy cat) OR (#meme has:images)"` will return either Tweets containing the terms grumpy and cat, or Tweets with images containing the hashtag #meme. Note that ANDs are applied first, then ORs are applied.                                                                                                                                                       |
 
-- `453 - You currently have Essential access which includes access to Twitter API v2 endpoints only` when starting the bot
-  - This bot was created before V2 of Twitter's API so you need to apply
-    ([here](https://developer.twitter.com/en/portal/apps/new))
-    for Elevated API access to get the V1 API keys. After you have applied
-    you can go to Projects & Apps -> Create App under Standalone Apps
-- `Poetry could not find a pyproject.toml file in the current directory.`
-  - You are probably in the wrong directory. Go to root of the project
-    where README.md, .env, and pyproject.toml are located.
-- `python` or `poetry` is not recognized as an internal or external command
-  - You need to install Python and Poetry if not installed or add them
-    to your PATH.
-    - When installing Python, you should check the box that says
-      `Add Python 3.10 to PATH`
-  - System Properties -> Environment Variables -> Double-click Path ->
-    Add if missing:
-    - `%localappdata%\Programs\Python\Python310\Scripts` (Change to your
-      Python version)
-    - `%localappdata%\Programs\Python\Python310\` (Change to your Python
-      version)
-    - `%appdata%\Python\Scripts`
+Note: Do not negate a set of operators grouped together in a set of
+parentheses. Instead, negate each individual operator.
+For example, instead of using `RULE="skiing -(snow OR day OR #NoSchool)"`, we suggest that you use `RULE="skiing -snow -day -#NoSchool"`.
+
+### Get everything from a user
+
+If you want to get tweets, replies, retweets and quotes from @Steam, @Xbox and @PlayStation.
+
+- You can use the following rule:
+  - `RULE="from:Steam OR from:Xbox OR from:PlayStation"`
+  - See [#remove-retweets-replies-and-quotes](#remove-retweets-replies-and-quotes) if you only want tweets.
+
+### Remove/Only retweets
+
+- Remove retweets by adding -is:retweet to the rule:
+  - `RULE="(from:Steam OR from:Xbox OR from:PlayStation) -is:retweet"`
+    - Change -is:retweet to is:retweet to only get retweets.
+    - Note that we added parentheses to group the operators together otherwise the -is:retweet would only be for Playstation.
+- If you want to get retweets (and tweets, replies, quotes) from Steam but not Xbox or PlayStation, you can use the following rule:
+  - `RULE="(from:Steam) OR (-is:retweet (from:Xbox OR from:PlayStation))"`
+
+### Remove/Only replies
+
+- Remove replies by adding -is:reply to the rule.
+  - `RULE="(from:Steam OR from:Xbox OR from:PlayStation) -is:reply"`
+    - Change -is:reply to is:reply to only get replies.
+    - Note that we added parentheses to group the operators together otherwise the -is:reply would only be for Playstation.
+- If you want to get replies (and tweets, retweets, quotes) from Steam but not Xbox or PlayStation, you can use the following rule:
+  - `RULE="(from:Steam) OR (-is:reply (from:Xbox OR from:PlayStation))"`
+
+### Remove/Only quote tweets
+
+- Remove quote tweets by adding -is:quote to the rule:
+  - `RULE="(from:Steam OR from:Xbox OR from:PlayStation) -is:quote"`
+    - Change -is:quote to is:quote to only get quotes
+    - Note that we added parentheses to group the operators together otherwise the -is:quote would only be for Playstation.
+- If you want to get quote tweets (and tweets, retweets, replies) from Steam but not Xbox or PlayStation, you can use the following rule:
+  - `RULE="(from:Steam) OR (-is:quote (from:Xbox OR from:PlayStation))"`
+
+### Remove retweets, replies and quotes
+
+- If you want to only get tweets from Steam, you can use the following rule:
+  - `RULE="from:Steam -is:retweet -is:reply -is:quote"`
+- If you have several users you have to use parentheses to group them together:
+  - `RULE="(from:Steam OR from:Xbox OR from:PlayStation) -is:retweet -is:reply -is:quote"`
+
+### Get tweets with a specific word
+
+- If you want to get tweets with the words `pepsi`, `cola` or `coca cola`, you
+  can use the following rule:
+  - `RULE='pepsi OR cola OR "coca cola"'`
+    - Note the double quotes around words with spaces.
+    - If we used double quotes in the rule we have to use single quotes around the rule.
+- If we only want to get tweets from @Xbox that are about Halo you can use the following rule:
+  - `RULE="Halo from:Xbox"`
+
+## Operators
+
+If you have Academic Research access you can use more advanced operators. Those can be found [here](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule#list).
+
+### Operators - Standalone
+
+| Operator             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Example                                                      |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| keyword              | Matches a keyword within the body of a Tweet. This is a tokenized match, meaning that your keyword string will be matched against the tokenized text of the Tweet body. Tokenization splits words based on punctuation, symbols, and Unicode basic plane separator characters. For example, a Tweet with the text “I like coca-cola” would be split into the following tokens: I, like, coca, cola. These tokens would then be compared to the keyword string used in your rule. To match strings containing punctuation (for example coca-cola), symbol, or separator characters, you must wrap your keyword in double-quotes. | `RULE='pepsi OR cola OR "coca cola"'`                        |
+| emoji                | Matches an emoji within the body of a Tweet. Similar to a keyword, emojis are a tokenized match, meaning that your emoji will be matched against the tokenized text of the Tweet body. Note that if an emoji has a variant, you must wrap it in double quotes to add to a rule.                                                                                                                                                                                                                                                                                                                                                 | `RULE="(😃 OR 😡) 😬"`                                       |
+| "exact phrase match" | Matches the exact phrase within the body of a Tweet.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | `RULE='("Twitter API" OR #v2) -"filtered stream"'`           |
+| #                    | Matches any Tweet containing a recognized hashtag, if the hashtag is a recognized entity in a Tweet. This operator performs an exact match, NOT a tokenized match, meaning the rule #thanku will match posts with the exact hashtag #thanku, but not those with the hashtag #thankunext.                                                                                                                                                                                                                                                                                                                                        | `RULE="#thankunext #fanart OR @arianagrande"`                |
+| @                    | Matches any Tweet that mentions the given username, if the username is a recognized entity (including the @ character).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | `RULE="(@twitterdev OR @twitterapi) -@twitter"`              |
+| from:                | Matches any Tweet from a specific user. The value can be either the username (excluding the @ character) or the user’s numeric user ID.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | `RULE="from:twitterdev OR from:twitterapi -from:twitter"`    |
+| to:                  | Matches any Tweet that is in reply to a particular user. The value can be either the username (excluding the @ character) or the user’s numeric user ID.                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `RULE="to:twitterdev OR to:twitterapi -to:twitter"`          |
+| url:                 | Performs a tokenized match on any validly-formatted URL of a Tweet. Works with both short URLs (https://t.co/c0A36SWil4) and real URLs (https://developer.twitter.com/en/docs/labs). URL needs to be quoted.                                                                                                                                                                                                                                                                                                                                                                                                                    | `RULE='from:TwitterDev url:"https://developer.twitter.com"'` |
+| retweets_of:         | Matches Tweets that are Retweets of the specified user. The value can be either the username (excluding the @ character) or the user’s numeric user ID.                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | `RULE="retweets_of:twitterdev OR retweets_of:twitterapi"`    |
+
+### Operators - Conjunction required
+
+| Operator     | Description                                                                                                                                                                                                                                                                                          | Example                                         |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| is:retweet   | Matches on Retweets that match the rest of the specified rule. This operator looks only for true Retweets (for example, those generated using the Retweet button). Quote Tweets will not be matched by this operator.                                                                                | `RULE="data @twitterdev is:retweet"`            |
+| is:quote     | Returns all Quote Tweets, also known as Tweets with comments.                                                                                                                                                                                                                                        | `RULE='"sentiment analysis" is:quote'`          |
+| is:verified  | Deliver only Tweets whose authors are verified by Twitter.                                                                                                                                                                                                                                           | `RULE="#nowplaying is:verified"`                |
+| has:hashtags | Matches Tweets that contain at least one hashtag.                                                                                                                                                                                                                                                    | `RULE="from:twitterdev has:hashtags"`           |
+| has:links    | This operator matches Tweets which contain links and media in the Tweet body.                                                                                                                                                                                                                        | `RULE="from:twitterdev announcement has:links"` |
+| has:mentions | Matches Tweets that mention another Twitter user.                                                                                                                                                                                                                                                    | `RULE="#nowplaying has:mentions"`               |
+| has:media    | Matches Tweets that contain a media object, such as a photo, GIF, or video, as determined by Twitter. This will not match on media created with Periscope, or Tweets with links to other media hosting sites.                                                                                        | `RULE="(kittens OR puppies) has:media"`         |
+| has:images   | Matches Tweets that contain a recognized URL to an image.                                                                                                                                                                                                                                            | `RULE="#meme has:images"`                       |
+| has:videos   | Matches Tweets that contain native Twitter videos, uploaded directly to Twitter. This will not match on videos created with Periscope, or Tweets with links to other video hosting sites.                                                                                                            | `RULE="#icebucketchallenge has:videos"`         |
+| sample:      | Returns a random percent sample of Tweets that match a rule rather than the entire set of Tweets. The percent value must be represented by an integer between 1 and 100 (for example, sample:10 will return a random 10% sample).                                                                    | `RULE="#nowplaying @spotify sample:15"`         |
+| lang:        | Matches Tweets that have been classified by Twitter as being of a particular language (if, and only if, the tweet has been classified). It is important to note that each Tweet is currently only classified as being of one language, so AND’ing together multiple languages will yield no results. | `RULE="recommend #paris lang:en"`               |
 
 ## Need help?
 

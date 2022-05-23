@@ -5,6 +5,16 @@ All notable changes to discord-twitter-webhooks will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2022-05-23
+
+## Changed
+
+- You need to use BEARER_TOKEN to authenticate instead of CONSUMER_KEY,
+  CONSUMER_SECRET, ACCESS_TOKEN and ACCESS_TOKEN_SECRET
+- You have to use RULE instead of USERS_TO_FOLLOW,
+  USER_LIST_REPLIES_TO_OTHERS_TWEET, USER_LIST_REPLIES_TO_OUR_TWEET,
+  USER_LIST_WE_RETWEET_SOMEONE_ELSES_TWEET, USER_LIST_SOMEONE_RETWEETS_OUR_TWEET
+
 ## [0.3.0] - 2022-02-19
 
 ### Added

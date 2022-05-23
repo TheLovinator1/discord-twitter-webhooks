@@ -1,4 +1,3 @@
-import contextlib
 import re
 
 from discord_twitter_webhooks import settings
@@ -27,7 +26,7 @@ def username_with_link(text: str) -> str:
     return regex
 
 
-def tco_url_link_with_real_link(tweet, text: str) -> str:
+def tco_url_link_with_real_link(entities, text: str) -> str:
     """Replace the t.co url with the real url so users know where the
     link goes to.
 
@@ -35,25 +34,15 @@ def tco_url_link_with_real_link(tweet, text: str) -> str:
     After: https://www.youtube.com/
 
     Args:
-        tweet ([type]): Tweet object
+        tweet (tweepy.Tweet): Tweet object
         text (str): Text from the tweet
 
     Returns:
         str: Text with the t.co url replaced with the real url
     """
-    try:
-        # Tweet is more than 140 characters
-        for url in tweet.extended_tweet["entities"]["urls"]:
-            settings.logger.debug(f"Extended tweet - URL: {url}")
-            text = text.replace(url["url"], url["expanded_url"])
-            settings.logger.debug(f"Extended tweet - text: {text}")
-    except AttributeError:
-        # Tweet is less than 140 characters
-        with contextlib.suppress(AttributeError):
-            for url in tweet.entities["urls"]:
-                settings.logger.debug(f"Normal tweet - URL: {url}")
-                text = text.replace(url["url"], url["expanded_url"])
-                settings.logger.debug(f"Normal tweet - text: {text}")
+    for url in entities["urls"]:
+        text = text.replace(url["url"], url["expanded_url"])
+
     return text
 
 

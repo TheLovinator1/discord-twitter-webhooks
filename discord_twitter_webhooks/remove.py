@@ -76,3 +76,22 @@ def copyright_symbols(text: str) -> str:
     settings.logger.debug(f"Text after removed ©: {text}")
 
     return text
+
+
+def remove_media_links(entities, text: str) -> str:
+    """Twitter appends a link to the media. It it not needed in Discord
+    so we remove it.
+
+
+    Args:
+        entities (_type_): Object with the entities from the tweet
+        text (str): Text from the tweet
+
+    Returns:
+        str: Text with the media links removed
+    """
+    for url in entities["urls"]:
+        if "status" not in url:
+            settings.logger.debug(f"Removing url: {url}")
+            text = text.replace(url["url"], "")
+    return text
