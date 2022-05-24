@@ -33,8 +33,7 @@ def discord_link_previews(text: str) -> str:
 def utm_source(text: str) -> str:
     """Remove the utm_source parameter from the url.
 
-    Before:
-    https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter
+    Before: https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter
 
     After: https://store.steampowered.com/app/457140/Oxygen_Not_Included/
 
@@ -43,7 +42,7 @@ def utm_source(text: str) -> str:
 
     Returns:
         str: Text with the utm_source parameter removed
-    """
+    """  # noqa: E501, pylint: disable=line-too-long
     regex = re.sub(
         r"(\?utm_source)\S*",
         r"",
