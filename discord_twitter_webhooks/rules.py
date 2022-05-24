@@ -26,7 +26,7 @@ def check_rules(stream) -> None:
     # TODO: Only remove rule if the user list has changed?
     # If the app already has rules, delete them first before adding our own
     if rules_to_delete:
-        settings.logger.info(f"Deleting rules: {rules_to_delete}")
+        settings.logger.debug(f"Deleting rules: {rules_to_delete}")
         stream.delete_rules(rules_to_delete)
     else:
         settings.logger.debug("App had no rules to delete")
