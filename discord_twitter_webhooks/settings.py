@@ -35,7 +35,7 @@ if not rule:
 # TODO: Add logging config file so you can customize the logging
 logger = logging
 logger.basicConfig(
-    format="%(asctime)s %(message)s",
+    format="%(asctime)s %(levelname)s %(message)s",
     datefmt="%H:%M:%S",
     level=log_level,
 )
