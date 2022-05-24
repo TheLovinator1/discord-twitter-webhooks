@@ -91,6 +91,12 @@ def remove_media_links(entities, text: str) -> str:
     """
     for url in entities["urls"]:
         if "status" not in url:
-            settings.logger.debug(f"Removing url: {url}")
-            text = text.replace(url["url"], "")
+            # This removed every link in this tweet:
+            # https://twitter.com/SteamDB/status/1528783609833865217
+            # So we check if the url is from twitter.com now
+            if url["expanded_url"].startswith("https://twitter.com/"):
+                settings.logger.debug(f"Removing url: {url}")
+                text = text.replace(url["url"], "")
+            else:
+                settings.logger.warning(f"Found URL without status: {url}")
     return text
