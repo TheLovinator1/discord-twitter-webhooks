@@ -35,7 +35,7 @@ def check_rules(stream) -> None:
 def add_new_rule(stream) -> None:
     """Add rule to Twitter. If error, exit."""
     # This is our user created rule
-    print(f"Adding new rule: {settings.rule} ")
+    print(f"Rule: {settings.rule}")
     rule_to_add = tweepy.StreamRule(value=settings.rule)
 
     # TODO: Add support for several rules and add support for writing to
