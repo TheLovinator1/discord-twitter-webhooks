@@ -1,5 +1,4 @@
 import html
-import os
 import sys
 from time import sleep
 
@@ -7,10 +6,12 @@ import tweepy
 from tweepy.streaming import StreamResponse
 
 from discord_twitter_webhooks import get, reddit, remove, replace, settings
+from discord_twitter_webhooks.rules import add_new_rule, check_rules
 from discord_twitter_webhooks.send_webhook import (
     send_embed_webhook,
     send_normal_webhook,
 )
+from discord_twitter_webhooks.v1_message import MESSAGE, check_if_we_used_v1
 
 # TODO: Add support for Twitter Spaces
 # TODO: Add backfill so we get missed tweets?
@@ -115,130 +116,58 @@ class MyStreamListener(tweepy.StreamingClient):
 
 def start() -> None:
     """Authenticate to the Twitter API and start the filter."""
-    MESSAGE = """Hello!
 
-[discord-twitter-webhooks](https://github.com/TheLovinator1/discord-twitter-webhooks) has been updated to version 2.0.0.
-There have been a few breaking changes, and it looks like you were using
-the old version.
-
-You will need to update your environment/configuration file to get
-discord-twitter-webhooks working again.
-
-The bot is now using the V2 version of the Twitter API, which means that you
-will need to update your configuration file to use a bearer token
-instead of API keys.
-
-Rules are also used instead of user ids. It's now possible to
-have more granular control over what tweets get sent to Discord.
-You can now filter specific words, only get tweets with images, and much more instead
-of getting all the tweets from a specific user.
-
-You can find more information in the [README.md](https://github.com/TheLovinator1/discord-twitter-webhooks).
-
-
-The bot will now sleep for 4 hours before restarting to avoid spamming
-this channel due to Docker/Systemd restarting the bot every time it
-shuts down. You will have to remove USERS_TO_FOLLOW from your
-environment/configuration file to stop this message from appearing.
-
-
-Feel free to contact me on Discord, make an [issue on GitHub](https://github.com/TheLovinator1/discord-twitter-webhooks), or email me
-at tlovinator@gmail.com if you have any questions.
-
-Thanks,
-TheLovinator#9276"""  # noqa: E501, pylint: disable=line-too-long
-
-    if "USERS_TO_FOLLOW" in os.environ:
-        # Send a message to the channel to let the user know that the
-        # configuration file has been updated
+    # Check if we have used the v1 bot before
+    if check_if_we_used_v1():
         send_normal_webhook(msg=MESSAGE)
-        settings.logger.critical(MESSAGE)
+
         # Sleep for 4 hours to avoid spamming the channel
-        try:
-            sleep(4 * 60 * 60)
-        except KeyboardInterrupt:
-            sys.exit(1)
+        sleep(4 * 60 * 60)
 
-    if not settings.bearer_token:
-        settings.logger.critical("No bearer token found, exiting")
-        sys.exit(1)
+    # TODO: Add proxy support?
+    stream = MyStreamListener(
+        settings.bearer_token,
+        wait_on_rate_limit=True,
+    )
 
-    if not settings.rule:
-        settings.logger.critical("No rule found, exiting")
-        sys.exit(1)
+    # Delete old rules
+    check_rules(stream)
 
-    else:
-        # TODO: Add proxy support?
-        stream = MyStreamListener(
-            settings.bearer_token,
-            wait_on_rate_limit=True,
+    # Add our rules
+    add_new_rule(stream)
+
+    # TODO: dry_run before to make sure everything works?
+    try:
+        settings.logger.info("Starting stream!")
+        stream.filter(
+            expansions=[
+                "author_id",
+                "referenced_tweets.id",
+                "in_reply_to_user_id",
+                "attachments.media_keys",
+                "attachments.poll_ids",
+                "entities.mentions.username",
+                "referenced_tweets.id.author_id",
+            ],
+            media_fields=[
+                "url",
+                "preview_image_url",
+            ],
+            tweet_fields=[
+                "attachments",
+                "author_id",
+                "entities",
+                "in_reply_to_user_id",
+                "referenced_tweets",
+            ],
+            user_fields=[
+                "profile_image_url",
+            ],
         )
 
-        # Check Twitter app for rules that already have been created
-        old_rules = stream.get_rules()
-
-        # Get rules and add to list so we can delete them later
-        rules_to_delete = []
-        if old_rules.data and len(old_rules.data) > 0:
-            for old_rule in old_rules.data:
-                settings.logger.debug(
-                    f"Added {old_rule.value} - {old_rule.id} for deletion",
-                )
-                rules_to_delete.append(old_rule.id)
-
-        # TODO: Only remove rule if the user list has changed?
-        # If the app already has rules, delete them first before adding our own
-        if rules_to_delete:
-            settings.logger.info(f"Deleting rules: {rules_to_delete}")
-            stream.delete_rules(rules_to_delete)
-        else:
-            settings.logger.info("App had no rules to delete")
-
-        # TODO: dry_run before to make sure everything works?
-        try:
-            rule_response = stream.add_rules(
-                add=tweepy.StreamRule(value=settings.rule),
-            )
-
-            if rule_response.errors:
-                for error in rule_response.errors:
-                    settings.logger.error(f"\nFound error for: {error['value']}")
-                    settings.logger.error(
-                        f"{error['title']} - Error details: {error['details'][0]}",
-                    )
-                sys.exit(1)
-
-            settings.logger.info("Starting stream!")
-
-            stream.filter(
-                expansions=[
-                    "author_id",
-                    "referenced_tweets.id",
-                    "in_reply_to_user_id",
-                    "attachments.media_keys",
-                    "attachments.poll_ids",
-                    "entities.mentions.username",
-                    "referenced_tweets.id.author_id",
-                ],
-                media_fields=[
-                    "url",
-                    "preview_image_url",
-                ],
-                tweet_fields=[
-                    "attachments",
-                    "author_id",
-                    "entities",
-                    "in_reply_to_user_id",
-                    "referenced_tweets",
-                ],
-                user_fields=[
-                    "profile_image_url",
-                ],
-            )
-
-        except KeyboardInterrupt:
-            stream.disconnect()
-            sys.exit(0)
+    except KeyboardInterrupt:
+        stream.disconnect()
+        sys.exit(0)
 
 
 if __name__ == "__main__":

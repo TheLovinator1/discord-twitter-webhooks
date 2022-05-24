@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 
 from dotenv import load_dotenv
 
@@ -24,6 +25,12 @@ collage_maker_url: str = os.getenv("TWITTER_IMAGE_COLLAGE_API", default="https:/
 
 # https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule
 rule: str = os.getenv("RULE", default="")
+
+if not bearer_token:
+    sys.exit("No bearer token found, exiting")
+
+if not rule:
+    sys.exit("No rule found, exiting")
 
 # TODO: Add logging config file so you can customize the logging
 logger = logging
