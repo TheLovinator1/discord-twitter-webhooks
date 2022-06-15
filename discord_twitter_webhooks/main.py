@@ -45,7 +45,12 @@ def main(response: StreamResponse) -> None:
     twitter_card_image = ""
 
     # Get the text from the tweet
-    text = data.text
+    try:
+        text = data.text
+    except AttributeError:
+        text = "*Failed to get text from tweet*"
+        settings.logger.error("No text found for tweet")
+
     settings.logger.debug(f"Text: {text}")
 
     # Get the images from the tweet and remove the URLs from the text
