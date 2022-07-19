@@ -41,8 +41,8 @@ shuts down. You will have to remove USERS_TO_FOLLOW from your
 environment/configuration file to stop this message from appearing.
 
 
-Feel free to contact me on Discord, make an [issue on GitHub](https://github.com/TheLovinator1/discord-twitter-webhooks), or email me
-at tlovinator@gmail.com if you have any questions.
+Feel free to contact me on Discord, make an [issue](https://github.com/TheLovinator1/discord-twitter-webhooks),
+or email me at tlovinator@gmail.com if you have any questions.
 
 Thanks,
-TheLovinator#9276"""  # noqa: E501, pylint: disable=line-too-long
+TheLovinator#9276"""

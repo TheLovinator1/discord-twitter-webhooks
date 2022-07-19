@@ -10,10 +10,10 @@ def username_with_link(text: str) -> str:
     After: [@TheLovinator1](https://twitter.com/TheLovinator1)
 
     Args:
-        text (str): Text from the tweet
+        text: Text from the tweet
 
     Returns:
-        str: Text with the username replaced with a link
+        Text with the username replaced with a link
     """
     regex = re.sub(
         r"\B@(\w*)",
@@ -35,7 +35,7 @@ def tco_url_link_with_real_link(entities, text: str) -> str:
 
     Args:
         tweet (tweepy.Tweet): Tweet object
-        text (str): Text from the tweet
+        text: Text from the tweet
 
     Returns:
         str: Text with the t.co url replaced with the real url
@@ -53,7 +53,7 @@ def hashtag_with_link(text: str) -> str:
     After: [#Hello](https://twitter.com/hashtag/Hello)
 
     Args:
-        text (str): Text from the tweet
+        text: Text from the tweet
 
     Returns:
         str: Text with the hashtag replaced with a link

@@ -14,10 +14,10 @@ def discord_link_previews(text: str) -> str:
     After: <https://www.example.com/>
 
     Args:
-        text (str): Text from the tweet
+        text: Text from the tweet
 
     Returns:
-        str: Text with the Discord link previews removed
+        Text with the Discord link previews removed
     """
     regex = re.sub(
         r"(^(https:|http:|www\.)\S*)",
@@ -38,7 +38,7 @@ def utm_source(text: str) -> str:
     After: https://store.steampowered.com/app/457140/Oxygen_Not_Included/
 
     Args:
-        text (str): Text from the tweet
+        text: Text from the tweet
 
     Returns:
         str: Text with the utm_source parameter removed
@@ -58,7 +58,7 @@ def copyright_symbols(text: str) -> str:
     """Remove ®, ™ and © symbols.
 
     Args:
-        text (str): Text from the tweet
+        text: Text from the tweet
 
     Returns:
         str: Text with the copyright symbols removed
@@ -84,7 +84,7 @@ def remove_media_links(entities, text: str) -> str:
 
     Args:
         entities (_type_): Object with the entities from the tweet
-        text (str): Text from the tweet
+        text: Text from the tweet
 
     Returns:
         str: Text with the media links removed

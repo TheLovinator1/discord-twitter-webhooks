@@ -9,7 +9,7 @@ class TestRemove:
     """Test things from discord_twitter_webhooks/remove.py"""
 
     hello_txt = "Hello @TheLovinator1 #Hello /u/test /r/aww"
-    hello2_txt = "/r/hello r/hello hello/r/hello /u/hello u/hello hello/u/hello"  # noqa: E501, pylint: disable=line-too-long
+    hello2_txt = "/r/hello r/hello hello/r/hello /u/hello u/hello hello/u/hello"
 
     short = "Hello I am short Sadge"
 
@@ -22,8 +22,8 @@ class TestRemove:
 
     def test_utm_source(self):
         """Test if the utm source is removed"""
-        before = "https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter"  # noqa, pylint: disable=line-too-long
-        after = "https://store.steampowered.com/app/457140/Oxygen_Not_Included/"  # noqa: E501, pylint: disable=line-too-long
+        before = "https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter"  # noqa
+        after = "https://store.steampowered.com/app/457140/Oxygen_Not_Included/"
         assert utm_source(before) == after
 
     def test_remove_copyright_symbols(self):

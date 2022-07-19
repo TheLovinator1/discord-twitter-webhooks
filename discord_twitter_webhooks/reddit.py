@@ -10,9 +10,9 @@ def username_to_link(text: str) -> str:
     After: [u/username](https://www.reddit.com/u/username/)
 
     Args:
-        text (str): Text from the tweet
+        text: Text from the tweet
     Returns:
-        str: Text with the username replaced with a clickable link
+        Text with the username replaced with a clickable link
     """
     # TODO: Add comments describing the regex
     regex = re.sub(
@@ -33,10 +33,10 @@ def subreddit_to_link(text: str) -> str:
     After: [r/sweden](https://www.reddit.com/r/sweden/)
 
     Args:
-        text (str): Text from the tweet
+        text: Text from the tweet
 
     Returns:
-        str: Text with the subreddit replaced with a clickable link
+        Text with the subreddit replaced with a clickable link
     """
     # TODO: Add comments describing the regex
     regex = re.sub(

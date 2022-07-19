@@ -9,7 +9,7 @@ def check_rules(stream) -> None:
     """Check if we have any old rules and delete them if we do.
 
     Args:
-        stream (_type_): The tweepy stream object
+        stream: The tweepy stream object
     """
 
     # Check Twitter app for rules that already have been created
@@ -20,7 +20,7 @@ def check_rules(stream) -> None:
     rules_to_delete = []
     if old_rules.data and len(old_rules.data) > 0:
         for old_rule in old_rules.data:
-            settings.logger.debug(f"Added {old_rule.value} - {old_rule.id} for deletion")  # noqa: E501, pylint: disable=line-too-long
+            settings.logger.debug(f"Added {old_rule.value} - {old_rule.id} for deletion")
             rules_to_delete.append(old_rule.id)
 
     # TODO: Only remove rule if the user list has changed?
@@ -38,13 +38,11 @@ def add_new_rule(stream) -> None:
     print(f"Rule: {settings.rule}")
     rule_to_add = tweepy.StreamRule(value=settings.rule)
 
-    # TODO: Add support for several rules and add support for writing to
-    # different channels
-
+    # TODO: Add support for several rules and add support for writing to different channels
     rule_response = stream.add_rules(add=rule_to_add)
 
     if rule_response.errors:
         for error in rule_response.errors:
             settings.logger.error(f"\nFound error for: {error['value']}")
-            settings.logger.error(f"{error['title']} - Error details: {error['details'][0]}")  # noqa: E501, pylint: disable=line-too-long
+            settings.logger.error(f"{error['title']} - Error details: {error['details'][0]}")
         sys.exit(1)

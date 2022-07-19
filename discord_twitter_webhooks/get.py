@@ -31,10 +31,10 @@ def meta_image(url: str) -> str:
     over twitter:image.
 
     Args:
-        url (str): Url to get the meta image from
+        url: Url to get the meta image from
 
     Returns:
-        str: twitter:image found in url
+        twitter:image found in url
     """
     image_url: str = ""
 
@@ -47,7 +47,7 @@ def meta_image(url: str) -> str:
         image_url = og_image[0].get("content")
         settings.logger.debug(f"og_image: {og_image}")
 
-    if twitter_image := soup.find_all("meta", attrs={"name": "twitter:image"}):  # noqa: E501, pylint: disable=line-too-long
+    if twitter_image := soup.find_all("meta", attrs={"name": "twitter:image"}):
         image_url = twitter_image[0].get("content")
         settings.logger.debug(f"twitter_image: {twitter_image}")
 
@@ -73,7 +73,7 @@ def tweet_urls(entities) -> list[str]:
         # entities["urls"] has URLs for images, videos that are uploaded
         # with the tweet.
         if "status" in url:
-            settings.logger.debug(f"{url['expanded_url']} has a HTTP status code - adding to tweet_urls")  # noqa: E501, pylint: disable=line-too-long
+            settings.logger.debug(f"{url['expanded_url']} has a HTTP status code - adding to tweet_urls")
             url_list.append(url["expanded_url"])
 
     settings.logger.debug(f"url_list: {url_list}")

@@ -21,7 +21,7 @@ log_level: str = os.getenv("LOG_LEVEL", default="INFO")
 # Where https://github.com/TheLovinator1/twitter-image-collage-maker is
 # running. You can run your own version or use the default
 # https://twitter.lovinator.space/
-collage_maker_url: str = os.getenv("TWITTER_IMAGE_COLLAGE_API", default="https://twitter.lovinator.space/add")  # noqa: E501, pylint: disable=line-too-long
+collage_maker_url: str = os.getenv("TWITTER_IMAGE_COLLAGE_API", default="https://twitter.lovinator.space/add")
 
 # https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule
 rule: str = os.getenv("RULE", default="")
