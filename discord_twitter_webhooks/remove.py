@@ -65,15 +65,11 @@ def copyright_symbols(text: str) -> str:
     """
     settings.logger.debug(f"Text before: {text}")
 
-    text = text.replace("®", "")
-    settings.logger.debug(f"Text after removed ®: {text}")
+    symbols = ["®", "™", "©"]
+    for symbol in symbols:
+        text = text.replace(symbol, "")
 
-    text = text.replace("™", "")
-    settings.logger.debug(f"Text after removed ™: {text}")
-
-    text = text.replace("©", "")
-    settings.logger.debug(f"Text after removed ©: {text}")
-
+    settings.logger.debug(f"Text after copyright symbols: {text}")
     return text
 
 
