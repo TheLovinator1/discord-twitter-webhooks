@@ -73,7 +73,7 @@ def copyright_symbols(text: str) -> str:
     return text
 
 
-def remove_media_links(entities, text: str) -> str:
+def remove_media_links(entities: dict, text: str) -> str:
     """Twitter appends a link to the media. It it not needed in Discord
     so we remove it.
 

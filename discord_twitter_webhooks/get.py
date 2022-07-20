@@ -55,7 +55,7 @@ def meta_image(url: str) -> str:
     return image_url
 
 
-def tweet_urls(entities) -> list[str]:
+def tweet_urls(entities: dict) -> list[str]:
     """Get URLs in the tweet.
 
     Args:

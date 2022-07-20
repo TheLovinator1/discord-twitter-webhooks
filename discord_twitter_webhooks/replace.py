@@ -26,7 +26,7 @@ def username_with_link(text: str) -> str:
     return regex
 
 
-def tco_url_link_with_real_link(entities, text: str) -> str:
+def tco_url_link_with_real_link(entities: dict, text: str) -> str:
     """Replace the t.co url with the real url so users know where the
     link goes to.
 
