@@ -1,5 +1,4 @@
 import sys
-
 import tweepy
 
 from discord_twitter_webhooks import settings

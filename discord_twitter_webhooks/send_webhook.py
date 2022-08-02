@@ -9,13 +9,13 @@ from discord_twitter_webhooks import settings
 
 
 def send_embed_webhook(
-    tweet_id: int,
-    link_list: list[str],
-    text: str,
-    twitter_card_image: str,
-    avatar_url: str,
-    screen_name: str,
-    webhook: str = settings.webhook_url,
+        tweet_id: int,
+        link_list: list[str],
+        text: str,
+        twitter_card_image: str,
+        avatar_url: str,
+        screen_name: str,
+        webhook: str = settings.webhook_url,
 ):
     """Send embed to Discord webhook.
 

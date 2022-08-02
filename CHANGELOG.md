@@ -37,7 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add CONTRIBUTING.md
 - ?utm_source is not removed from the tweet
 - Added more tests and docstrings. Still not enough
-- It now gets a image from the URL in the tweet if the tweet has none. It checks for the twitter:image tag and og:image tag.
+- It now gets a image from the URL in the tweet if the tweet has none. It checks for the twitter:image tag and og:image
+  tag.
 
 ### Changed
 

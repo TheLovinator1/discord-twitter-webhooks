@@ -1,7 +1,7 @@
 import logging
 import os
-import sys
 
+import sys
 from dotenv import load_dotenv
 
 # Parse the .env file and then load all the variables found as

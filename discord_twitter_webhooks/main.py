@@ -1,8 +1,8 @@
 import html
-import sys
-from time import sleep
 
+import sys
 import tweepy
+from time import sleep
 from tweepy.streaming import StreamResponse
 
 from discord_twitter_webhooks import get, reddit, remove, replace, settings
@@ -12,6 +12,7 @@ from discord_twitter_webhooks.send_webhook import (
     send_normal_webhook,
 )
 from discord_twitter_webhooks.v1_message import MESSAGE, check_if_we_used_v1
+
 
 # TODO: Add support for Twitter Spaces
 # TODO: Add backfill so we get missed tweets?
