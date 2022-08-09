@@ -3,6 +3,7 @@ import sys
 import tweepy
 
 from discord_twitter_webhooks import settings
+from discord_twitter_webhooks.send_webhook import send_normal_webhook
 
 
 def delete_old_rules(stream) -> None:
@@ -48,9 +49,13 @@ def new_rule(rule, rule_tag, stream) -> str:
 
         if rule_response.errors:
             for error in rule_response.errors:
-                settings.logger.error(f"\nFound error for: {error['value']!r}")
-                settings.logger.error(f"{error['title']!r} - Error details: {error['details'][0]!r}")
+                error_msg = (f"Error adding rule: {error['value']!r}"
+                             f"{error['title']!r} - Error details: {error['details'][0]!r}")
+                settings.logger.error(error_msg)
+                if settings.send_errors == "True":
+                    send_normal_webhook(error_msg, settings.error_webhook)
             sys.exit(1)
+
         rule_data = rule_response.data
         settings.logger.debug(f"Rule data: {rule_data}")
 

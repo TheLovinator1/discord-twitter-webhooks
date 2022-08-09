@@ -28,14 +28,28 @@ def send_embed_webhook(
         webhook: Webhook URL. Defaults to environment variable WEBHOOK_URL.
         twitter_card_image: Twitter card image from the tweet.
     """
-    settings.logger.debug(f"Tweet: {text}")
+
+    settings.logger.debug(f"send_normal_webhook() - Tweet ID: {tweet_id}")
+    settings.logger.debug(f"send_normal_webhook() - Text: {text}")
+    settings.logger.debug(f"send_normal_webhook() - Twitter card image: {twitter_card_image}")
+    settings.logger.debug(f"send_normal_webhook() - Avatar URL: {avatar_url}")
+    settings.logger.debug(f"send_normal_webhook() - Screen name: {screen_name}")
+    settings.logger.debug(f"send_normal_webhook() - Webhook URL: {webhook}")
+    for media_link in media_links:
+        settings.logger.debug(f"send_normal_webhook() - Media link: {media_link}")
+
+    if not webhook:
+        settings.logger.error("No webhook URL found")
+        if settings.send_errors == "True":
+            send_normal_webhook(f"No webhook URL found. Trying to send tweet embed for {tweet_id}",
+                                settings.error_webhook)
+        return
 
     hook = DiscordWebhook(url=webhook)
     embed = DiscordEmbed(description=text)
 
     if twitter_card_image:
         embed.set_image(url=twitter_card_image)
-        settings.logger.debug(f"twitter_card_image: {twitter_card_image}")
 
     # Only add image if one
     if len(media_links):
@@ -47,13 +61,16 @@ def send_embed_webhook(
             # (e.g https://twitter.lovinator.space/) and get a collage back.
             response = requests.get(url=settings.collage_maker_url, params={"tweet_id": tweet_id})
 
-            if response.status_code == 200:
+            if response.ok:
                 json_data = json.loads(response.text)
                 settings.logger.debug(f"JSON data from twitter-image-collage-maker: {json_data}")
                 embed.set_image(url=json_data["url"])
             else:
-                settings.logger.error(f"Got {response.status_code} from {settings.collage_maker_url}")
+                error_msg = f"Got {response.status_code!r} from {settings.collage_maker_url!r} for tweet {tweet_id!r}"
+                settings.logger.error(error_msg)
                 embed.set_image(url=media_links[0])
+                if settings.send_errors == "True":
+                    send_normal_webhook(error_msg, settings.error_webhook)
 
     settings.logger.debug(f"Avatar URL: {avatar_url}")
 
@@ -84,7 +101,14 @@ def send_normal_webhook(msg: str, webhook: str = settings.webhook_url):
         msg: Message to send
         webhook: Webhook URL. Defaults to environment variable WEBHOOK_URL.
     """
-    settings.logger.debug(f"Message: {msg}")
+    settings.logger.debug(f"send_normal_webhook() - Message: {msg}")
+    settings.logger.debug(f"send_normal_webhook() - Webhook URL: {webhook}")
+
+    if not webhook:
+        settings.logger.error("No webhook URL found")
+        if settings.send_errors == "True":
+            send_normal_webhook(f"No webhook URL found. Trying to send {msg!r}", settings.error_webhook)
+        return
 
     hook = DiscordWebhook(url=webhook, content=msg)
 
