@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 from discord_twitter_webhooks import settings
 
 
-def media_links(media) -> list[str]:
+def media_links(media: list[dict]) -> list[str]:
     """Get media links from tweet.
 
     Args:
@@ -21,7 +21,7 @@ def media_links(media) -> list[str]:
     Returns:
         List of media links found in the tweet
     """
-    link_list = []
+    link_list: list[str] = []
     for image in media:
         # Get the media links from the tweet
         if image["type"] == "photo":

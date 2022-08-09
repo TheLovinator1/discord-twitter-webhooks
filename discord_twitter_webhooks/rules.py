@@ -6,12 +6,13 @@ new_rule - Add new rules to Twitter.
 import sys
 
 import tweepy
+from tweepy import StreamRule, StreamingClient
 
 from discord_twitter_webhooks import settings
-from discord_twitter_webhooks.send_webhook import send_normal_webhook
+from discord_twitter_webhooks.send_webhook import send_error_webhook
 
 
-def delete_old_rules(stream) -> None:
+def delete_old_rules(stream: StreamingClient) -> None:
     """Check if we have any old rules and delete them if we do.
 
     Args:
@@ -24,8 +25,10 @@ def delete_old_rules(stream) -> None:
 
     # Get rules and add to list, so we can delete them later.
     rules_to_delete = []
-    if old_rules.data and len(old_rules.data) > 0:
-        for old_rule in old_rules.data:
+
+    if len(old_rules.data) > 0:
+        rules_data: list[StreamRule] = old_rules.data
+        for old_rule in rules_data:
             settings.logger.debug(f"Added {old_rule.value} - {old_rule.id} for deletion")
             rules_to_delete.append(old_rule.id)
 
@@ -38,7 +41,7 @@ def delete_old_rules(stream) -> None:
         settings.logger.debug("App had no rules to delete")
 
 
-def new_rule(rule, rule_tag, stream) -> str:
+def new_rule(rule: str, rule_tag: str, stream: StreamingClient) -> str:
     """Add rule to Twitter. If error, exit.
 
     Args:
@@ -49,16 +52,14 @@ def new_rule(rule, rule_tag, stream) -> str:
     settings.logger.debug(f"Adding rule: {rule!r} for stream: {stream!r}")
     if rule:
         print(f"Rule: {rule}")
-        rule_to_add = tweepy.StreamRule(value=rule, tag=rule_tag)
+        rule_to_add: StreamRule = tweepy.StreamRule(value=rule, tag=rule_tag)
         rule_response = stream.add_rules(add=rule_to_add)
 
         if rule_response.errors:
             for error in rule_response.errors:
                 error_msg = (f"Error adding rule: {error['value']!r}"
                              f"{error['title']!r} - Error details: {error['details'][0]!r}")
-                settings.logger.error(error_msg)
-                if settings.send_errors == "True":
-                    send_normal_webhook(error_msg, settings.error_webhook)
+                send_error_webhook(error_msg)
             sys.exit(1)
 
         rule_data = rule_response.data

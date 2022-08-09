@@ -10,7 +10,7 @@ from discord_twitter_webhooks import get, reddit, remove, replace, settings
 from discord_twitter_webhooks.rules import delete_old_rules, new_rule
 from discord_twitter_webhooks.send_webhook import (
     send_embed_webhook,
-    send_normal_webhook,
+    send_error_webhook, send_normal_webhook,
 )
 from discord_twitter_webhooks.v1_message import MESSAGE, check_if_we_used_v1
 
@@ -54,35 +54,23 @@ def main(response: StreamResponse) -> None:
         elif matching_rules[0].tag == "Rule5":
             new_webhook_url = settings.webhook_url5
         else:
-            send_normal_webhook(matching_rule_error)
+            send_error_webhook(matching_rule_error)
     else:
-        send_normal_webhook(matching_rule_error)
-
-    media = []
-    try:
-        if "media" in response.includes:
-            media = [media.data for media in response.includes["media"]]
-            settings.logger.debug(f"Media: {media}")
-    except AttributeError:
-        error_msg = f"Failed to get media {response.includes!r} for tweet {data.id}"
-        settings.logger.error(error_msg)
-        if settings.send_errors == "True":
-            send_normal_webhook(error_msg, settings.error_webhook)
+        send_error_webhook(matching_rule_error)
 
     # Get avatar and username, this is used for the embed avatar and name.
     avatar = ""
     user_name = ""
     try:
-        if "users" in response.includes:
-            users = [users.data for users in response.includes["users"]]
-            settings.logger.debug(f"Users: {users}")
-            avatar = users[0]["profile_image_url"]
-            user_name = users[0]["name"]
+        users = [users.data for users in response.includes["users"]]
+        for user in users:
+            settings.logger.debug(f"User: {user}")
+
+        avatar = users[0]["profile_image_url"]
+        user_name = users[0]["name"]
     except AttributeError:
         error_msg = f"Failed to get users {response.includes!r} for tweet {data.id}"
-        settings.logger.error(error_msg)
-        if settings.send_errors == "True":
-            send_normal_webhook(error_msg, settings.error_webhook)
+        send_error_webhook(error_msg)
 
     # Get the text from the tweet.
     try:
@@ -91,13 +79,19 @@ def main(response: StreamResponse) -> None:
         text = "*Failed to get text from tweet*"
 
         error_msg = f"No text found {data!r} for tweet {data.id}"
-        settings.logger.error(error_msg)
-        if settings.send_errors == "True":
-            send_normal_webhook(error_msg, settings.error_webhook)
+        send_error_webhook(error_msg)
     settings.logger.debug(f"Text: {text}")
 
-    # Get the images from the tweet and remove the URLs from the text.
-    media_links = get.media_links(media) if media else []
+    media_links: list[str] = []
+    try:
+        media_list: list[dict] = [media.data for media in response.includes["media"]]
+        settings.logger.debug(f"Media list: {media_list}")
+
+        # Get the images from the tweet and remove the URLs from the text.
+        media_links = get.media_links(media_list)
+    except AttributeError:
+        error_msg = f"Failed to get media {response.includes!r} for tweet {data.id}"
+        send_error_webhook(error_msg)
 
     # Get entities from the tweet.
     entities = {}
@@ -107,9 +101,7 @@ def main(response: StreamResponse) -> None:
             settings.logger.debug(f"Entities: {entities}")
     except AttributeError:
         error_msg = f"No entities found {data!r} for tweet {data.id}"
-        settings.logger.error(error_msg)
-        if settings.send_errors == "True":
-            send_normal_webhook(error_msg, settings.error_webhook)
+        send_error_webhook(error_msg)
 
     # Remove media links from the text.
     twitter_card_image = ""
@@ -170,9 +162,7 @@ class MyStreamListener(tweepy.StreamingClient):
         """An unhandled exception was raised while streaming. Shutting down."""
         error_msg = (f"An unhandled exception was raised while streaming. Shutting down"
                      f"\nException: {exception!r}")
-        settings.logger.error(error_msg)
-        if settings.send_errors == "True":
-            send_normal_webhook(error_msg, settings.error_webhook)
+        send_error_webhook(error_msg)
 
         self.disconnect()
         sys.exit(error_msg)
