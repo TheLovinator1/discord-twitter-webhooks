@@ -1,3 +1,4 @@
+"""The main file for discord-twitter-webhooks. Run this file to run the bot."""
 import html
 import sys
 from time import sleep
@@ -22,6 +23,9 @@ from discord_twitter_webhooks.v1_message import MESSAGE, check_if_we_used_v1
 # TODO: If tweet is poll, update it in Discord so we can see results?
 
 def main(response: StreamResponse) -> None:
+    """The main function for the bot. This is where the magic happens."""
+    # TODO: Make this smaller
+
     settings.logger.debug(f"Response: {response}")
 
     data = response.data
@@ -55,29 +59,41 @@ def main(response: StreamResponse) -> None:
         send_normal_webhook(matching_rule_error)
 
     media = []
-    if response.includes:
+    try:
         if "media" in response.includes:
             media = [media.data for media in response.includes["media"]]
             settings.logger.debug(f"Media: {media}")
+    except AttributeError:
+        error_msg = f"Failed to get media {response.includes!r} for tweet {data.id}"
+        settings.logger.error(error_msg)
+        if settings.send_errors == "True":
+            send_normal_webhook(error_msg, settings.error_webhook)
 
     # Get avatar and username, this is used for the embed avatar and name.
     avatar = ""
     user_name = ""
-    if "users" in response.includes:
-        users = [users.data for users in response.includes["users"]]
-        settings.logger.debug(f"Users: {users}")
-        avatar = users[0]["profile_image_url"]
-        user_name = users[0]["name"]
-
-    twitter_card_image = ""
+    try:
+        if "users" in response.includes:
+            users = [users.data for users in response.includes["users"]]
+            settings.logger.debug(f"Users: {users}")
+            avatar = users[0]["profile_image_url"]
+            user_name = users[0]["name"]
+    except AttributeError:
+        error_msg = f"Failed to get users {response.includes!r} for tweet {data.id}"
+        settings.logger.error(error_msg)
+        if settings.send_errors == "True":
+            send_normal_webhook(error_msg, settings.error_webhook)
 
     # Get the text from the tweet.
     try:
         text = data.text
     except AttributeError:
         text = "*Failed to get text from tweet*"
-        settings.logger.error("No text found for tweet")
 
+        error_msg = f"No text found {data!r} for tweet {data.id}"
+        settings.logger.error(error_msg)
+        if settings.send_errors == "True":
+            send_normal_webhook(error_msg, settings.error_webhook)
     settings.logger.debug(f"Text: {text}")
 
     # Get the images from the tweet and remove the URLs from the text.
@@ -90,10 +106,13 @@ def main(response: StreamResponse) -> None:
             entities = data.entities
             settings.logger.debug(f"Entities: {entities}")
     except AttributeError:
-        settings.logger.error("No entities found for tweet")
-        entities = {}
+        error_msg = f"No entities found {data!r} for tweet {data.id}"
+        settings.logger.error(error_msg)
+        if settings.send_errors == "True":
+            send_normal_webhook(error_msg, settings.error_webhook)
 
     # Remove media links from the text.
+    twitter_card_image = ""
     if "urls" in entities:
         text = remove.remove_media_links(entities, text)
 
@@ -109,7 +128,7 @@ def main(response: StreamResponse) -> None:
     # Replace the @mentions with URLs.
     text = replace.username_with_link(text)
 
-    # Replace the #hashtags with URLs.
+    # Replace the hashtags with URLs.
     text = replace.hashtag_with_link(text)
 
     # Append < and > to disable Discords link previews.
@@ -132,7 +151,7 @@ def main(response: StreamResponse) -> None:
 
     send_embed_webhook(
         tweet_id=data.id,
-        link_list=media_links,
+        media_links=media_links,
         text=text,
         twitter_card_image=twitter_card_image,
         avatar_url=avatar,
@@ -147,7 +166,18 @@ class MyStreamListener(tweepy.StreamingClient):
     Stream tweets in realtime.
     """
 
-    def on_response(self, response: StreamResponse):
+    def on_exception(self, exception: Exception) -> None:
+        """An unhandled exception was raised while streaming. Shutting down."""
+        error_msg = (f"An unhandled exception was raised while streaming. Shutting down"
+                     f"\nException: {exception!r}")
+        settings.logger.error(error_msg)
+        if settings.send_errors == "True":
+            send_normal_webhook(error_msg, settings.error_webhook)
+
+        self.disconnect()
+        sys.exit(error_msg)
+
+    def on_response(self, response: StreamResponse) -> None:
         """This is called when a response is received."""
         main(response)
 
@@ -159,7 +189,8 @@ def start() -> None:
     if check_if_we_used_v1():
         send_normal_webhook(msg=MESSAGE)
 
-        # Sleep for 4 hours to avoid spamming the channel
+        # Sleep for 4 hours to avoid spamming the channel.
+        # Sleep is in seconds so 60 seconds * 60 minutes * 4 hours = 14400 seconds.
         sleep(4 * 60 * 60)
 
     # TODO: Add proxy support?
@@ -169,28 +200,34 @@ def start() -> None:
     )
 
     # Delete old rules
+    # TODO: We should only delete the rules we created and if they are changed.
     delete_old_rules(stream=stream)
 
-    rule_id = new_rule(rule=settings.rule, rule_tag="Rule1", stream=stream)
-    rule2_id = new_rule(rule=settings.rule2, rule_tag="Rule2", stream=stream)
-    rule3_id = new_rule(rule=settings.rule3, rule_tag="Rule3", stream=stream)
-    rule4_id = new_rule(rule=settings.rule4, rule_tag="Rule4", stream=stream)
-    rule5_id = new_rule(rule=settings.rule5, rule_tag="Rule5", stream=stream)
-
+    # Create the rules
+    rule_id: str = new_rule(rule=settings.rule, rule_tag="Rule1", stream=stream)
     if rule_id:
-        settings.logger.info(f"Rule {rule_id} added")
+        settings.logger.info(f"Rule {rule_id!r} added")
+
+    rule2_id: str = new_rule(rule=settings.rule2, rule_tag="Rule2", stream=stream)
     if rule2_id:
-        settings.logger.info(f"Rule {rule2_id} added")
+        settings.logger.info(f"Rule {rule2_id!r} added")
+
+    rule3_id: str = new_rule(rule=settings.rule3, rule_tag="Rule3", stream=stream)
     if rule3_id:
-        settings.logger.info(f"Rule {rule3_id} added")
+        settings.logger.info(f"Rule {rule3_id!r} added")
+
+    rule4_id: str = new_rule(rule=settings.rule4, rule_tag="Rule4", stream=stream)
     if rule4_id:
-        settings.logger.info(f"Rule {rule4_id} added")
+        settings.logger.info(f"Rule {rule4_id!r} added")
+
+    rule5_id: str = new_rule(rule=settings.rule5, rule_tag="Rule5", stream=stream)
     if rule5_id:
-        settings.logger.info(f"Rule {rule5_id} added")
+        settings.logger.info(f"Rule {rule5_id!r} added")
 
     # TODO: dry_run before to make sure everything works?
     try:
-        settings.logger.info("Starting stream!")
+        settings.logger.info("Starting stream! (Press CTRL+C to stop, it will take 20 seconds to stop, because we have"
+                             " to wait for the next signal to be sent from the Twitter API)")
         stream.filter(
             expansions=[
                 "author_id",

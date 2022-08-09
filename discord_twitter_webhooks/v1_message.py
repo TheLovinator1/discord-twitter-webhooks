@@ -1,18 +1,5 @@
+"""If the user was using the old version, we need to notify them that they have to update their config file."""
 import os
-
-
-def check_if_we_used_v1():
-    """Check if we have USERS_TO_FOLLOW in our environment, this means
-    we have used the bot before v2.0.0. If we have, send a message to
-    the Discord channel that we have been updated. After that we sleep for 4 hours,
-    so we don't spam the channel.
-    """
-    if "USERS_TO_FOLLOW" in os.environ:
-        # Send a message to the channel to let the user know that the
-        # configuration file has been updated.
-        print(MESSAGE)
-        return True
-
 
 MESSAGE = """Hello!
 
@@ -46,3 +33,16 @@ or email me at tlovinator@gmail.com if you have any questions.
 
 Thanks,
 TheLovinator#9276"""
+
+
+def check_if_we_used_v1():
+    """Check if we have USERS_TO_FOLLOW in our environment, this means
+    we have used the bot before v2.0.0. If we have, send a message to
+    the Discord channel that we have been updated. After that we sleep for 4 hours,
+    so we don't spam the channel.
+    """
+    if "USERS_TO_FOLLOW" in os.environ:
+        # Send a message to the channel to let the user know that the
+        # configuration file has been updated.
+        print(MESSAGE)
+        return True
