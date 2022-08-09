@@ -24,95 +24,34 @@ from discord_twitter_webhooks.v1_message import MESSAGE, check_if_we_used_v1
 
 def main(response: StreamResponse) -> None:
     """The main function for the bot. This is where the magic happens."""
-    # TODO: Make this smaller
-
     settings.logger.debug(f"Response: {response}")
 
-    data = response.data
-    settings.logger.debug(f"Data: {data}")
-
-    settings.logger.debug(f"Includes: {response.includes}")
-    settings.logger.debug(f"Matching rule: {response.matching_rules}")
-
-    matching_rules = response.matching_rules
-    settings.logger.debug(f"Matching rules: {matching_rules}")
-
-    matching_rule_error = (f"discord-twitter-webhooks error: Failed to find matching rule for {matching_rules[0].tag!r}"
-                           f"\nTweet was: <https://twitter.com/i/web/status/{data.id}>"
-                           "\nContact TheLovinator#9276 if this keeps happening.")
-
-    new_webhook_url = settings.webhook_url
-    if matching_rules:
-        if matching_rules[0].tag == "Rule1":
-            new_webhook_url = settings.webhook_url
-        elif matching_rules[0].tag == "Rule2":
-            new_webhook_url = settings.webhook_url2
-        elif matching_rules[0].tag == "Rule3":
-            new_webhook_url = settings.webhook_url3
-        elif matching_rules[0].tag == "Rule4":
-            new_webhook_url = settings.webhook_url4
-        elif matching_rules[0].tag == "Rule5":
-            new_webhook_url = settings.webhook_url5
-        else:
-            send_error_webhook(matching_rule_error)
-    else:
-        send_error_webhook(matching_rule_error)
-
-    # Get avatar and username, this is used for the embed avatar and name.
-    avatar = ""
-    user_name = ""
-    try:
-        users = [users.data for users in response.includes["users"]]
-        for user in users:
-            settings.logger.debug(f"User: {user}")
-
-        avatar = users[0]["profile_image_url"]
-        user_name = users[0]["name"]
-    except AttributeError:
-        error_msg = f"Failed to get users {response.includes!r} for tweet {data.id}"
-        send_error_webhook(error_msg)
-
-    # Get the text from the tweet.
-    try:
-        text = data.text
-    except AttributeError:
-        text = "*Failed to get text from tweet*"
-
-        error_msg = f"No text found {data!r} for tweet {data.id}"
-        send_error_webhook(error_msg)
-    settings.logger.debug(f"Text: {text}")
-
-    media_links: list[str] = []
-    try:
-        media_list: list[dict] = [media.data for media in response.includes["media"]]
-        settings.logger.debug(f"Media list: {media_list}")
-
-        # Get the images from the tweet and remove the URLs from the text.
-        media_links = get.media_links(media_list)
-    except AttributeError:
-        error_msg = f"Failed to get media {response.includes!r} for tweet {data.id}"
-        send_error_webhook(error_msg)
-
-    # Get entities from the tweet.
-    entities = {}
-    try:
-        if data.entities:
-            entities = data.entities
-            settings.logger.debug(f"Entities: {entities}")
-    except AttributeError:
-        error_msg = f"No entities found {data!r} for tweet {data.id}"
-        send_error_webhook(error_msg)
-
-    # Remove media links from the text.
     twitter_card_image = ""
-    if "urls" in entities:
-        text = remove.remove_media_links(entities, text)
+    media_links: list[str] = []
 
-        if urls_found := get.tweet_urls(entities):
-            twitter_card_image = get.meta_image(urls_found[0])
+    webhook_url = get_webook_url(response)
+    avatar, user_name = get_avatar_and_username(response)
+    text = get_text(response)
+    
+    data = response.data
 
-        # Replace Twitters shortened URLs with the original URL.
-        text = replace.tco_url_link_with_real_link(entities, text)
+    if response.includes:
+        includes = response.includes
+        if "media" in includes:
+            media_list: list[dict] = [media.data for media in response.includes["media"]]
+            settings.logger.debug(f"Media list: {media_list}")
+
+            # Get the images from the tweet and remove the URLs from the text.
+            media_links = get.media_links(media_list)
+
+    entities = get_entities(response)
+    if entities:
+        if "urls" in entities:
+            text = remove.remove_media_links(entities, text)
+            twitter_card_image = get.meta_image(entities)
+
+            # Replace Twitters shortened URLs with the original URL.
+            text = replace.tco_url_link_with_real_link(entities, text)
 
     # We coverts &gt; and &lt; to > and < to make the text look nicer.
     text = html.unescape(text)
@@ -148,8 +87,79 @@ def main(response: StreamResponse) -> None:
         twitter_card_image=twitter_card_image,
         avatar_url=avatar,
         screen_name=user_name,
-        webhook=new_webhook_url,
+        webhook=webhook_url,
     )
+
+
+def get_avatar_and_username(response):
+    """Get avatar and username, this is used for the embed avatar and name.
+
+    Args:
+        response (StreamResponse): The response from the stream.
+    """
+    users = [users.data for users in response.includes["users"]]
+    for user in users:
+        settings.logger.debug(f"User: {user}")
+    avatar = users[0]["profile_image_url"]
+    user_name = users[0]["name"]
+    return avatar, user_name
+
+
+def get_entities(response) -> dict:
+    """Get the entities from the tweet.
+
+    Args:
+        response (StreamResponse): The response from the stream.
+    """
+    data = response.data
+    entities = []
+    if data["entities"]:
+        entities = data.entities
+        settings.logger.debug(f"Entities: {entities}")
+    return entities
+
+
+def get_webook_url(response):
+    data = response.data
+    matching_rules = response.matching_rules
+    matching_rule_error = (f"discord-twitter-webhooks error: Failed to find matching rule for {matching_rules[0].tag!r}"
+                           f"\nTweet was: <https://twitter.com/i/web/status/{data.id}>"
+                           "\nContact TheLovinator#9276 if this keeps happening.")
+    new_webhook_url = settings.webhook_url
+    if matching_rules:
+        if matching_rules[0].tag == "Rule1":
+            new_webhook_url = settings.webhook_url
+        elif matching_rules[0].tag == "Rule2":
+            new_webhook_url = settings.webhook_url2
+        elif matching_rules[0].tag == "Rule3":
+            new_webhook_url = settings.webhook_url3
+        elif matching_rules[0].tag == "Rule4":
+            new_webhook_url = settings.webhook_url4
+        elif matching_rules[0].tag == "Rule5":
+            new_webhook_url = settings.webhook_url5
+        else:
+            send_error_webhook(matching_rule_error)
+    else:
+        send_error_webhook(matching_rule_error)
+    return new_webhook_url
+
+
+def get_text(response):
+    """Get the text from the tweet.
+
+    Args:
+        response (StreamResponse): The response from the stream.
+    """
+    data = response.data
+    try:
+        text = data.text
+    except AttributeError:
+        text = "*Failed to get text from tweet*"
+
+        error_msg = f"No text found {data!r} for tweet {data.id}"
+        send_error_webhook(error_msg)
+    settings.logger.debug(f"Text: {text}")
+    return text
 
 
 class MyStreamListener(tweepy.StreamingClient):

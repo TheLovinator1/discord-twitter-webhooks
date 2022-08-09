@@ -3,7 +3,6 @@ media_links - Get media links from tweet.
 meta_image - Get twitter:image meta tag from url.
 tweet_urls - Get URLs in the tweet.
 """
-
 from typing import List
 
 import requests
@@ -36,7 +35,7 @@ def media_links(media: list[dict]) -> list[str]:
     return link_list
 
 
-def meta_image(url: str) -> str:
+def meta_image(entities) -> str:
     """Get twitter:image meta tag from url.
 
     Looks for <meta name="twitter:image" content=""> and
@@ -44,51 +43,42 @@ def meta_image(url: str) -> str:
     over twitter:image.
 
     Args:
-        url: Url to get the meta image from
+        entities: Entities from the tweet. This is used to get the URL.
 
     Returns:
         twitter:image found in url
     """
     image_url: str = ""
-
-    response = requests.get(url)
-    settings.logger.debug(f"Response: {response}")
-
-    soup = BeautifulSoup(response.content, "html.parser")
-
-    if og_image := soup.find_all("meta", attrs={"property": "og:image"}):
-        image_url = og_image[0].get("content")
-        settings.logger.debug(f"og_image: {og_image}")
-
-    if twitter_image := soup.find_all("meta", attrs={"name": "twitter:image"}):
-        image_url = twitter_image[0].get("content")
-        settings.logger.debug(f"twitter_image: {twitter_image}")
-
-    settings.logger.debug(f"image_url: {image_url}")
-    return image_url
-
-
-def tweet_urls(entities: dict) -> list[str]:
-    """Get URLs in the tweet.
-
-    Args:
-        entities: Entities from the tweet, can be urls, hashtags, etc.
-
-    Returns:
-        List of URLs found in the tweet
-    """
     url_list: List[str] = []
 
     for url in entities["urls"]:
         settings.logger.debug(f"url found in tweet: {url['expanded_url']}")
 
-        # We only want to add external links to the list and
-        # entities["urls"] has URLs for images, videos that are uploaded
-        # with the tweet.
+        # We only want to add external links to the list and entities["urls"] has URLs for images, videos that are
+        # uploaded with the tweet.
         if "status" in url:
             settings.logger.debug(f"{url['expanded_url']} has a HTTP status code - adding to tweet_urls")
             url_list.append(url["expanded_url"])
 
-    settings.logger.debug(f"url_list: {url_list}")
+    for url in url_list:
+        settings.logger.debug(f"meta_image() - url in url_list: {url}")
+    if url_list:
+        response: requests.Response = requests.get(url_list[0])
+        settings.logger.debug(f"meta_image() - Response: {response}")
 
-    return url_list
+        if not response.ok:
+            settings.logger.error(f"meta_image() - Response not ok: {response!r}")
+            return image_url
+
+        soup = BeautifulSoup(response.content, "html.parser")
+
+        if og_image := soup.find_all("meta", attrs={"property": "og:image"}):
+            image_url = og_image[0].get("content")
+            settings.logger.debug(f"meta_image() - og_image: {og_image}")
+
+        if twitter_image := soup.find_all("meta", attrs={"name": "twitter:image"}):
+            image_url = twitter_image[0].get("content")
+            settings.logger.debug(f"meta_image() - twitter_image: {twitter_image}")
+
+        settings.logger.debug(f"meta_image() - image_url: {image_url}")
+    return image_url
