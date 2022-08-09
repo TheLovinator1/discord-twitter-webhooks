@@ -11,6 +11,7 @@ def discord_link_previews(text: str) -> str:
     and after the link.
 
     Before: https://www.example.com/
+
     After: <https://www.example.com/>
 
     Args:
@@ -41,8 +42,8 @@ def utm_source(text: str) -> str:
         text: Text from the tweet
 
     Returns:
-        str: Text with the utm_source parameter removed
-    """  # noqa: E501, pylint: disable=line-too-long
+        Text with the utm_source parameter removed
+    """
     regex = re.sub(
         r"(\?utm_source)\S*",
         r"",
@@ -61,7 +62,7 @@ def copyright_symbols(text: str) -> str:
         text: Text from the tweet
 
     Returns:
-        str: Text with the copyright symbols removed
+        Text with the copyright symbols removed
     """
     settings.logger.debug(f"Text before: {text}")
 
@@ -74,16 +75,16 @@ def copyright_symbols(text: str) -> str:
 
 
 def remove_media_links(entities: dict, text: str) -> str:
-    """Twitter appends a link to the media. It it not needed in Discord
+    """Twitter appends a link to the media. It is not needed in Discord,
     so we remove it.
 
 
     Args:
-        entities (_type_): Object with the entities from the tweet
-        text: Text from the tweet
+        entities: Object with the entities from the tweet
+        text: Text from the tweet.
 
     Returns:
-        str: Text with the media links removed
+        Text with the media links removed
     """
     for url in entities["urls"]:
         if "status" not in url:

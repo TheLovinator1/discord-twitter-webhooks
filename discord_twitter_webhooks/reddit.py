@@ -30,6 +30,7 @@ def subreddit_to_link(text: str) -> str:
     """Change /r/subreddit to clickable link.
 
     Before: /r/sweden
+
     After: [r/sweden](https://www.reddit.com/r/sweden/)
 
     Args:

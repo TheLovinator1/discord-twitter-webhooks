@@ -17,11 +17,12 @@ def send_embed_webhook(
         screen_name: str,
         webhook: str = settings.webhook_url,
 ):
-    """Send embed to Discord webhook.
+    """Send an embed to Discord webhook.
 
     Args:
-        avatar: Avatar URL
-        tweet_id: Tweet id
+        avatar_url: Avatar URL
+        screen_name: The username, we use this to show who the tweet is from
+        tweet_id: Tweet ID
         link_list: List of links from the tweet
         text: Text from the tweet
         webhook: Webhook URL. Defaults to environment variable WEBHOOK_URL.
@@ -36,7 +37,7 @@ def send_embed_webhook(
         embed.set_image(url=twitter_card_image)
         settings.logger.debug(f"twitter_card_image: {twitter_card_image}")
 
-    # Only add image if there is one
+    # Only add image if one
     if len(link_list):
         if len(link_list) == 1:
             embed.set_image(url=link_list[0])

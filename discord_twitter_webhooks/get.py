@@ -7,6 +7,14 @@ from discord_twitter_webhooks import settings
 
 
 def media_links(media) -> list[str]:
+    """Get media links from tweet.
+
+    Args:
+        media: The media from the tweet, can be images, videos, gifs, etc.
+
+    Returns:
+        List of media links found in the tweet
+    """
     link_list = []
     for image in media:
         # Get the media links from the tweet
@@ -14,8 +22,7 @@ def media_links(media) -> list[str]:
             link_list.append(image["url"])
         elif image["type"] in ["animated_gif", "video"]:
             link_list.append(image["preview_image_url"])
-            # TODO: Add actual .mp4 or add play button overlay so you
-            # can see that it's a video
+            # TODO: Add actual .mp4 or add play button overlay so you can see that it's a video
         else:
             return []
         settings.logger.debug(f"Image: {image}")
@@ -59,10 +66,10 @@ def tweet_urls(entities: dict) -> list[str]:
     """Get URLs in the tweet.
 
     Args:
-        entities (_type_): __description__
+        entities: Entities from the tweet, can be urls, hashtags, etc.
 
     Returns:
-        list[str]: List of URLs found in the tweet
+        List of URLs found in the tweet
     """
     url_list: List[str] = []
 
