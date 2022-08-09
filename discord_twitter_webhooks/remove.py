@@ -26,8 +26,8 @@ def discord_link_previews(text: str) -> str:
         text,
     )
 
-    settings.logger.debug(f"Text before username_to_link: {text}")
-    settings.logger.debug(f"Text after username_to_link: {regex}")
+    settings.logger.debug(f"discord_link_previews() - Text before: {text}")
+    settings.logger.debug(f"discord_link_previews() - Text after: {regex}")
     return regex
 
 
@@ -50,8 +50,8 @@ def utm_source(text: str) -> str:
         text,
     )
 
-    settings.logger.debug(f"Text before username_to_link: {text}")
-    settings.logger.debug(f"Text after username_to_link: {regex}")
+    settings.logger.debug(f"utm_source() - Text before {text}")
+    settings.logger.debug(f"utm_source() - Text after: {regex}")
     return regex
 
 
@@ -70,7 +70,7 @@ def copyright_symbols(text: str) -> str:
     for symbol in symbols:
         text = text.replace(symbol, "")
 
-    settings.logger.debug(f"Text after copyright symbols: {text}")
+    settings.logger.debug(f"copyright_symbols() - Text after: {text}")
     return text
 
 
@@ -90,10 +90,10 @@ def remove_media_links(entities: dict, text: str) -> str:
         if "status" not in url:
             # This removed every link in this tweet:
             # https://twitter.com/SteamDB/status/1528783609833865217
-            # So we check if the url is from twitter.com now
+            # Because of that we check if the url is from the twitter.com domain.
             if url["expanded_url"].startswith("https://twitter.com/"):
-                settings.logger.debug(f"Removing url: {url}")
+                settings.logger.debug(f"remove_media_links() - Removing url: {url}")
                 text = text.replace(url["url"], "")
             else:
-                settings.logger.warning(f"Found URL without status: {url}")
+                settings.logger.warning(f"remove_media_links() - Found URL without status: {url}")
     return text
