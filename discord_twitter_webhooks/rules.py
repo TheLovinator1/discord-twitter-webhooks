@@ -1,21 +1,22 @@
 import sys
+
 import tweepy
 
 from discord_twitter_webhooks import settings
 
 
-def check_rules(stream) -> None:
+def delete_old_rules(stream) -> None:
     """Check if we have any old rules and delete them if we do.
 
     Args:
         stream: The tweepy stream object
     """
 
-    # Check Twitter app for rules that already have been created
+    # Check Twitter app for rules that already have been created.
     old_rules = stream.get_rules()
     settings.logger.debug(f"Old rules: {old_rules}")
 
-    # Get rules and add to list so we can delete them later
+    # Get rules and add to list, so we can delete them later.
     rules_to_delete = []
     if old_rules.data and len(old_rules.data) > 0:
         for old_rule in old_rules.data:
@@ -31,17 +32,26 @@ def check_rules(stream) -> None:
         settings.logger.debug("App had no rules to delete")
 
 
-def add_new_rule(stream) -> None:
-    """Add rule to Twitter. If error, exit."""
-    # This is our user created rule
-    print(f"Rule: {settings.rule}")
-    rule_to_add = tweepy.StreamRule(value=settings.rule)
+def new_rule(rule, rule_tag, stream) -> str:
+    """Add rule to Twitter. If error, exit.
 
-    # TODO: Add support for several rules and add support for writing to different channels
-    rule_response = stream.add_rules(add=rule_to_add)
+    Args:
+        rule: The rule to add.
+        rule_tag: The tag label. This is a free-form text you can use to identify the rules.
+        stream: The tweepy stream object.
+    """
+    settings.logger.debug(f"Adding rule: {rule!r} for stream: {stream!r}")
+    if rule:
+        print(f"Rule: {rule}")
+        rule_to_add = tweepy.StreamRule(value=rule, tag=rule_tag)
+        rule_response = stream.add_rules(add=rule_to_add)
 
-    if rule_response.errors:
-        for error in rule_response.errors:
-            settings.logger.error(f"\nFound error for: {error['value']}")
-            settings.logger.error(f"{error['title']} - Error details: {error['details'][0]}")
-        sys.exit(1)
+        if rule_response.errors:
+            for error in rule_response.errors:
+                settings.logger.error(f"\nFound error for: {error['value']!r}")
+                settings.logger.error(f"{error['title']!r} - Error details: {error['details'][0]!r}")
+            sys.exit(1)
+        rule_data = rule_response.data
+        settings.logger.debug(f"Rule data: {rule_data}")
+
+        return rule_data[0].id

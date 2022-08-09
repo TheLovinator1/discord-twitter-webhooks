@@ -1,12 +1,12 @@
 import logging
 import os
-
 import sys
+
 from dotenv import load_dotenv
 
 # Parse the .env file and then load all the variables found as
-# environment variables
-load_dotenv()
+# environment variables.
+load_dotenv(verbose=True)
 
 # Environment variables
 # https://developer.twitter.com/en/portal/projects-and-apps
@@ -14,6 +14,10 @@ bearer_token: str = os.getenv("BEARER_TOKEN", default="")
 
 # https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
 webhook_url: str = os.environ["WEBHOOK_URL"]
+webhook_url2: str = os.getenv("WEBHOOK_URL2", default=None)
+webhook_url3: str = os.getenv("WEBHOOK_URL3", default=None)
+webhook_url4: str = os.getenv("WEBHOOK_URL4", default=None)
+webhook_url5: str = os.getenv("WEBHOOK_URL5", default=None)
 
 # Log severity. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG
 log_level: str = os.getenv("LOG_LEVEL", default="INFO")
@@ -25,6 +29,10 @@ collage_maker_url: str = os.getenv("TWITTER_IMAGE_COLLAGE_API", default="https:/
 
 # https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule
 rule: str = os.getenv("RULE", default="")
+rule2: str = os.getenv("RULE2", default="")
+rule3: str = os.getenv("RULE3", default="")
+rule4: str = os.getenv("RULE4", default="")
+rule5: str = os.getenv("RULE5", default="")
 
 if not bearer_token:
     sys.exit("No bearer token found, exiting")

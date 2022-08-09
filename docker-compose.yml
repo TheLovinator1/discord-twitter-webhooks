@@ -8,6 +8,10 @@ services:
       - WEBHOOK_URL=${WEBHOOK_URL}
       - BEARER_TOKEN=${BEARER_TOKEN}
       - RULE=${RULE}
+      # - RULE2=${RULE2}
+      # - RULE3=${RULE3}
+      # - RULE4=${RULE4}
+      # - RULE5=${RULE5}
       - LOG_LEVEL=${LOG_LEVEL}
       - TWITTER_IMAGE_COLLAGE_API=${TWITTER_IMAGE_COLLAGE_API}
 

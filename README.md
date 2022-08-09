@@ -1,7 +1,7 @@
 # Discord-twitter-webhooks
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/TheLovinator1/discord-twitter-webhooks/master/Bot.png"/>
+  <img src="https://raw.githubusercontent.com/TheLovinator1/discord-twitter-webhooks/master/Bot.png" title="Example Image" alt="This image shows a tweet from @Steam"/>
 </p>
 
 <p align="center"><sup> Theme is https://github.com/KillYoy/DiscordNight <sup></p>
@@ -13,12 +13,13 @@ This bot is configured with a config file (.env) or environment variables.
 
 ## Features
 
-- Change Reddit username and subreddits to clickable links
-- Change Twitter username and hashtags to clickable links
-- Change t.co url to the actual url
+- Change Reddit username and subreddits to clickable links.
+- Change Twitter username and hashtags to clickable links.
+- Change t.co url to the actual url.
 - If the tweet has more than one image, it will merge them into one
-  image in the embed
-- Remove ®, ™ and © from the tweet text
+  image in the embed.
+- Remove ®, ™ and © from the tweet text.
+- Five rules can be configured, each with a different webhook.
 
 ## Installation
 
@@ -143,7 +144,6 @@ If you want to get tweets, replies, retweets and quotes from @Steam, @Xbox and @
 
 - Email: [tlovinator@gmail.com](mailto:tlovinator@gmail.com)
 - Discord: TheLovinator#9276
-- Steam: [TheLovinator](https://steamcommunity.com/id/TheLovinator/)
 - Send an issue: [discord-twitter-webhooks/issues](https://github.com/TheLovinator1/discord-twitter-webhooks/issues)
 - GitHub
   Discussions: [discord-twitter-webhooks/discussions](https://github.com/TheLovinator1/discord-twitter-webhooks/discussions)
