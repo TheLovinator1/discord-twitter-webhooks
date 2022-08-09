@@ -43,12 +43,10 @@ def send_embed_webhook(
 
     if not webhook:
         settings.logger.error("No webhook URL found")
-        if settings.send_errors == "True":
-            send_normal_webhook(f"No webhook URL found. Trying to send tweet embed for {tweet_id}",
-                                settings.error_webhook)
+        send_error_webhook(f"No webhook URL found. Trying to send tweet embed for {tweet_id}")
         return
 
-    hook = DiscordWebhook(url=webhook)
+    hook = DiscordWebhook(url=webhook, rate_limit_retry=True)
     embed = DiscordEmbed(description=text)
 
     if twitter_card_image:
@@ -72,8 +70,7 @@ def send_embed_webhook(
                 error_msg = f"Got {response.status_code!r} from {settings.collage_maker_url!r} for tweet {tweet_id!r}"
                 settings.logger.error(error_msg)
                 embed.set_image(url=media_links[0])
-                if settings.send_errors == "True":
-                    send_normal_webhook(error_msg, settings.error_webhook)
+                send_error_webhook(error_msg)
 
     settings.logger.debug(f"Avatar URL: {avatar_url}")
 
@@ -93,8 +90,7 @@ def send_embed_webhook(
     else:
         settings.logger.error(f"Got {response.status_code!r} from {webhook!r}")
         settings.logger.error(f"Response: {response.text!r}")
-        if settings.send_errors == "True":
-            send_normal_webhook(f"Got {response.status_code!r} from {webhook!r}", settings.error_webhook)
+        send_error_webhook(f"Got {response.status_code!r} from {webhook!r}")
 
 
 def send_normal_webhook(msg: str, webhook: str = settings.webhook_url):
@@ -104,22 +100,45 @@ def send_normal_webhook(msg: str, webhook: str = settings.webhook_url):
         msg: Message to send
         webhook: Webhook URL. Defaults to environment variable WEBHOOK_URL.
     """
-    settings.logger.debug(f"send_normal_webhook() - Message: {msg}")
-    settings.logger.debug(f"send_normal_webhook() - Webhook URL: {webhook}")
+    _send_webhook(message=msg, webhook=webhook, func_name="send_normal_webhook()")
+
+
+def _send_webhook(message: str, webhook: str, func_name: str):
+    """Send the webhook to Discord.
+
+    Args:
+        message: Message to send
+        webhook: Webhook URL.
+        func_name: Name of the function that called this function. Used for logging.
+    """
+    settings.logger.debug(f"{func_name} - Message: {message}")
+    settings.logger.debug(f"{func_name} - Webhook URL: {webhook}")
 
     if not webhook:
         settings.logger.error("No webhook URL found")
-        if settings.send_errors == "True":
-            send_normal_webhook(f"No webhook URL found. Trying to send {msg!r}", settings.error_webhook)
+        send_error_webhook(f"No webhook URL found. Trying to send {message!r}")
         return
 
-    hook = DiscordWebhook(url=webhook, content=msg)
-
+    hook = DiscordWebhook(url=webhook, content=message, rate_limit_retry=True)
     response: requests.Response = hook.execute()
     if response.ok:
         settings.logger.debug(f"Webhook response: {response!r}")
     else:
         settings.logger.error(f"Got {response.status_code!r} from {webhook!r}")
         settings.logger.error(f"Response: {response.text!r}")
-        if settings.send_errors == "True":
-            send_normal_webhook(f"Got {response.status_code!r} from {webhook!r}", settings.error_webhook)
+        send_error_webhook(f"Got {response.status_code!r} from {webhook!r}")
+
+
+def send_error_webhook(msg: str, webhook: str = settings.error_webhook):
+    """Send error message to Discord webhook.
+
+    Args:
+        msg: Message to send
+        webhook: Webhook URL. Defaults to environment variable ERROR_WEBHOOK.
+    """
+    settings.logger.error(f"Got an error: {msg}")
+
+    if settings.send_errors == "True":
+        _send_webhook(message=msg, webhook=webhook, func_name="send_error_webhook()")
+    else:
+        settings.logger.debug("Tried to send error webhook but send_errors is not set to True")
