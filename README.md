@@ -1,10 +1,14 @@
 # Discord-twitter-webhooks
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/TheLovinator1/discord-twitter-webhooks/master/Bot.png" title="Example Image" alt="This image shows a tweet from @Steam"/>
+  <img src="https://i.lovinator.space/discord-twitter-webhooks.png" title="Example Image" alt="This image shows a tweet from @Steam"/>
 </p>
 
-<p align="center"><sup> Theme is https://github.com/KillYoy/DiscordNight <sup></p>
+<p align="center">
+<sup> 
+Theme is https://github.com/KillYoy/DiscordNight
+</sup>
+</p>
 
 `discord-twitter-webhooks` is an automated tool that checks [Twitter](https://twitter.com) for new tweets and sends them
 to a [Discord](https://discord.com/) webhook.
@@ -34,7 +38,7 @@ using [Docker](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).
         - You want to add Python to your PATH.
     - [Poetry](https://python-poetry.org/docs/master/#installation)
         - Windows: You have to add `%appdata%\Python\Scripts` to your PATH for Poetry to work.
-- Download the project from GitHub with git or download
+- Download the project from GitHub with Git or download
   the [ZIP](https://github.com/TheLovinator1/discord-twitter-webhooks/archive/refs/heads/master.zip).
     - If you want to update the bot, you can run `git pull` in the project folder or download the ZIP again.
 - Rename .env.example to .env and open it in a text editor (e.g.,
@@ -49,8 +53,8 @@ using [Docker](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).
       and `Open PowerShell window here`
 - Install requirements:
     - Type `poetry install` into the PowerShell window. Make sure you are
-      in the repository folder with the [pyproject.toml](pyproject.toml) file.
-        - (You may have to restart your terminal if it can't find the `poetry` command. Also double check that it's in
+      in the repository folder where the [pyproject.toml](pyproject.toml) file is located.
+        - (You may have to restart your terminal if it can't find the `poetry` command. Also double check it is in
           your PATH.)
 - Start the bot:
     - Type `poetry run bot` into the PowerShell window.
@@ -66,7 +70,7 @@ Docker Hub: [thelovinator/discord-twitter-webhooks](https://hub.docker.com/r/the
     - If you can't see the file extension:
         - Windows 10: Click the View Tab in File Explorer and click the box next to File name extensions.
         - Windows 11: Click View -> Show -> File name extensions.
-- Open a terminal in the extras folder.
+- Open a terminal in the repository folder.
     - Windows 10: <kbd>Shift</kbd> + <kbd>right-click</kbd> in the folder and select `Open PowerShell window here`
     - Windows 11: <kbd>Shift</kbd> + <kbd>right-click</kbd> in the folder and Show more options
       and `Open PowerShell window here`
@@ -80,7 +84,7 @@ Docker Hub: [thelovinator/discord-twitter-webhooks](https://hub.docker.com/r/the
 More information about the rules can be found in
 the [Twitter Documentation](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule)
 .
-Operator examples can be found [here](rule-operators.md).
+Operator (AND, OR, NOT) examples can be found [here](rule-operators.md).
 
 ### Get everything from a user
 
