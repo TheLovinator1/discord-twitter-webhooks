@@ -1,3 +1,8 @@
+"""Functions for Reddit specific stuff
+
+username_to_link: Change /u/username to clickable link.
+subreddit_to_link: Change /r/subreddit to clickable link.
+"""
 import re
 
 from discord_twitter_webhooks import settings
@@ -12,7 +17,7 @@ def username_to_link(text: str) -> str:
     Args:
         text: Text from the tweet
     Returns:
-        Text with the username replaced with a clickable link
+        Text with the username replaced with a clickable link.
     """
     # TODO: Add comments describing the regex
     regex = re.sub(

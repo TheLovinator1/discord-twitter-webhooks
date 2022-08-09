@@ -1,3 +1,8 @@
+"""Delete old rules and add new rules.
+
+delete_old_rules - Delete old rules from Twitter.
+new_rule - Add new rules to Twitter.
+"""
 import sys
 
 import tweepy

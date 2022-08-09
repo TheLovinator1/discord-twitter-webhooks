@@ -1,5 +1,8 @@
-"""This file has only one function and that function helps with
-embedding the tweet and sending it to Discord."""
+""" Discord webhook stuff
+
+send_embed_webhook - Send an embed to Discord webhook.
+send_normal_webhook - Send a normal message to Discord webhook. We use this for sending errors.
+"""
 import json
 
 import requests

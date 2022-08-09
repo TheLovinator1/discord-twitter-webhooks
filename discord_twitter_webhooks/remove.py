@@ -1,3 +1,11 @@
+"""
+Remove stuff from the tweet text.
+
+discord_link_previews: Remove the Discord link previews.
+utm_source: Remove the utm_source parameter from the url.
+copyright_symbols: Remove ®, ™ and © symbols.
+remove_media_links: Remove the media links.
+"""
 import re
 
 from discord_twitter_webhooks import settings
@@ -34,9 +42,9 @@ def discord_link_previews(text: str) -> str:
 def utm_source(text: str) -> str:
     """Remove the utm_source parameter from the url.
 
-    Before: https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter
+    Before: steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter
 
-    After: https://store.steampowered.com/app/457140/Oxygen_Not_Included/
+    After: steampowered.com/app/457140/Oxygen_Not_Included/
 
     Args:
         text: Text from the tweet
