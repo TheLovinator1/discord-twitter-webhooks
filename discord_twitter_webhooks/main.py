@@ -7,6 +7,7 @@ import tweepy
 from tweepy.streaming import StreamResponse
 
 from discord_twitter_webhooks import get, reddit, remove, replace, settings
+from discord_twitter_webhooks.get import get_avatar_and_username, get_entities, get_text, get_webhook_url
 from discord_twitter_webhooks.rules import delete_old_rules, new_rule
 from discord_twitter_webhooks.send_webhook import (
     send_embed_webhook,
@@ -29,10 +30,10 @@ def main(response: StreamResponse) -> None:
     twitter_card_image = ""
     media_links: list[str] = []
 
-    webhook_url = get_webook_url(response)
+    webhook_url = get_webhook_url(response)
     avatar, user_name = get_avatar_and_username(response)
     text = get_text(response)
-    
+
     data = response.data
 
     if response.includes:
@@ -91,77 +92,6 @@ def main(response: StreamResponse) -> None:
     )
 
 
-def get_avatar_and_username(response):
-    """Get avatar and username, this is used for the embed avatar and name.
-
-    Args:
-        response (StreamResponse): The response from the stream.
-    """
-    users = [users.data for users in response.includes["users"]]
-    for user in users:
-        settings.logger.debug(f"User: {user}")
-    avatar = users[0]["profile_image_url"]
-    user_name = users[0]["name"]
-    return avatar, user_name
-
-
-def get_entities(response) -> dict:
-    """Get the entities from the tweet.
-
-    Args:
-        response (StreamResponse): The response from the stream.
-    """
-    data = response.data
-    entities = []
-    if data["entities"]:
-        entities = data.entities
-        settings.logger.debug(f"Entities: {entities}")
-    return entities
-
-
-def get_webook_url(response):
-    data = response.data
-    matching_rules = response.matching_rules
-    matching_rule_error = (f"discord-twitter-webhooks error: Failed to find matching rule for {matching_rules[0].tag!r}"
-                           f"\nTweet was: <https://twitter.com/i/web/status/{data.id}>"
-                           "\nContact TheLovinator#9276 if this keeps happening.")
-    new_webhook_url = settings.webhook_url
-    if matching_rules:
-        if matching_rules[0].tag == "Rule1":
-            new_webhook_url = settings.webhook_url
-        elif matching_rules[0].tag == "Rule2":
-            new_webhook_url = settings.webhook_url2
-        elif matching_rules[0].tag == "Rule3":
-            new_webhook_url = settings.webhook_url3
-        elif matching_rules[0].tag == "Rule4":
-            new_webhook_url = settings.webhook_url4
-        elif matching_rules[0].tag == "Rule5":
-            new_webhook_url = settings.webhook_url5
-        else:
-            send_error_webhook(matching_rule_error)
-    else:
-        send_error_webhook(matching_rule_error)
-    return new_webhook_url
-
-
-def get_text(response):
-    """Get the text from the tweet.
-
-    Args:
-        response (StreamResponse): The response from the stream.
-    """
-    data = response.data
-    try:
-        text = data.text
-    except AttributeError:
-        text = "*Failed to get text from tweet*"
-
-        error_msg = f"No text found {data!r} for tweet {data.id}"
-        send_error_webhook(error_msg)
-    settings.logger.debug(f"Text: {text}")
-    return text
-
-
 class MyStreamListener(tweepy.StreamingClient):
     """https://docs.tweepy.org/en/latest/streaming.html#using-streamingclient
 
@@ -170,7 +100,7 @@ class MyStreamListener(tweepy.StreamingClient):
 
     def on_exception(self, exception: Exception) -> None:
         """An unhandled exception was raised while streaming. Shutting down."""
-        error_msg = (f"An unhandled exception was raised while streaming. Shutting down"
+        error_msg = (f"discord-twitter-webhooks: An unhandled exception was raised while streaming. Shutting down"
                      f"\nException: {exception!r}")
         send_error_webhook(error_msg)
 
