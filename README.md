@@ -143,6 +143,8 @@ If you want to get tweets, replies, retweets and quotes from @Steam, @Xbox and @
         - If we used double quotes in the rule we have to use single quotes around the rule.
 - If we only want to get tweets from @Xbox that are about Halo you can use the following rule:
     - `RULE="Halo from:Xbox"`
+- Several words can be used in the rule:
+    - `RULE='("Resident Evil" OR "Team Fortress" OR "Terraria" OR "Free Weekend") from:Steam'`
 
 ## Need help?
 
