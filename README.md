@@ -31,8 +31,6 @@ You have three choices, using [Docker](https://hub.docker.com/r/thelovinator/dis
 [Heroku](https://dashboard.heroku.com/apps/discord-twitter-webhooks)
 or [install directly on your computer](#Install-directly-on-your-computer).
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
 ### Docker
 
 This is the recommended way to install the bot.
