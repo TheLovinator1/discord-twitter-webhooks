@@ -1,0 +1,1 @@
+worker: python discord_twitter_webhooks/main.py
