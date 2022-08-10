@@ -1,7 +1,9 @@
 {
   "name": "discord-twitter-webhooks",
   "description": "Stream tweets to Discord",
+  "website": "https://github.com/thelovinator1/discord-twitter-webhooks",
   "repository": "https://github.com/thelovinator1/discord-twitter-webhooks",
+  "logo": "https://i.lovinator.space/4153203.jpg",
   "keywords": [
     "python",
     "bot",
@@ -13,79 +15,19 @@
   ],
   "env": {
     "WEBHOOK_URL": {
-      "description": "https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks\nRight click channel in Discord -> Intergrations -> Webhooks -> Create Webhook\nThe webhook URL to send the tweet to - RULE goes to this webhook",
-      "default": "",
+      "description": "The webhook to send the tweet to.",
+      "default": "https://discord.com/api/webhooks/582696524044304394/CHANGE_ME_lzSSRYBx0-AlPAHseJWqhHLfsAg_X4erac9-CHANGE_ME",
       "required": true
     },
-    "WEBHOOK_URL2": {
-      "description": "RULE2 goes to this webhook",
-      "default": "",
-      "required": false
-    },
-    "WEBHOOK_URL3": {
-      "description": "RULE3 goes to this webhook",
-      "default": "",
-      "required": false
-    },
-    "WEBHOOK_URL4": {
-      "description": "RULE4 goes to this webhook",
-      "default": "",
-      "required": false
-    },
-    "WEBHOOK_URL5": {
-      "description": "RULE5 goes to this webhook",
-      "default": "",
-      "required": false
-    },
     "BEARER_TOKEN": {
-      "description": "The bearer token to use for authentication\nhttps://developer.twitter.com/en/portal/dashboard\nFill out your information and accept the developer agreement & policy\nCreate an app and copy your bearer token\nI will remove every rule that the bearer token has access to so you should probably create a new app for this bot.",
-      "default": "",
+      "description": "The bearer token to use for authentication.",
+      "default": "AAAAAAAAAAAAAAAAAAAAAAMGcQEAAAAA2Xh6%2Bjxw4NM7xetr2C9trBdsNUo%3DIyQF6ddixAnAtuAUq7NRKUVcGJsJ8IlriICvVWqCWFK2SfhRY",
       "required": true
     },
     "RULE": {
-      "description": "The rule to use for filtering tweets - RULE goes to WEBHOOK_URL",
-      "default": "",
+      "description": "The rule to use for filtering tweets.",
+      "default": "(from:Steam OR from:Xbox OR from:PlayStation) -is:retweet -is:reply -is:quote",
       "required": true
-    },
-    "RULE2": {
-      "description": "The second rule to use for filtering tweets - RULE goes to WEBHOOK_URL2",
-      "default": "",
-      "required": false
-    },
-    "RULE3": {
-      "description": "The third rule to use for filtering tweets - RULE goes to WEBHOOK_URL3",
-      "default": "",
-      "required": false
-    },
-    "RULE4": {
-      "description": "The fourth rule to use for filtering tweets - RULE goes to WEBHOOK_URL4",
-      "default": "",
-      "required": false
-    },
-    "RULE5": {
-      "description": "The fifth rule to use for filtering tweets - RULE goes to WEBHOOK_URL5",
-      "default": "",
-      "required": false
-    },
-    "ERROR_WEBHOOK": {
-      "description": "The webhook URL to send errors to",
-      "default": "",
-      "required": false
-    },
-    "SEND_ERRORS": {
-      "description": "Whether to send errors to the error webhook",
-      "default": "False",
-      "required": false
-    },
-    "LOG_LEVEL": {
-      "description": "The log level to use",
-      "default": "INFO",
-      "required": false
-    },
-    "TWITTER_IMAGE_COLLAGE_API": {
-      "description": "The Twitter image collage API to use",
-      "default": "https://twitter.lovinator.space/add",
-      "required": false
     }
   }
 }
