@@ -30,7 +30,24 @@ This bot is configured with a config file (.env) or environment variables.
 You have two choices, [install directly on your computer](#Install-directly-on-your-computer) or
 using [Docker](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).
 
-### Install directly on your computer
+### Docker (Recommended)
+
+Docker Hub: [thelovinator/discord-twitter-webhooks](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks)
+
+- Rename .env.example to .env and open it in a text editor (e.g., VSCode, Notepad++, Notepad) and fill it out.
+    - If you can't see the file extension:
+        - Windows 10: Click the View Tab in File Explorer and click the box next to File name extensions.
+        - Windows 11: Click View -> Show -> File name extensions.
+- Open a terminal in the repository folder.
+    - Windows 10: <kbd>Shift</kbd> + <kbd>right-click</kbd> in the folder and select `Open PowerShell window here`
+    - Windows 11: <kbd>Shift</kbd> + <kbd>right-click</kbd> in the folder and Show more options
+      and `Open PowerShell window here`
+- Run the Docker Compose file:
+    - `docker-compose up`
+        - You can stop the bot with <kbd>Ctrl</kbd> + <kbd>c</kbd>.
+        - If you want to run the bot in the background, you can run `docker-compose up -d`.
+
+### Install directly on your computer (Not recommended without an init system (i.e. Systemd))
 
 - Install the latest version of needed software:
     - [Python](https://www.python.org/)
@@ -61,23 +78,6 @@ using [Docker](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks).
         - You can stop the bot with <kbd>Ctrl</kbd> + <kbd>c</kbd>.
 
 Note: You will need to run `poetry install` again if [poetry.lock](poetry.lock) has been modified.
-
-### Docker
-
-Docker Hub: [thelovinator/discord-twitter-webhooks](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks)
-
-- Rename .env.example to .env and open it in a text editor (e.g., VSCode, Notepad++, Notepad) and fill it out.
-    - If you can't see the file extension:
-        - Windows 10: Click the View Tab in File Explorer and click the box next to File name extensions.
-        - Windows 11: Click View -> Show -> File name extensions.
-- Open a terminal in the repository folder.
-    - Windows 10: <kbd>Shift</kbd> + <kbd>right-click</kbd> in the folder and select `Open PowerShell window here`
-    - Windows 11: <kbd>Shift</kbd> + <kbd>right-click</kbd> in the folder and Show more options
-      and `Open PowerShell window here`
-- Run the Docker Compose file:
-    - `docker-compose up`
-        - You can stop the bot with <kbd>Ctrl</kbd> + <kbd>c</kbd>.
-        - If you want to run the bot in the background, you can run `docker-compose up -d`.
 
 ## Rules
 
@@ -140,7 +140,7 @@ If you want to get tweets, replies, retweets and quotes from @Steam, @Xbox and @
   can use the following rule:
     - `RULE='pepsi OR cola OR "coca cola"'`
         - Note the double quotes around words with spaces.
-        - If we used double quotes in the rule we have to use single quotes around the rule.
+        - We have to use single quotes around the rule if we used double quotes in the rule.
 - If we only want to get tweets from @Xbox that are about Halo you can use the following rule:
     - `RULE="Halo from:Xbox"`
 - Several words can be used in the rule:
