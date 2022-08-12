@@ -52,25 +52,10 @@ def send_embed_webhook(
     if twitter_card_image:
         embed.set_image(url=twitter_card_image)
 
-    # Only add image if one
-    if len(media_links):
-        if len(media_links) == 1:
-            embed.set_image(url=media_links[0])
-
-        elif len(media_links) > 1:
-            # Send images to twitter-image-collage-maker
-            # (e.g https://twitter.lovinator.space/) and get a collage back.
-            response = requests.get(url=settings.collage_maker_url, params={"tweet_id": tweet_id})
-
-            if response.ok:
-                json_data = json.loads(response.text)
-                settings.logger.debug(f"JSON data from twitter-image-collage-maker: {json_data}")
-                embed.set_image(url=json_data["url"])
-            else:
-                error_msg = f"Got {response.status_code!r} from {settings.collage_maker_url!r} for tweet {tweet_id!r}"
-                settings.logger.error(error_msg)
-                embed.set_image(url=media_links[0])
-                send_error_webhook(error_msg)
+    # Get image to add to the Discord embed.
+    embed_image = get_embed_image(media_links, tweet_id)
+    if embed_image:
+        embed.set_image(url=embed_image)
 
     settings.logger.debug(f"Avatar URL: {avatar_url}")
 
@@ -91,6 +76,51 @@ def send_embed_webhook(
         settings.logger.error(f"Got {response.status_code!r} from {webhook!r}")
         settings.logger.error(f"Response: {response.text!r}")
         send_error_webhook(f"Got {response.status_code!r} from {webhook!r}")
+
+
+def get_embed_image(media_links, tweet_id) -> str:
+    """Get the image that will be in the Discord embed.
+
+    Args:
+        media_links: List of media links from the tweet. This is used to add the images to the embed.
+        tweet_id: Tweet ID of the tweet. This is used to link to the tweet on Twitter.
+
+    Returns:
+        The image that will be in the Discord embed.
+    """
+    embed_image = ""
+
+    settings.logger.debug(f"get_embed_image() - media_links {media_links!r}")
+    if len(media_links):
+        if len(media_links) == 1:
+            embed_image = media_links[0]
+
+        elif len(media_links) > 1:
+            # Send images to twitter-image-collage-maker
+            # (e.g https://twitter.lovinator.space/) and get a collage back.
+            response = requests.get(url=settings.collage_maker_url, params={"tweet_id": tweet_id})
+
+            if response.ok:
+                json_data = json.loads(response.text)
+                settings.logger.debug(f"JSON data from twitter-image-collage-maker: {json_data}")
+                embed_image = json_data["url"]
+
+                # Check if image exists
+                if_exists = requests.head(url=embed_image)
+                if if_exists.ok:
+                    settings.logger.debug(f"Image {embed_image!r} exists")
+                else:
+                    settings.logger.error(f"Image {embed_image!r} does not exist")
+                    send_error_webhook(f"Image {embed_image!r} does not exist, but that is the URL we got from "
+                                       f"{settings.collage_maker_url}. It looks like the collage maker is broken.")
+                    embed_image = media_links[0]
+            else:
+                error_msg = f"Got {response.status_code!r} from {settings.collage_maker_url!r} for tweet {tweet_id!r}"
+                settings.logger.error(error_msg)
+                embed_image = media_links[0]
+                send_error_webhook(error_msg)
+
+    return embed_image
 
 
 def send_normal_webhook(msg: str, webhook: str = settings.webhook_url):

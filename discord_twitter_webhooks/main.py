@@ -21,7 +21,7 @@ from discord_twitter_webhooks.v1_message import MESSAGE, check_if_we_used_v1
 # TODO: Add threading?
 # TODO: Add polls?
 # TODO: If tweet is deleted, remove it from Discord?
-# TODO: If tweet is poll, update it in Discord so we can see results?
+# TODO: If tweet is poll, update it in Discord, so we can see results?
 
 def main(response: StreamResponse) -> None:
     """The main function for the bot. This is where the magic happens."""
