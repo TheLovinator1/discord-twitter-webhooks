@@ -15,13 +15,15 @@ from discord_twitter_webhooks.send_webhook import (
 )
 from discord_twitter_webhooks.v1_message import MESSAGE, check_if_we_used_v1
 
-
 # TODO: Add support for Twitter Spaces
 # TODO: Add backfill so we get missed tweets?
 # TODO: Add threading?
 # TODO: Add polls?
 # TODO: If tweet is deleted, remove it from Discord?
 # TODO: If tweet is poll, update it in Discord, so we can see results?
+
+rule_ids = {}
+
 
 def main(response: StreamResponse) -> None:
     """The main function for the bot. This is where the magic happens."""
@@ -30,7 +32,7 @@ def main(response: StreamResponse) -> None:
     twitter_card_image = ""
     media_links: list[str] = []
 
-    webhook_url = get_webhook_url(response)
+    webhook_url = get_webhook_url(response, rule_ids)
     avatar, user_name = get_avatar_and_username(response)
     text = get_text(response)
 
@@ -138,25 +140,15 @@ def start() -> None:
     delete_old_rules(stream=stream)
 
     # Create the rules
-    rule_id: str = new_rule(rule=settings.rule, rule_tag="Rule1", stream=stream)
-    if rule_id:
+    rules = settings.rules
+    for rule_num in rules:
+        print(rule_num, '->', rules[rule_num])
+        rule = str(rules[rule_num])
+        rule_id = new_rule(stream=stream, rule=rule, rule_tag=f"rule{rule_num}")
         settings.logger.info(f"Rule {rule_id!r} added")
+        rule_ids[rule_num] = {rule_id}
 
-    rule2_id: str = new_rule(rule=settings.rule2, rule_tag="Rule2", stream=stream)
-    if rule2_id:
-        settings.logger.info(f"Rule {rule2_id!r} added")
-
-    rule3_id: str = new_rule(rule=settings.rule3, rule_tag="Rule3", stream=stream)
-    if rule3_id:
-        settings.logger.info(f"Rule {rule3_id!r} added")
-
-    rule4_id: str = new_rule(rule=settings.rule4, rule_tag="Rule4", stream=stream)
-    if rule4_id:
-        settings.logger.info(f"Rule {rule4_id!r} added")
-
-    rule5_id: str = new_rule(rule=settings.rule5, rule_tag="Rule5", stream=stream)
-    if rule5_id:
-        settings.logger.info(f"Rule {rule5_id!r} added")
+    settings.logger.debug(f"Rule IDs: {rule_ids}")
 
     # TODO: dry_run before to make sure everything works?
     try:

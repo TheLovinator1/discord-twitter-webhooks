@@ -3,7 +3,7 @@ media_links - Get media links from tweet.
 meta_image - Get twitter:image meta tag from url.
 tweet_urls - Get URLs in the tweet.
 """
-from typing import List
+from typing import Dict, List
 
 import requests
 from bs4 import BeautifulSoup
@@ -103,13 +103,14 @@ def get_entities(response: StreamResponse) -> dict:
     return entities
 
 
-def get_webhook_url(response: StreamResponse) -> str:
+def get_webhook_url(response: StreamResponse, rule_ids: Dict) -> str:
     """Get the webhook url.
 
     We will check for a stream tag and match it with a webhook url.
 
     Args:
         response: The response from the stream.
+        rule_ids: Rule IDs and tags. Used to send rule to correct webhook.
 
     Returns:
         str: The webhook url.
@@ -119,23 +120,23 @@ def get_webhook_url(response: StreamResponse) -> str:
     matching_rule_error = (f"discord-twitter-webhooks error: Failed to find matching rule for {matching_rules[0].tag!r}"
                            f"\nTweet was: <https://twitter.com/i/web/status/{data.id}>"
                            "\nContact TheLovinator#9276 if this keeps happening.")
-    new_webhook_url = settings.webhook_url
+
+    webhook_url = settings.webhooks[0]
     if matching_rules:
-        if matching_rules[0].tag == "Rule1":
-            new_webhook_url = settings.webhook_url
-        elif matching_rules[0].tag == "Rule2":
-            new_webhook_url = settings.webhook_url2
-        elif matching_rules[0].tag == "Rule3":
-            new_webhook_url = settings.webhook_url3
-        elif matching_rules[0].tag == "Rule4":
-            new_webhook_url = settings.webhook_url4
-        elif matching_rules[0].tag == "Rule5":
-            new_webhook_url = settings.webhook_url5
-        else:
-            send_error_webhook(matching_rule_error)
+        tag = matching_rules[0].tag
+
+        # Get the number from the tag
+        tag_number = tag[-1]
+        settings.logger.debug(f"tag_number: {tag_number} for tag: {tag}")
+        for key in rule_ids:
+            if tag_number == rule_ids[key]:
+                webhook_url = settings.webhooks[key]
+                break
     else:
         send_error_webhook(matching_rule_error)
-    return new_webhook_url
+
+    settings.logger.debug(f"webhook_url: {webhook_url}")
+    return webhook_url
 
 
 def get_text(response: StreamResponse) -> str:

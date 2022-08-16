@@ -14,11 +14,15 @@ load_dotenv(verbose=True)
 bearer_token: str = os.getenv("BEARER_TOKEN", default="")
 
 # https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
-webhook_url: str = os.environ["WEBHOOK_URL"]
-webhook_url2: str = os.getenv("WEBHOOK_URL2", default="")
-webhook_url3: str = os.getenv("WEBHOOK_URL3", default="")
-webhook_url4: str = os.getenv("WEBHOOK_URL4", default="")
-webhook_url5: str = os.getenv("WEBHOOK_URL5", default="")
+webhooks = {}
+hook_num = 0
+for hook in os.environ:
+    if hook.startswith("WEBHOOK_URL"):
+        print(f"{hook_num}: {hook}={os.environ[hook]}")
+        webhooks[hook_num] = {os.environ[hook]}
+
+        hook_num += 1
+print(f"webhooks={webhooks}")
 
 # Log severity. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG.
 log_level: str = os.getenv("LOG_LEVEL", default="INFO")
@@ -28,11 +32,28 @@ log_level: str = os.getenv("LOG_LEVEL", default="INFO")
 collage_maker_url: str = os.getenv("TWITTER_IMAGE_COLLAGE_API", default="https://twitter.lovinator.space/add")
 
 # https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule
-rule: str = os.getenv("RULE", default="")
-rule2: str = os.getenv("RULE2", default="")
-rule3: str = os.getenv("RULE3", default="")
-rule4: str = os.getenv("RULE4", default="")
-rule5: str = os.getenv("RULE5", default="")
+rules = {}
+rule_num = 0
+for rule in os.environ:
+    if rule.startswith("RULE"):
+        print(f"{rule_num}: {rule}={os.environ[rule]}")
+        rules[rule_num] = os.environ[rule]
+
+        rule_num += 1
+print(f"rules={rules}")
+
+if len(rules) == 0:
+    print("No rules found")
+    sys.exit(1)
+
+# Tell the user he needs Elevated Twitter API access if he has more than 5 webhooks.
+if len(rules) > 26:
+    print("You have more than 26 rules. If this doesn't work, you need Academic Research API access.")
+elif len(rules) > 5:
+    print("You have more than 5 rules. If this doesn't work, you need Elevated Twitter API access.")
+
+if len(webhooks) != len(rules):
+    print(f"Note: You have {len(webhooks)} webhooks but only {len(rules)} rules.")
 
 # If we should send errors to Discord. Can be True or False.
 send_errors: str = os.getenv("SEND_ERRORS", default="False")
@@ -40,9 +61,6 @@ error_webhook: str = os.getenv("ERROR_WEBHOOK", default="")
 
 if not bearer_token:
     sys.exit("No bearer token found, exiting")
-
-if not rule:
-    sys.exit("No rule found, exiting")
 
 # TODO: Add logging config file so you can customize the logging
 logger = logging

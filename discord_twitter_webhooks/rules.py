@@ -26,7 +26,7 @@ def delete_old_rules(stream: StreamingClient) -> None:
     # Get rules and add to list, so we can delete them later.
     rules_to_delete = []
 
-    if len(old_rules.data) > 0:
+    if old_rules.data is not None:
         rules_data: list[StreamRule] = old_rules.data
         for old_rule in rules_data:
             settings.logger.debug(f"Added {old_rule.value} - {old_rule.id} for deletion")
@@ -51,7 +51,6 @@ def new_rule(rule: str, rule_tag: str, stream: StreamingClient) -> str:
     """
     settings.logger.debug(f"Adding rule: {rule!r} for stream: {stream!r}")
     if rule:
-        print(f"Rule: {rule}")
         rule_to_add: StreamRule = tweepy.StreamRule(value=rule, tag=rule_tag)
         rule_response = stream.add_rules(add=rule_to_add)
 
@@ -63,6 +62,6 @@ def new_rule(rule: str, rule_tag: str, stream: StreamingClient) -> str:
             sys.exit(1)
 
         rule_data = rule_response.data
-        settings.logger.debug(f"Rule data: {rule_data}")
+        settings.logger.debug(f"Rule data: {rule_data} for rule: {rule!r}")
 
         return rule_data[0].id

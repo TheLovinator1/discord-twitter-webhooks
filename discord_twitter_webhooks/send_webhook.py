@@ -123,7 +123,7 @@ def get_embed_image(media_links, tweet_id) -> str:
     return embed_image
 
 
-def send_normal_webhook(msg: str, webhook: str = settings.webhook_url):
+def send_normal_webhook(msg: str, webhook: str):
     """Send normal message to Discord webhook.
 
     Args:
