@@ -110,9 +110,6 @@ class MyStreamListener(tweepy.StreamingClient):
         """This is called when a response is received."""
         if response.data:
             main(response)
-        else:
-            send_error_webhook(f"discord-twitter-webhooks: No data in response, and we didn't crash so you can remove "
-                               f"this message in the future :-)\nResponse: {response!r}")
 
 
 def start() -> None:
