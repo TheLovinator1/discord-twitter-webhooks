@@ -1,7 +1,6 @@
 """The main file for discord-twitter-webhooks. Run this file to run the bot."""
 import html
 import sys
-from time import sleep
 
 import tweepy
 from tweepy.streaming import StreamResponse
@@ -11,9 +10,7 @@ from discord_twitter_webhooks.get import get_avatar_and_username, get_entities, 
 from discord_twitter_webhooks.rules import delete_old_rules, new_rule
 from discord_twitter_webhooks.send_webhook import (
     send_embed_webhook,
-    send_error_webhook, send_normal_webhook,
-)
-from discord_twitter_webhooks.v1_message import MESSAGE, check_if_we_used_v1
+    send_error_webhook, )
 
 # TODO: Add support for Twitter Spaces
 # TODO: Add backfill so we get missed tweets?
@@ -120,15 +117,6 @@ class MyStreamListener(tweepy.StreamingClient):
 
 def start() -> None:
     """Authenticate to the Twitter API and start the filter."""
-
-    # Check if we have used the v1 bot before
-    if check_if_we_used_v1():
-        send_normal_webhook(msg=MESSAGE)
-
-        # Sleep for 4 hours to avoid spamming the channel.
-        # Sleep is in seconds so 60 seconds * 60 minutes * 4 hours = 14400 seconds.
-        sleep(4 * 60 * 60)
-
     # TODO: Add proxy support?
     stream = MyStreamListener(
         settings.bearer_token,
