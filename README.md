@@ -50,6 +50,9 @@ Docker Hub: [thelovinator/discord-twitter-webhooks](https://hub.docker.com/r/the
     - `docker-compose up`
         - You can stop the bot with <kbd>Ctrl</kbd> + <kbd>c</kbd>.
         - If you want to run the bot in the background, you can run `docker-compose up -d`.
+- You can update the container with `docker-compose pull`
+    - You can automate this with [Watchtower](https://github.com/containrrr/watchtower)
+      or [Diun](https://github.com/crazy-max/diun)
 
 ### Heroku
 
