@@ -62,6 +62,29 @@ error_webhook: str = os.getenv("ERROR_WEBHOOK", default="")
 if not bearer_token:
     sys.exit("No bearer token found, exiting")
 
+webhook_author_name: str = os.getenv("WEBHOOK_AUTHOR_NAME", default="")
+webhook_author_url: str = os.getenv("WEBHOOK_AUTHOR_URL", default="")
+webhook_author_icon: str = os.getenv("WEBHOOK_AUTHOR_ICON", default="")
+webhook_image: str = os.getenv("WEBHOOK_IMAGE", default="")
+webhook_thumbnail: str = os.getenv("WEBHOOK_THUMBNAIL", default="")
+webhook_footer_text: str = os.getenv("WEBHOOK_FOOTER_TEXT", default="")
+webhook_footer_icon: str = os.getenv("WEBHOOK_FOOTER_ICON", default="")
+
+if webhook_author_name:
+    print(f"Note that you have customized webhook_author_name to '{webhook_author_name}'.")
+if webhook_author_url:
+    print(f"Note that you have customized webhook_author_url to '{webhook_author_url}'.")
+if webhook_author_icon:
+    print(f"Note that you have customized webhook_author_icon to '{webhook_author_icon}'.")
+if webhook_image:
+    print(f"Note that you have customized webhook_image to '{webhook_image}'.")
+if webhook_thumbnail:
+    print(f"Note that you have customized webhook_thumbnail to '{webhook_thumbnail}'.")
+if webhook_footer_text:
+    print(f"Note that you have customized webhook_footer_text to '{webhook_footer_text}'.")
+if webhook_footer_icon:
+    print(f"Note that you have customized webhook_footer_icon to '{webhook_footer_icon}'.")
+
 # TODO: Add logging config file so you can customize the logging
 logger = logging
 logger.basicConfig(

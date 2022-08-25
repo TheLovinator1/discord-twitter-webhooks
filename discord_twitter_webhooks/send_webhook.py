@@ -65,6 +65,41 @@ def send_embed_webhook(
         url=f"https://twitter.com/i/web/status/{tweet_id}",
     )
 
+    author_icon = settings.webhook_author_icon
+    if author_icon:
+        settings.logger.debug(f"User has customized the author icon: {author_icon}")
+        embed.set_author(icon_url=author_icon)
+
+    author_name = settings.webhook_author_name
+    if author_name:
+        settings.logger.debug(f"User has customized the author name: {author_name}")
+        embed.set_author(name=author_name)
+
+    author_url = settings.webhook_author_url
+    if author_url:
+        settings.logger.debug(f"User has customized the author url: {author_url}")
+        embed.set_author(url=author_url)
+
+    footer_icon = settings.webhook_footer_icon
+    if footer_icon:
+        settings.logger.debug(f"User has customized the footer icon: {author_url}")
+        embed.set_footer(icon_url=footer_icon)
+
+    footer_text = settings.webhook_footer_text
+    if footer_text:
+        settings.logger.debug(f"User has customized the footer text: {footer_text}")
+        embed.set_footer(text=footer_text)
+
+    webhook_image = settings.webhook_image
+    if webhook_image:
+        settings.logger.debug(f"User has customized the embedded image: {webhook_image}")
+        embed.set_image(url=webhook_image)
+
+    thumbnail = settings.webhook_thumbnail
+    if thumbnail:
+        settings.logger.debug(f"User has customized the thumbnail: {thumbnail}")
+        embed.set_thumbnail(url=thumbnail)
+
     # Add embed to webhook.
     hook.add_embed(embed)
 

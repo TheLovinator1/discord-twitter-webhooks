@@ -24,6 +24,7 @@ This bot is configured with a config file (.env) or environment variables.
   image in the embed.
 - Remove ®, ™ and © from the tweet text.
 - Five rules can be configured, each with a different webhook.
+- Customize the Discord embed.
 
 ## Installation
 
