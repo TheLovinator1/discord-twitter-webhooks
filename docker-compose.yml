@@ -20,10 +20,17 @@ services:
       - TWITTER_IMAGE_COLLAGE_API=${TWITTER_IMAGE_COLLAGE_API}
       # - ERROR_WEBHOOK=${ERROR_WEBHOOK}
       # - SEND_ERRORS=False
+      # - WEBHOOK_AUTHOR_NAME=TheLovinator
+      # - WEBHOOK_AUTHOR_URL=https://github.com/TheLovinator1/discord-twitter-webhooks
+      # - WEBHOOK_AUTHOR_ICON=https://avatars.githubusercontent.com/u/4153203
+      # - WEBHOOK_IMAGE=https://upload.wikimedia.org/wikipedia/commons/0/0b/Cat_poster_1.jpg
+      # - WEBHOOK_THUMBNAIL=https://avatars.githubusercontent.com/u/4153203
+      # - WEBHOOK_FOOTER_TEXT=Hello!
+      # - WEBHOOK_FOOTER_ICON=https://avatars.githubusercontent.com/u/4153203
 
     # The bot will only stop after we get a keep-alive signal from the
     # Twitter API, this can take 20 seconds.
     # By default, stop waits 10 seconds for the container to exit before
     # sending SIGKILL.
-    stop_grace_period: 1m
+    stop_grace_period: 30s
     restart: unless-stopped
