@@ -20,8 +20,8 @@ python = "^3.9"
 requests = "^2.28.1"
 python-dotenv = "^0.20.0"
 beautifulsoup4 = "^4.11.1"
-tweepy = "^4.10.0"
-discord-webhook = "^0.16.3"
+tweepy = "^4.10.1"
+discord-webhook = "^0.17.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
