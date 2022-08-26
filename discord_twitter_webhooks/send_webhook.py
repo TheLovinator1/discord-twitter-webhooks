@@ -11,6 +11,25 @@ from discord_webhook import DiscordEmbed, DiscordWebhook
 from discord_twitter_webhooks import settings
 
 
+def customize_footer(embed: DiscordEmbed):
+    """Customize the webhook footer."""
+    footer_icon = settings.webhook_footer_icon
+    footer_text = settings.webhook_footer_text
+
+    if footer_icon and footer_text:
+        settings.logger.debug(f"User has customized the footer icon: {footer_icon} and footer text: {footer_text}")
+        embed.set_footer(icon_url=footer_icon, text=footer_text)
+
+    elif footer_icon:
+        settings.logger.debug(f"User has customized the footer icon: {footer_icon}")
+        embed.set_footer(icon_url=footer_icon)
+
+    elif footer_text:
+        settings.logger.debug(f"User has customized the footer text: {footer_text}")
+        embed.set_footer(text=footer_text)
+    return embed
+
+
 def send_embed_webhook(
         tweet_id: int,
         media_links: list[str],
@@ -31,6 +50,7 @@ def send_embed_webhook(
         webhook: Webhook URL. Defaults to environment variable WEBHOOK_URL.
         twitter_card_image: Twitter card image from the tweet.
     """
+    tweet_url = f"https://twitter.com/i/web/status/{tweet_id}"
 
     settings.logger.debug(f"send_normal_webhook() - Tweet ID: {tweet_id}")
     settings.logger.debug(f"send_normal_webhook() - Text: {text}")
@@ -38,6 +58,7 @@ def send_embed_webhook(
     settings.logger.debug(f"send_normal_webhook() - Avatar URL: {avatar_url}")
     settings.logger.debug(f"send_normal_webhook() - Screen name: {screen_name}")
     settings.logger.debug(f"send_normal_webhook() - Webhook URL: {webhook}")
+    settings.logger.debug(f"send_normal_webhook() - Tweet URL: {tweet_url}")
     for media_link in media_links:
         settings.logger.debug(f"send_normal_webhook() - Media link: {media_link}")
 
@@ -57,38 +78,23 @@ def send_embed_webhook(
     if embed_image:
         embed.set_image(url=embed_image)
 
-    settings.logger.debug(f"Avatar URL: {avatar_url}")
+    if settings.webhook_author_icon:
+        settings.logger.debug(f"User has customized the author icon: {settings.webhook_author_icon}")
+        avatar_url = settings.webhook_author_icon
+
+    if settings.webhook_author_name:
+        settings.logger.debug(f"User has customized the author name: {settings.webhook_author_name}")
+        screen_name = settings.webhook_author_name
+
+    if settings.webhook_author_url:
+        settings.logger.debug(f"User has customized the author url: {settings.webhook_author_url}")
+        tweet_url = settings.webhook_author_url
 
     embed.set_author(
         icon_url=avatar_url,
         name=screen_name,
-        url=f"https://twitter.com/i/web/status/{tweet_id}",
+        url=tweet_url,
     )
-
-    author_icon = settings.webhook_author_icon
-    if author_icon:
-        settings.logger.debug(f"User has customized the author icon: {author_icon}")
-        embed.set_author(icon_url=author_icon)
-
-    author_name = settings.webhook_author_name
-    if author_name:
-        settings.logger.debug(f"User has customized the author name: {author_name}")
-        embed.set_author(name=author_name)
-
-    author_url = settings.webhook_author_url
-    if author_url:
-        settings.logger.debug(f"User has customized the author url: {author_url}")
-        embed.set_author(url=author_url)
-
-    footer_icon = settings.webhook_footer_icon
-    if footer_icon:
-        settings.logger.debug(f"User has customized the footer icon: {author_url}")
-        embed.set_footer(icon_url=footer_icon)
-
-    footer_text = settings.webhook_footer_text
-    if footer_text:
-        settings.logger.debug(f"User has customized the footer text: {footer_text}")
-        embed.set_footer(text=footer_text)
 
     webhook_image = settings.webhook_image
     if webhook_image:
@@ -99,6 +105,8 @@ def send_embed_webhook(
     if thumbnail:
         settings.logger.debug(f"User has customized the thumbnail: {thumbnail}")
         embed.set_thumbnail(url=thumbnail)
+
+    embed = customize_footer(embed)
 
     # Add embed to webhook.
     hook.add_embed(embed)
