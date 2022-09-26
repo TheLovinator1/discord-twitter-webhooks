@@ -8,6 +8,10 @@ on:
   pull_request:
     branches: [ master ]
   workflow_dispatch:
+env:
+  BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
+  WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+  RULE: "(from:Steam OR from:Xbox OR from:PlayStation) -is:retweet -is:reply -is:quote"
 jobs:
   build:
     runs-on: ubuntu-latest
