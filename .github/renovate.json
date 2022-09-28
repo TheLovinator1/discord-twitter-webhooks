@@ -11,12 +11,7 @@
         "digest",
         "lockFileMaintenance"
       ],
-      "automerge": true,
-      "automergeType": "branch",
-      "platformAutomerge": true,
-      "schedule": [
-        "after 8am and before 11am on monday through friday"
-      ]
+      "automerge": true
     }
   ],
   "dependencyDashboard": false,
@@ -28,12 +23,7 @@
   ],
   "lockFileMaintenance": {
     "enabled": true,
-    "automerge": true,
-    "automergeType": "branch",
-    "platformAutomerge": true,
-    "schedule": [
-      "after 8am and before 11am on monday through friday"
-    ]
+    "automerge": true
   },
   "timezone": "Europe/Stockholm"
 }
