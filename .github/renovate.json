@@ -11,7 +11,9 @@
         "digest",
         "lockFileMaintenance"
       ],
-      "automerge": true
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
     }
   ],
   "dependencyDashboard": false,
@@ -23,7 +25,9 @@
   ],
   "lockFileMaintenance": {
     "enabled": true,
-    "automerge": true
+    "automerge": true,
+    "automergeType": "pr",
+    "platformAutomerge": true
   },
   "timezone": "Europe/Stockholm"
 }
