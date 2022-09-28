@@ -28,8 +28,7 @@ This bot is configured with a config file (.env) or environment variables.
 
 ## Installation
 
-You have three choices, using [Docker](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks),
-[Heroku](https://dashboard.heroku.com/apps/discord-twitter-webhooks)
+You have three choices, using [Docker](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks)
 or [install directly on your computer](#Install-directly-on-your-computer).
 
 ### Docker
@@ -53,18 +52,6 @@ Docker Hub: [thelovinator/discord-twitter-webhooks](https://hub.docker.com/r/the
 - You can update the container with `docker-compose pull`
     - You can automate this with [Watchtower](https://github.com/containrrr/watchtower)
       or [Diun](https://github.com/crazy-max/diun)
-
-### Heroku
-
-[![Link to deploy this program on Heroku](https://www.herokucdn.com/deploy/button.svg "Deploy")](https://heroku.com/deploy)
-
-- Fill out the form.
-    - You can find more information about each environment variable in the [.env.example](.env.example) file. If you
-      have any questions, feel free to [contact me](#Need help?)
-- If you want to have several webhooks and/or different rules, you can add WEBHOOK_URL2/RULE2, WEBHOOK_URL3/RULE3
-  under Settings and then Config Vars. You can find more environment variable in the [.env.example](.env.example) file.
-- To run the bot you have to go to Resources, Click the little pen icon besides the worker and activate it.
-- Click More in the top right corner and select View logs to see the logs and if the bot is running or not.
 
 ### Install directly on your computer
 
