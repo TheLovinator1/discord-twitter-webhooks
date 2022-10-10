@@ -3,6 +3,7 @@
 If we have both a .env file and environment variables, we will use the environment variables."""
 import logging
 import os
+import re
 import sys
 
 from dotenv import load_dotenv
@@ -13,16 +14,39 @@ load_dotenv(verbose=True)
 # https://developer.twitter.com/en/portal/projects-and-apps
 bearer_token: str = os.getenv("BEARER_TOKEN", default="")
 
-# https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
 webhooks = {}
-hook_num = 0
-for hook in os.environ:
-    if hook.startswith("WEBHOOK_URL"):
-        print(f"{hook_num}: {hook}={os.environ[hook]}")
-        webhooks[hook_num] = {os.environ[hook]}
+rules = {}
 
-        hook_num += 1
-print(f"webhooks={webhooks}")
+
+def get_hook_and_rule():
+    """
+    Get webhook and rule with the corresponding number.
+
+    For example:
+        WEBHOOK_URL1 goes with RULE1.
+        WEBHOOK_URL5 goes with RULE5.
+    """
+    for k, v in os.environ.items():
+        if k == "RULE":
+            rules[0] = v
+            webhooks[0] = os.getenv("WEBHOOK_URL")
+            if webhooks[0] is None:
+                sys.exit("I failed to get WEBHOOK_URL")
+            print(f"Rule 0: {k}={v} will get send to {webhooks[0]!r}")
+        elif k.startswith("RULE"):
+            m = re.search(r'\d+$', k)  # Get digits at the end of the string
+            get_digit = int(m.group()) if m else None
+            if get_digit is None:
+                print(f"I couldn't figure out what {get_digit!r} was when parsing {k}={v}. Contact TheLovinator if "
+                      f"this should work.")
+            rules[get_digit] = v
+            webhooks[get_digit] = os.getenv(f"WEBHOOK_URL{get_digit}")
+
+            print(f"Rule {get_digit}: {v!r} will get send to {webhooks[get_digit]!r}")
+
+
+# Get webhook and rule from the environment.
+get_hook_and_rule()
 
 # Log severity. Can be CRITICAL, ERROR, WARNING, INFO or DEBUG.
 log_level: str = os.getenv("LOG_LEVEL", default="INFO")
@@ -30,17 +54,6 @@ log_level: str = os.getenv("LOG_LEVEL", default="INFO")
 # Where https://github.com/TheLovinator1/twitter-image-collage-maker is running.
 # You can run your own version or use the default https://twitter.lovinator.space/
 collage_maker_url: str = os.getenv("TWITTER_IMAGE_COLLAGE_API", default="https://twitter.lovinator.space/add")
-
-# https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule
-rules = {}
-rule_num = 0
-for rule in os.environ:
-    if rule.startswith("RULE"):
-        print(f"{rule_num}: {rule}={os.environ[rule]}")
-        rules[rule_num] = os.environ[rule]
-
-        rule_num += 1
-print(f"rules={rules}")
 
 if len(rules) == 0:
     print("No rules found")
@@ -51,9 +64,6 @@ if len(rules) > 26:
     print("You have more than 26 rules. If this doesn't work, you need Academic Research API access.")
 elif len(rules) > 5:
     print("You have more than 5 rules. If this doesn't work, you need Elevated Twitter API access.")
-
-if len(webhooks) != len(rules):
-    print(f"Note: You have {len(webhooks)} webhooks but only {len(rules)} rules.")
 
 # If we should send errors to Discord. Can be True or False.
 send_errors: str = os.getenv("SEND_ERRORS", default="False")

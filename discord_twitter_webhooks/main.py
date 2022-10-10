@@ -127,10 +127,9 @@ def start() -> None:
     # Create the rules
     rules = settings.rules
     for rule_num in rules:
-        print(rule_num, '->', rules[rule_num])
         rule = str(rules[rule_num])
         rule_id = new_rule(stream=stream, rule=rule, rule_tag=f"rule{rule_num}")
-        settings.logger.info(f"Rule {rule_id!r} added")
+        settings.logger.info(f"Rule {rule_id!r} added to Twitter.com")
         rule_ids[rule_num] = {rule_id}
 
     settings.logger.debug(f"Rule IDs: {rule_ids}")
