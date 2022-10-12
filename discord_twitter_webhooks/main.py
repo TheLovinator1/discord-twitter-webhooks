@@ -2,8 +2,7 @@
 import html
 import sys
 
-import tweepy
-from tweepy.streaming import StreamResponse
+from tweepy.streaming import StreamResponse, StreamingClient
 
 from discord_twitter_webhooks import get, reddit, remove, replace, settings
 from discord_twitter_webhooks.get import get_avatar_and_username, get_entities, get_text, get_webhook_url
@@ -91,7 +90,7 @@ def main(response: StreamResponse) -> None:
     )
 
 
-class MyStreamListener(tweepy.StreamingClient):
+class MyStreamListener(StreamingClient):
     """https://docs.tweepy.org/en/latest/streaming.html#using-streamingclient
 
     Stream tweets in realtime.
