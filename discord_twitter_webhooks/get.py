@@ -3,6 +3,7 @@ media_links - Get media links from tweet.
 meta_image - Get twitter:image meta tag from url.
 tweet_urls - Get URLs in the tweet.
 """
+import re
 from typing import Dict, List
 
 import requests
@@ -126,12 +127,14 @@ def get_webhook_url(response: StreamResponse, rule_ids: Dict) -> str:
         tag = matching_rules[0].tag
 
         # Get the number from the tag
-        tag_number = tag[-1]
+        m = re.search(r'\d+$', tag)  # Get digits at the end of the string
+        tag_number = int(m.group()) if m else None
+        if tag_number is None:
+            settings.logger.error(
+                f"I couldn't figure out what {tag_number!r} was when parsing {tag}. Contact TheLovinator "
+                "if this should work.")
         settings.logger.debug(f"tag_number: {tag_number} for tag: {tag}")
-        for key in rule_ids:
-            if tag_number == rule_ids[key]:
-                webhook_url = settings.webhooks[key]
-                break
+        webhook_url = settings.webhooks.get(tag_number)
     else:
         send_error_webhook(matching_rule_error)
 
