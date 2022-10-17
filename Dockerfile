@@ -22,7 +22,7 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 # Add poetry to our path
 ENV PATH="/home/botuser/.local/bin/:${PATH}"
 
-COPY pyproject.toml poetry.lock README.md LICENSE /home/botuser/discord-twitter-webhooks/
+COPY pyproject.toml README.md LICENSE /home/botuser/discord-twitter-webhooks/
 
 # Change directory to where we will run the bot.
 WORKDIR /home/botuser/discord-twitter-webhooks
