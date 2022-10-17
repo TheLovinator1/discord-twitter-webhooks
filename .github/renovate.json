@@ -2,14 +2,17 @@
   "extends": [
     "config:base"
   ],
+  "schedule": [
+    "after 8am every weekday",
+    "before 2pm every weekday"
+  ],
   "packageRules": [
     {
       "matchUpdateTypes": [
         "minor",
         "patch",
         "pin",
-        "digest",
-        "lockFileMaintenance"
+        "digest"
       ],
       "automerge": true,
       "automergeType": "pr",
