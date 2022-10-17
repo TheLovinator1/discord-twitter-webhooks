@@ -10,8 +10,8 @@ import requests
 from bs4 import BeautifulSoup
 from tweepy import StreamResponse
 
-import settings
-from send_webhook import send_error_webhook
+from discord_twitter_webhooks import settings
+from discord_twitter_webhooks.send_webhook import send_error_webhook
 
 
 def media_links(media: list[dict]) -> list[str]:

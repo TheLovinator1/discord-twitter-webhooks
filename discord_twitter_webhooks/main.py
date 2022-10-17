@@ -3,14 +3,13 @@ import html
 import sys
 
 from tweepy.streaming import StreamResponse, StreamingClient
-import get
-import reddit
-import remove
-import replace
-import settings
-from get import get_avatar_and_username, get_entities, get_text, get_webhook_url
-from rules import delete_old_rules, new_rule
-from send_webhook import send_embed_webhook, send_error_webhook
+
+from discord_twitter_webhooks import get, reddit, remove, replace, settings
+from discord_twitter_webhooks.get import get_avatar_and_username, get_entities, get_text, get_webhook_url
+from discord_twitter_webhooks.rules import delete_old_rules, new_rule
+from discord_twitter_webhooks.send_webhook import (
+    send_embed_webhook,
+    send_error_webhook, )
 
 # TODO: Add support for Twitter Spaces
 # TODO: Add backfill so we get missed tweets?

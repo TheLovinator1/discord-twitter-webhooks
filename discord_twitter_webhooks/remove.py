@@ -7,7 +7,8 @@ copyright_symbols: Remove ®, ™ and © symbols.
 remove_media_links: Remove the media links.
 """
 import re
-import settings
+
+from discord_twitter_webhooks import settings
 
 
 def discord_link_previews(text: str) -> str:

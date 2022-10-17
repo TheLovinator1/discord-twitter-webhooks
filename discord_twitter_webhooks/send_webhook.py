@@ -8,7 +8,7 @@ import json
 import requests
 from discord_webhook import DiscordEmbed, DiscordWebhook
 
-import settings
+from discord_twitter_webhooks import settings
 
 
 def customize_footer(embed: DiscordEmbed):

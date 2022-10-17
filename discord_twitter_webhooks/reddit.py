@@ -4,7 +4,8 @@ username_to_link: Change /u/username to clickable link.
 subreddit_to_link: Change /r/subreddit to clickable link.
 """
 import re
-import settings
+
+from discord_twitter_webhooks import settings
 
 
 def username_to_link(text: str) -> str:

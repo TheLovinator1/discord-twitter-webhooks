@@ -23,8 +23,14 @@
   "enabledManagers": [
     "dockerfile",
     "docker-compose",
-    "pip_requirements",
+    "poetry",
     "github-actions"
   ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true,
+    "automergeType": "pr",
+    "platformAutomerge": true
+  },
   "timezone": "Europe/Stockholm"
 }

@@ -8,8 +8,8 @@ import sys
 import tweepy
 from tweepy import StreamRule, StreamingClient
 
-import settings
-from send_webhook import send_error_webhook
+from discord_twitter_webhooks import settings
+from discord_twitter_webhooks.send_webhook import send_error_webhook
 
 
 def delete_old_rules(stream: StreamingClient) -> None:
