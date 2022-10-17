@@ -27,7 +27,7 @@ COPY pyproject.toml README.md LICENSE /home/botuser/discord-twitter-webhooks/
 # Change directory to where we will run the bot.
 WORKDIR /home/botuser/discord-twitter-webhooks
 
-RUN poetry install --no-interaction --no-ansi --no-dev
+RUN poetry install --no-interaction --no-ansi --only main
 
 ADD discord_twitter_webhooks /home/botuser/discord-twitter-webhooks/discord_twitter_webhooks/
 
