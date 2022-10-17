@@ -13,7 +13,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends build-essential
 
 # Create user so we don't run as root.
 RUN useradd --create-home botuser
-RUN chown -R botuser:botuser /home/botuser && chmod -R 755 /home/botuser
 USER botuser
 
 # Install poetry
@@ -29,7 +28,7 @@ WORKDIR /home/botuser/discord-twitter-webhooks
 
 RUN poetry install --no-interaction --no-ansi --only main
 
-ADD discord_twitter_webhooks /home/botuser/discord-twitter-webhooks/discord_twitter_webhooks/
+ADD --chown=botuser:botuser discord_twitter_webhooks /home/botuser/discord-twitter-webhooks/discord_twitter_webhooks/
 
 # Run bot.
 CMD [ "poetry", "run", "bot" ]
