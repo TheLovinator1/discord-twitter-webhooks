@@ -73,7 +73,7 @@ This is not recommended if you don't have an init system (e.g., systemd)
     - <kbd>Shift</kbd> + <kbd>right-click</kbd> in the folder and select `Open PowerShell window here`
 - Install requirements:
     - Type `python -m venv .venv` into the PowerShell window to create
-      a virtual environment.
+      the virtual environment.
         - Activate the virtual environment: `.\.venv\Scripts\activate`.
             - Install requirements: `python -m pip install -r requirements.txt`
 - Start the bot:
