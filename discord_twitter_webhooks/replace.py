@@ -8,7 +8,7 @@ hashtag_with_link: Replace the hashtag with a link to Twitter search.
 
 import re
 
-from discord_twitter_webhooks import settings
+import settings
 
 
 def username_with_link(text: str) -> str:
