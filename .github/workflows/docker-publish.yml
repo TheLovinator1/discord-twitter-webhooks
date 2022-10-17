@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
-      - run: pipx install poetry
+      - run: pipx install poetry --python $(which python)
       - run: poetry install
       - run: poetry run pytest
       - uses: docker/login-action@v2
