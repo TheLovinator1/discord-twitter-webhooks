@@ -1,4 +1,4 @@
-from discord_twitter_webhooks.remove import (copyright_symbols, discord_link_previews, remove_media_links, utm_source)
+from discord_twitter_webhooks.remove import copyright_symbols, discord_link_previews, remove_media_links, utm_source
 
 
 class TestRemove:
