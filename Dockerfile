@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 # We don't want apt-get to interact with us and we want the default answers to be used for all questions.
 ARG DEBIAN_FRONTEND=noninteractive
