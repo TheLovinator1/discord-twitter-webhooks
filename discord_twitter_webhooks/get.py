@@ -4,11 +4,11 @@ meta_image - Get twitter:image meta tag from url.
 tweet_urls - Get URLs in the tweet.
 """
 import re
-from typing import Dict, List
 
 import requests
 from bs4 import BeautifulSoup
 from tweepy import StreamResponse
+from typing import Dict, List
 
 from discord_twitter_webhooks import settings
 from discord_twitter_webhooks.send_webhook import send_error_webhook
