@@ -8,7 +8,7 @@ class TestReddit:
     hello2_txt = "/r/hello r/hello hello/r/hello /u/hello u/hello hello/u/hello"
 
     def test_subreddit_to_clickable_link(self):
-        """Test if the subreddit is replaced with a clickable link"""
+        """Test if the subreddit is replaced with a clickable link."""
         text = self.hello_txt
         after = "Hello @TheLovinator1 #Hello /u/test [/r/aww](https://reddit.com/r/aww)"
         assert subreddit_to_link(text) == after
@@ -18,7 +18,7 @@ class TestReddit:
         assert subreddit_to_link(text2) == after2
 
     def test_reddit_username_to_link(self):
-        """Test if the reddit username is replaced with a link"""
+        """Test if the reddit username is replaced with a link."""
         text = self.hello_txt
         after = "Hello @TheLovinator1 #Hello [/u/test](https://reddit.com/u/test) /r/aww"
         assert username_to_link(text) == after
