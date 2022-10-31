@@ -28,7 +28,7 @@ def main(response: StreamResponse) -> None:
     twitter_card_image = ""
     media_links: list[str] = []
 
-    webhook_url = get_webhook_url(response, rule_ids)
+    webhook_url = get_webhook_url(response)
     avatar, user_name = get_avatar_and_username(response)
     text = get_text(response)
 

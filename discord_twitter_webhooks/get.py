@@ -4,11 +4,11 @@ meta_image - Get twitter:image meta tag from url.
 tweet_urls - Get URLs in the tweet.
 """
 import re
+from typing import List
 
 import requests
 from bs4 import BeautifulSoup
 from tweepy import StreamResponse
-from typing import Dict, List
 
 from discord_twitter_webhooks import settings
 from discord_twitter_webhooks.send_webhook import send_error_webhook
@@ -104,23 +104,23 @@ def get_entities(response: StreamResponse) -> dict:
     return entities
 
 
-def get_webhook_url(response: StreamResponse, rule_ids: Dict) -> str:
+def get_webhook_url(response: StreamResponse) -> str:
     """Get the webhook url.
 
     We will check for a stream tag and match it with a webhook url.
 
     Args:
         response: The response from the stream.
-        rule_ids: Rule IDs and tags. Used to send rule to correct webhook.
 
     Returns:
         str: The webhook url.
     """
     data = response.data
     matching_rules = response.matching_rules
-    matching_rule_error = (f"discord-twitter-webhooks error: Failed to find matching rule for {matching_rules[0].tag!r}"
-                           f"\nTweet was: <https://twitter.com/i/web/status/{data.id}>"
-                           "\nContact TheLovinator#9276 if this keeps happening.")
+    matching_rule_error = (
+        f"discord-twitter-webhooks error: Failed to find matching rule for {matching_rules[0].tag!r}\n"
+        f"Tweet was: <https://twitter.com/i/web/status/{data.id}>\n"
+        "Contact TheLovinator#9276 if this keeps happening.")
 
     webhook_url = settings.webhooks[0]
     if matching_rules:
