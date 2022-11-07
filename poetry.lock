@@ -70,7 +70,7 @@ async = ["httpx (>=0.20.0)"]
 
 [[package]]
 name = "exceptiongroup"
-version = "1.0.0"
+version = "1.0.1"
 description = "Backport of PEP 654 (exception groups)"
 category = "dev"
 optional = false
@@ -224,7 +224,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "tweepy"
-version = "4.12.0"
+version = "4.12.1"
 description = "Twitter library for Python"
 category = "main"
 optional = false
@@ -238,6 +238,7 @@ requests-oauthlib = ">=1.2.0,<2"
 [package.extras]
 async = ["aiohttp (>=3.7.3,<4)", "async-lru (>=1.0.3,<2)"]
 dev = ["coverage (>=4.4.2)", "coveralls (>=2.1.0)", "tox (>=3.21.0)"]
+docs = ["myst-parser (==0.15.2)", "readthedocs-sphinx-search (==0.1.1)", "sphinx (==4.2.0)", "sphinx-hoverxref (==0.7b1)", "sphinx-rtd-theme (==1.0.0)", "sphinx-tabs (==3.2.0)"]
 socks = ["requests[socks] (>=2.27.0,<3)"]
 test = ["vcrpy (>=1.10.3)"]
 
@@ -285,8 +286,8 @@ discord-webhook = [
     {file = "discord_webhook-0.17.0-py3-none-any.whl", hash = "sha256:d869849c4834f928f5c22597dc7600b1a30f9e797d1aeb1d4196711a243d9a73"},
 ]
 exceptiongroup = [
-    {file = "exceptiongroup-1.0.0-py3-none-any.whl", hash = "sha256:2ac84b496be68464a2da60da518af3785fff8b7ec0d090a581604bc870bdee41"},
-    {file = "exceptiongroup-1.0.0.tar.gz", hash = "sha256:affbabf13fb6e98988c38d9c5650e701569fe3c1de3233cfb61c5f33774690ad"},
+    {file = "exceptiongroup-1.0.1-py3-none-any.whl", hash = "sha256:4d6c0aa6dd825810941c792f53d7b8d71da26f5e5f84f20f9508e8f2d33b140a"},
+    {file = "exceptiongroup-1.0.1.tar.gz", hash = "sha256:73866f7f842ede6cb1daa42c4af078e2035e5f7607f0e2c762cc51bb31bbe7b2"},
 ]
 idna = [
     {file = "idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
@@ -337,8 +338,8 @@ tomli = [
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
 tweepy = [
-    {file = "tweepy-4.12.0-py3-none-any.whl", hash = "sha256:c463fa147f75016e3a5ed3713580c7339a301b58f90895e696bfae068556d7cc"},
-    {file = "tweepy-4.12.0.tar.gz", hash = "sha256:274f91dfee6d4aed83d9178fbe338bbfd3c06a4220cfe14438159685db7569b7"},
+    {file = "tweepy-4.12.1-py3-none-any.whl", hash = "sha256:86d4f6738cbd5a57f86dff7ae0caf52f66004d5777626bf5da970aa8c8aa35df"},
+    {file = "tweepy-4.12.1.tar.gz", hash = "sha256:5e4c5b5d22f9e5dd9678a708fae4e40e6eeb1a860a89891a5de3040d5f3da8fe"},
 ]
 urllib3 = [
     {file = "urllib3-1.26.12-py2.py3-none-any.whl", hash = "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997"},
