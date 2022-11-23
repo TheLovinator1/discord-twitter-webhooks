@@ -61,6 +61,7 @@ This is not recommended if you don't have an init system (e.g., systemd)
     - [Python](https://www.python.org/)
         - You should use the latest version.
         - You want to add Python to your PATH.
+        - Windows: Find `App execution aliases` and disable python.exe and python3.exe
     - [Poetry](https://python-poetry.org/docs/master/#installation)
         - Windows: You have to add `%appdata%\Python\Scripts` to your PATH for Poetry to work.
 - Download the project from GitHub with Git or download
