@@ -28,7 +28,7 @@ This bot is configured with a config file (.env) or environment variables.
 
 ## Installation
 
-You have three choices, using [Docker](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks)
+You have two choices, using [Docker](https://hub.docker.com/r/thelovinator/discord-twitter-webhooks)
 or [install directly on your computer](#Install-directly-on-your-computer).
 
 ### Docker
