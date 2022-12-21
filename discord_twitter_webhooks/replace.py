@@ -25,8 +25,8 @@ def username_with_link(text: str) -> str:
         Text with the username replaced with a link
     """
     regex = re.sub(
-        r"\B@(\w*)",
-        r"[\g<0>](https://twitter.com/\g<1>)",
+        r" (@(\w*))",
+        r" [\g<1>](https://twitter.com/\g<2>)",
         text,
     )
 
