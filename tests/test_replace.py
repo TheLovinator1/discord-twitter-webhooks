@@ -37,7 +37,11 @@ class TestReplace:
                                            "Hello https://t.co/x5R5a8MWYW") == "Hello https://twitter.com/Bot2Lovi/status/1556986132813971458/photo/1"
 
     def test_mastodon_links(self):
-        link = "https://mastodon.gamedev.place/@eloraam"
-        link_and_twitter = "https://mastodon.gamedev.place/@eloraam @eloraam"
+        link = "https://mastodon.gamedev.place/@eloraam?hello#something"
+        link_and_twitter = "https://mastodon.gamedev.place/@eloraam?hello#something @eloraam #Hello"
         assert username_with_link(link) == link
-        assert username_with_link(link_and_twitter) == "https://mastodon.gamedev.place/@eloraam [@eloraam](https://twitter.com/eloraam)"
+        assert username_with_link(
+            link_and_twitter) == "https://mastodon.gamedev.place/@eloraam?hello#something [@eloraam](https://twitter.com/eloraam) #Hello"
+        assert hashtag_with_link(link) == link
+        assert hashtag_with_link(
+            link_and_twitter) == "https://mastodon.gamedev.place/@eloraam?hello#something @eloraam [#Hello](https://twitter.com/hashtag/Hello)"

@@ -71,8 +71,8 @@ def hashtag_with_link(text: str) -> str:
         Text with the hashtag replaced with a link
     """
     regex = re.sub(
-        r"\B#(\w*)",
-        r"[\g<0>](https://twitter.com/hashtag/\g<1>)",
+        r" (#(\w*))",
+        r" [\g<1>](https://twitter.com/hashtag/\g<2>)",
         text,
     )
 
