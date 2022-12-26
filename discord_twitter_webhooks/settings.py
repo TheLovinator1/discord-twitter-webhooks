@@ -88,6 +88,21 @@ webhook_thumbnail: str = os.getenv("WEBHOOK_THUMBNAIL", default="")
 webhook_footer_text: str = os.getenv("WEBHOOK_FOOTER_TEXT", default="")
 webhook_footer_icon: str = os.getenv("WEBHOOK_FOOTER_ICON", default="")
 
+# Only send the text
+no_embed: str = os.getenv("NO_EMBED", default="")
+
+# Disable features
+disable_remove_tco_links: str = os.getenv("DISABLE_REMOVE_TCO_LINKS", default="")
+disable_unescape_text: str = os.getenv("DISABLE_UNESCAPE_TEXT", default="")
+disable_replace_username: str = os.getenv("DISABLE_REPLACE_USERNAME", default="")
+disable_replace_hashtag: str = os.getenv("DISABLE_REPLACE_HASHTAG", default="")
+disable_remove_discord_link_previews: str = os.getenv("DISABLE_REMOVE_DISCORD_LINK_PREVIEWS", default="")
+disable_replace_subreddit: str = os.getenv("DISABLE_REPLACE_SUBREDDIT", default="")
+disable_replace_reddit_username: str = os.getenv("DISABLE_REPLACE_REDDIT_USERNAME", default="")
+disable_remove_utm_parameters: str = os.getenv("DISABLE_REMOVE_UTM", default="")
+disable_remove_trailing_whitespace: str = os.getenv("DISABLE_REMOVE_TRAILING_WHITESPACE", default="")
+disable_remove_copyright_symbols: str = os.getenv("DISABLE_REMOVE_COPYRIGHT_SYMBOLS", default="")
+
 if webhook_author_name:
     logger.info(f"Note that you have customized webhook_author_name to '{webhook_author_name}'.")
 if webhook_author_url:

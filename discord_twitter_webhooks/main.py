@@ -5,11 +5,31 @@ import sys
 from tweepy.streaming import StreamResponse, StreamingClient
 
 from discord_twitter_webhooks import get, reddit, remove, replace, settings
-from discord_twitter_webhooks.get import get_avatar_and_username, get_entities, get_text, get_webhook_url
+from discord_twitter_webhooks.get import (
+    get_avatar_and_username,
+    get_entities,
+    get_text,
+    get_webhook_url,
+)
 from discord_twitter_webhooks.rules import delete_old_rules, new_rule
 from discord_twitter_webhooks.send_webhook import (
     send_embed_webhook,
-    send_error_webhook, )
+    send_error_webhook,
+    send_normal_webhook,
+)
+from settings import (
+    disable_remove_copyright_symbols,
+    disable_remove_discord_link_previews,
+    disable_remove_tco_links,
+    disable_remove_trailing_whitespace,
+    disable_remove_utm_parameters,
+    disable_replace_hashtag,
+    disable_replace_reddit_username,
+    disable_replace_subreddit,
+    disable_replace_username,
+    disable_unescape_text,
+    no_embed,
+)
 
 # TODO: Add support for Twitter Spaces
 # TODO: Add backfill so we get missed tweets?
@@ -49,45 +69,59 @@ def main(response: StreamResponse) -> None:
             text = remove.remove_media_links(entities, text)
             twitter_card_image = get.meta_image(entities)
 
-            # Replace Twitters shortened URLs with the original URL.
-            text = replace.tco_url_link_with_real_link(entities, text)
+            if not disable_remove_tco_links == "True":
+                # Replace Twitters shortened URLs with the original URL.
+                text = replace.tco_url_link_with_real_link(entities, text)
 
-    # We coverts &gt; and &lt; to > and < to make the text look nicer.
-    text = html.unescape(text)
+    if not disable_unescape_text == "True":
+        # We coverts &gt; and &lt; to > and < to make the text look nicer.
+        text = html.unescape(text)
 
-    # Replace the @mentions with URLs.
-    text = replace.username_with_link(text)
+    if not disable_replace_username == "True":
+        # Replace the @mentions with URLs.
+        text = replace.username_with_link(text)
 
-    # Replace the hashtags with URLs.
-    text = replace.hashtag_with_link(text)
+    if not disable_replace_hashtag == "True":
+        # Replace the hashtags with URLs.
+        text = replace.hashtag_with_link(text)
 
-    # Append < and > to disable Discords link previews.
-    text = remove.discord_link_previews(text)
+    if not disable_remove_discord_link_previews == "True":
+        # Append < and > to disable Discords link previews.
+        text = remove.discord_link_previews(text)
 
-    # Change /r/subreddit to the subreddit URL.
-    text = reddit.subreddit_to_link(text)
+    if not disable_replace_subreddit == "True":
+        # Change /r/subreddit to the subreddit URL.
+        text = reddit.subreddit_to_link(text)
 
-    # Change /u/username to the user URL.
-    text = reddit.username_to_link(text)
+    if not disable_replace_reddit_username == "True":
+        # Change /u/username to the user URL.
+        text = reddit.username_to_link(text)
 
-    # Remove UTM parameters, this cleans up the URL.
-    text = remove.utm_source(text)
+    if not disable_remove_utm_parameters == "True":
+        # Remove UTM parameters, this cleans up the URL.
+        text = remove.utm_source(text)
 
-    # Remove trailing whitespace.
-    text = text.rstrip()
+    if not disable_remove_trailing_whitespace == "True":
+        # Remove trailing whitespace.
+        text = text.rstrip()
 
-    # Remove copyright symbols.
-    text = remove.copyright_symbols(text)
+    if not disable_remove_copyright_symbols == "True":
+        # Remove copyright symbols.
+        text = remove.copyright_symbols(text)
 
-    send_embed_webhook(
-        tweet_id=data.id,
-        media_links=media_links,
-        text=text,
-        twitter_card_image=twitter_card_image,
-        avatar_url=avatar,
-        screen_name=user_name,
-        webhook=webhook_url,
-    )
+    if no_embed == "True":
+        send_normal_webhook(msg=text, webhook=webhook_url)
+
+    else:
+        send_embed_webhook(
+            tweet_id=data.id,
+            media_links=media_links,
+            text=text,
+            twitter_card_image=twitter_card_image,
+            avatar_url=avatar,
+            screen_name=user_name,
+            webhook=webhook_url,
+        )
 
 
 class MyStreamListener(StreamingClient):
@@ -98,8 +132,10 @@ class MyStreamListener(StreamingClient):
 
     def on_exception(self, exception: Exception) -> None:
         """An unhandled exception was raised while streaming. Shutting down."""
-        error_msg = (f"discord-twitter-webhooks: An unhandled exception was raised while streaming. Shutting down"
-                     f"\nException: {exception!r}")
+        error_msg = (
+            f"discord-twitter-webhooks: An unhandled exception was raised while streaming. Shutting down"
+            f"\nException: {exception!r}"
+        )
         send_error_webhook(error_msg)
 
         self.disconnect()
@@ -135,8 +171,10 @@ def start() -> None:
 
     # TODO: dry_run before to make sure everything works?
     try:
-        settings.logger.info("Starting stream! (Press CTRL+C to stop, it will take 20 seconds to stop, because we have"
-                             " to wait for the next signal to be sent from the Twitter API)")
+        settings.logger.info(
+            "Starting stream! (Press CTRL+C to stop, it will take 20 seconds to stop, because we have"
+            " to wait for the next signal to be sent from the Twitter API)"
+        )
         stream.filter(
             expansions=[
                 "author_id",
