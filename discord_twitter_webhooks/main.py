@@ -17,7 +17,7 @@ from discord_twitter_webhooks.send_webhook import (
     send_error_webhook,
     send_normal_webhook,
 )
-from settings import (
+from discord_twitter_webhooks.settings import (
     disable_remove_copyright_symbols,
     disable_remove_discord_link_previews,
     disable_remove_tco_links,
