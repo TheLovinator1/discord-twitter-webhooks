@@ -28,7 +28,7 @@ def discord_link_previews(text: str) -> str:
     Returns:
         Text with the Discord link previews removed
     """
-    regex = re.sub(
+    regex: str = re.sub(
         r"(^(https:|http:|www\.)\S*)",
         r"<\g<1>>",
         text,
@@ -52,7 +52,7 @@ def utm_source(text: str) -> str:
     Returns:
         Text with the utm_source parameter removed
     """
-    regex = re.sub(
+    regex: str = re.sub(
         r"(\?utm_source)\S*",
         r"",
         text,
@@ -74,12 +74,13 @@ def copyright_symbols(text: str) -> str:
     """
     settings.logger.debug(f"Text before: {text}")
 
-    symbols = ["®", "™", "©"]
+    symbols: list[str] = ["®", "™", "©"]
+    replaced_text: str = text
     for symbol in symbols:
-        text = text.replace(symbol, "")
+        replaced_text: str = replaced_text.replace(symbol, "")
 
-    settings.logger.debug(f"copyright_symbols() - Text after: {text}")
-    return text
+    settings.logger.debug(f"copyright_symbols() - Text after: {replaced_text}")
+    return replaced_text
 
 
 def remove_media_links(entities: dict, text: str) -> str:
@@ -94,6 +95,7 @@ def remove_media_links(entities: dict, text: str) -> str:
     Returns:
         Text with the media links removed
     """
+    replaced_text: str = text
     for url in entities["urls"]:
         if "status" not in url:
             # This removed every link in this tweet:
@@ -101,7 +103,7 @@ def remove_media_links(entities: dict, text: str) -> str:
             # Because of that we check if the url is from the twitter.com domain.
             if url["expanded_url"].startswith("https://twitter.com/"):
                 settings.logger.debug(f"remove_media_links() - Removing url: {url}")
-                text = text.replace(url["url"], "")
+                replaced_text: str = replaced_text.replace(url["url"], "")
             else:
                 settings.logger.warning(f"remove_media_links() - Found URL without status: {url}")
-    return text
+    return replaced_text

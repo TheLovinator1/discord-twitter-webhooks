@@ -6,7 +6,7 @@ new_rule - Add new rules to Twitter.
 import sys
 
 import tweepy
-from tweepy import StreamRule, StreamingClient
+from tweepy import StreamingClient, StreamRule
 
 from discord_twitter_webhooks import settings
 from discord_twitter_webhooks.send_webhook import send_error_webhook
@@ -26,8 +26,8 @@ def delete_old_rules(stream: StreamingClient) -> None:
     # Get rules and add to list, so we can delete them later.
     rules_to_delete = []
 
-    if old_rules.data is not None:
-        rules_data: list[StreamRule] = old_rules.data
+    if old_rules.data is not None:  # type: ignore
+        rules_data: list[StreamRule] = old_rules.data  # type: ignore
         for old_rule in rules_data:
             settings.logger.debug(f"Added {old_rule.value} - {old_rule.id} for deletion")
             rules_to_delete.append(old_rule.id)
@@ -54,14 +54,15 @@ def new_rule(rule: str, rule_tag: str, stream: StreamingClient) -> str:
         rule_to_add: StreamRule = tweepy.StreamRule(value=rule, tag=rule_tag)
         rule_response = stream.add_rules(add=rule_to_add)
 
-        if rule_response.errors:
-            for error in rule_response.errors:
-                error_msg = (f"Error adding rule: {error['value']!r}"
-                             f"{error['title']!r} - Error details: {error['details'][0]!r}")
+        if rule_response.errors:  # type: ignore
+            for error in rule_response.errors:  # type: ignore
+                error_msg: str = f"Error adding rule: {error['value']!r}{error['title']!r} - Error details: {error['details'][0]!r}"  # noqa: E501
                 send_error_webhook(error_msg)
-            sys.exit(1)
+            sys.exit("Error adding rule.")
 
-        rule_data = rule_response.data
+        rule_data = rule_response.data  # type: ignore
         settings.logger.debug(f"Rule data: {rule_data} for rule: {rule!r}")
 
         return rule_data[0].id
+    else:
+        sys.exit("No rule to add")

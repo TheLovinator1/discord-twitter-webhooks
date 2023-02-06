@@ -29,7 +29,7 @@ webhooks = {}
 rules = {}
 
 
-def get_hook_and_rule():
+def get_hook_and_rule() -> None:
     """
     Get webhook and rule with the corresponding number.
 
@@ -45,11 +45,12 @@ def get_hook_and_rule():
                 sys.exit("I failed to get WEBHOOK_URL")
             logger.info(f"Rule 0: {k}={v} will get send to {webhooks[0]!r}")
         elif k.startswith("RULE"):
-            m = re.search(r'\d+$', k)  # Get digits at the end of the string
-            get_digit = int(m.group()) if m else None
+            m: re.Match[str] | None = re.search(r"\d+$", k)  # Get digits at the end of the string
+            get_digit: int | None = int(m.group()) if m else None
             if get_digit is None:
-                logger.error(f"I couldn't figure out what {get_digit!r} was when parsing {k}={v}. Contact TheLovinator "
-                             "if this should work.")
+                logger.error(
+                    f"I couldn't figure out what {get_digit!r} was when parsing {k}={v}. Contact TheLovinator if this should work."  # noqa: E501
+                )
             rules[get_digit] = v
             webhooks[get_digit] = os.getenv(f"WEBHOOK_URL{get_digit}")
 
@@ -64,8 +65,7 @@ get_hook_and_rule()
 collage_maker_url: str = os.getenv("TWITTER_IMAGE_COLLAGE_API", default="https://twitter.lovinator.space/add")
 
 if len(rules) == 0:
-    logger.error("No rules found")
-    sys.exit(1)
+    sys.exit("No rules found, you should edit the .env or environment variables to add rules.")
 
 # Tell the user he needs Elevated Twitter API access if he has more than 5 webhooks.
 if len(rules) > 26:
@@ -78,7 +78,7 @@ send_errors: str = os.getenv("SEND_ERRORS", default="False")
 error_webhook: str = os.getenv("ERROR_WEBHOOK", default="")
 
 if not bearer_token:
-    sys.exit("No bearer token found, exiting")
+    sys.exit("No bearer token found in .env file or environment variables.")
 
 webhook_author_name: str = os.getenv("WEBHOOK_AUTHOR_NAME", default="")
 webhook_author_url: str = os.getenv("WEBHOOK_AUTHOR_URL", default="")

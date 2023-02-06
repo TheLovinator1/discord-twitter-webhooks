@@ -9,6 +9,7 @@ from typing import List
 import requests
 from bs4 import BeautifulSoup
 from tweepy import StreamResponse
+from tweepy.streaming import StreamRule
 
 from discord_twitter_webhooks import settings
 from discord_twitter_webhooks.send_webhook import send_error_webhook
@@ -73,7 +74,7 @@ def meta_image(entities) -> str:
             settings.logger.error(f"meta_image() - Response not ok: {response!r}")
             return image_url
 
-        soup = BeautifulSoup(response.content, "html.parser")
+        soup: BeautifulSoup = BeautifulSoup(response.content, "html.parser")
 
         if og_image := soup.find_all("meta", attrs={"property": "og:image"}):
             image_url = og_image[0].get("content")
@@ -101,7 +102,7 @@ def get_entities(response: StreamResponse) -> dict:
     if data["entities"]:
         entities = data.entities
         settings.logger.debug(f"Entities: {entities}")
-    return entities
+    return entities  # type: ignore
 
 
 def get_webhook_url(response: StreamResponse) -> str:
@@ -115,31 +116,35 @@ def get_webhook_url(response: StreamResponse) -> str:
     Returns:
         str: The webhook url.
     """
-    data = response.data
-    matching_rules = response.matching_rules
-    matching_rule_error = (
-        f"discord-twitter-webhooks error: Failed to find matching rule for {matching_rules[0].tag!r}\n"
-        f"Tweet was: <https://twitter.com/i/web/status/{data.id}>\n"
-        "Contact TheLovinator#9276 if this keeps happening.")
-
-    webhook_url = settings.webhooks[0]
-    if matching_rules:
-        tag = matching_rules[0].tag
-
-        # Get the number from the tag
-        m = re.search(r'\d+$', tag)  # Get digits at the end of the string
-        tag_number = int(m.group()) if m else None
-        if tag_number is None:
-            settings.logger.error(
-                f"I couldn't figure out what {tag_number!r} was when parsing {tag}. Contact TheLovinator "
-                "if this should work.")
-        settings.logger.debug(f"tag_number: {tag_number} for tag: {tag}")
-        webhook_url = settings.webhooks.get(tag_number)
+    webhook_url: str = settings.webhooks[0]
+    if matching_rules := response.matching_rules:
+        webhook_url = get_webhook_from_tag(matching_rules)
     else:
+        data = response.data
+        matching_rule_error: str = (
+            f"discord-twitter-webhooks error: Failed to find matching rule for {matching_rules[0].tag!r}\n"
+            f"Tweet was: <https://twitter.com/i/web/status/{data.id}>\n"
+            "Contact TheLovinator#9276 if this keeps happening."
+        )
+
         send_error_webhook(matching_rule_error)
 
     settings.logger.debug(f"webhook_url: {webhook_url}")
     return webhook_url
+
+
+def get_webhook_from_tag(matching_rules: list[StreamRule]) -> str:
+    tag: str = matching_rules[0].tag
+
+    # Get the number from the tag
+    m: re.Match[str] | None = re.search(r"\d+$", tag)  # Get digits at the end of the string
+    tag_number: int | None = int(m.group()) if m else None
+    if tag_number is None:
+        settings.logger.error(
+            f"I couldn't figure out what {tag_number!r} was when parsing {tag}. Contact TheLovinator if this should work."  # noqa: E501
+        )
+    settings.logger.debug(f"tag_number: {tag_number} for tag: {tag}")
+    return settings.webhooks.get(tag_number)  # type: ignore
 
 
 def get_text(response: StreamResponse) -> str:
@@ -153,17 +158,17 @@ def get_text(response: StreamResponse) -> str:
     """
     data = response.data
     try:
-        text = data.text
+        text: str = data.text
     except AttributeError:
         text = "*Failed to get text from tweet*"
 
-        error_msg = f"No text found {data!r} for tweet {data.id}"
+        error_msg: str = f"No text found {data!r} for tweet {data.id}"
         send_error_webhook(error_msg)
     settings.logger.debug(f"Text: {text}")
     return text
 
 
-def get_avatar_and_username(response: StreamResponse) -> tuple:
+def get_avatar_and_username(response: StreamResponse) -> tuple[str, str]:
     """Get avatar and username, this is used for the embed avatar and name.
 
     Args:
@@ -175,6 +180,6 @@ def get_avatar_and_username(response: StreamResponse) -> tuple:
     users = [users.data for users in response.includes["users"]]
     for user in users:
         settings.logger.debug(f"User: {user}")
-    avatar = users[0]["profile_image_url"]
-    user_name = users[0]["name"]
+    avatar: str = users[0]["profile_image_url"]
+    user_name: str = users[0]["name"]
     return avatar, user_name
