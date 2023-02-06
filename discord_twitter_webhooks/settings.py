@@ -35,19 +35,25 @@ def get_hook_and_rule() -> None:
         WEBHOOK_URL5 goes with RULE5.
     """
     for rule_name, rule_value in os.environ.items():
+        # Check for single rule
         if rule_name == "RULE":
             rules[0] = rule_value
             webhooks[0] = os.getenv("WEBHOOK_URL", default="")
+
+            # If we can't get the webhook, exit.
             if webhooks[0] == "":
                 sys.exit("I failed to get WEBHOOK_URL")
             logger.info(f"Rule 0: {rule_name}={rule_value} will get send to {webhooks[0]!r}")
+
+        # Check for multiple rules
         elif rule_name.startswith("RULE"):
-            m: re.Match[str] | None = re.search(r"\d+$", rule_name)  # Get digits at the end of the string
-            get_digit: int | None = int(m.group()) if m else None
+            # Get digits at the end of the string
+            match: re.Match[str] | None = re.search(r"\d+$", rule_name)
+            get_digit: int | None = int(match.group()) if match else None
+
+            # If we can't get the digit, log an error and continue.
             if get_digit is None:
-                logger.error(
-                    f"I couldn't figure out what {get_digit!r} was when parsing {rule_name}={rule_value}. Contact TheLovinator if this should work."  # noqa: E501
-                )
+                logger.error(f"I couldn't figure out what {get_digit!r} was when parsing {rule_name}={rule_value}.")
             else:
                 rules[get_digit] = rule_value
                 webhooks[get_digit] = os.getenv(f"WEBHOOK_URL{get_digit}")  # type: ignore
