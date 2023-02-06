@@ -5,6 +5,7 @@ import logging
 import os
 import re
 import sys
+from typing import Dict
 
 from dotenv import load_dotenv
 
@@ -16,17 +17,13 @@ log_level: str = os.getenv("LOG_LEVEL", default="INFO")
 
 # TODO: Add logging config file so you can customize the logging
 logger = logging
-logger.basicConfig(
-    format="%(asctime)s %(levelname)s %(message)s",
-    datefmt="%H:%M:%S",
-    level=log_level,
-)
+logger.basicConfig(format="%(asctime)s %(levelname)s %(message)s", datefmt="%H:%M:%S", level=log_level)
 
 # https://developer.twitter.com/en/portal/projects-and-apps
 bearer_token: str = os.getenv("BEARER_TOKEN", default="")
 
-webhooks = {}
-rules = {}
+webhooks: Dict[int, str] = {}
+rules: Dict[int, str] = {}
 
 
 def get_hook_and_rule() -> None:
@@ -37,24 +34,25 @@ def get_hook_and_rule() -> None:
         WEBHOOK_URL1 goes with RULE1.
         WEBHOOK_URL5 goes with RULE5.
     """
-    for k, v in os.environ.items():
-        if k == "RULE":
-            rules[0] = v
-            webhooks[0] = os.getenv("WEBHOOK_URL")
-            if webhooks[0] is None:
+    for rule_name, rule_value in os.environ.items():
+        if rule_name == "RULE":
+            rules[0] = rule_value
+            webhooks[0] = os.getenv("WEBHOOK_URL", default="")
+            if webhooks[0] == "":
                 sys.exit("I failed to get WEBHOOK_URL")
-            logger.info(f"Rule 0: {k}={v} will get send to {webhooks[0]!r}")
-        elif k.startswith("RULE"):
-            m: re.Match[str] | None = re.search(r"\d+$", k)  # Get digits at the end of the string
+            logger.info(f"Rule 0: {rule_name}={rule_value} will get send to {webhooks[0]!r}")
+        elif rule_name.startswith("RULE"):
+            m: re.Match[str] | None = re.search(r"\d+$", rule_name)  # Get digits at the end of the string
             get_digit: int | None = int(m.group()) if m else None
             if get_digit is None:
                 logger.error(
-                    f"I couldn't figure out what {get_digit!r} was when parsing {k}={v}. Contact TheLovinator if this should work."  # noqa: E501
+                    f"I couldn't figure out what {get_digit!r} was when parsing {rule_name}={rule_value}. Contact TheLovinator if this should work."  # noqa: E501
                 )
-            rules[get_digit] = v
-            webhooks[get_digit] = os.getenv(f"WEBHOOK_URL{get_digit}")
+            else:
+                rules[get_digit] = rule_value
+                webhooks[get_digit] = os.getenv(f"WEBHOOK_URL{get_digit}")  # type: ignore
 
-            logger.info(f"Rule {get_digit}: {v!r} will get send to {webhooks[get_digit]!r}")
+                logger.info(f"Rule {get_digit}: {rule_value!r} will get sent to {webhooks[get_digit]!r}")
 
 
 # Get webhook and rule from the environment.
