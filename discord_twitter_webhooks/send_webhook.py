@@ -88,11 +88,7 @@ def send_embed_webhook(
         settings.logger.debug(f"User has customized the author url: {settings.webhook_author_url}")
         tweet_url = settings.webhook_author_url
 
-    embed.set_author(
-        icon_url=avatar_url,
-        name=screen_name,
-        url=tweet_url,
-    )
+    embed.set_author(icon_url=avatar_url, name=screen_name, url=tweet_url)
 
     if webhook_image := settings.webhook_image:
         settings.logger.debug(f"User has customized the embedded image: {webhook_image}")
@@ -101,6 +97,10 @@ def send_embed_webhook(
     if thumbnail := settings.webhook_thumbnail:
         settings.logger.debug(f"User has customized the thumbnail: {thumbnail}")
         embed.set_thumbnail(url=thumbnail)
+
+    if show_timestamp := settings.webhook_show_timestamp:
+        settings.logger.debug(f"User has customized the timestamp: {show_timestamp}")
+        embed.set_timestamp()
 
     embed = customize_footer(embed)
 
