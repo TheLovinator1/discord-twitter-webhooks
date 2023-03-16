@@ -1,5 +1,4 @@
-"""
-Remove stuff from the tweet text.
+"""Remove stuff from the tweet text.
 
 discord_link_previews: Remove the Discord link previews.
 utm_source: Remove the utm_source parameter from the url.
@@ -34,8 +33,8 @@ def discord_link_previews(text: str) -> str:
         text,
     )
 
-    settings.logger.debug(f"discord_link_previews() - Text before: {text}")
-    settings.logger.debug(f"discord_link_previews() - Text after: {regex}")
+    settings.logger.debug("discord_link_previews() - Text before: %s", text)
+    settings.logger.debug("discord_link_previews() - Text after: %s", regex)
     return regex
 
 
@@ -58,8 +57,8 @@ def utm_source(text: str) -> str:
         text,
     )
 
-    settings.logger.debug(f"utm_source() - Text before {text}")
-    settings.logger.debug(f"utm_source() - Text after: {regex}")
+    settings.logger.debug("utm_source() - Text before %s", text)
+    settings.logger.debug("utm_source() - Text after: %s", regex)
     return regex
 
 
@@ -72,21 +71,19 @@ def copyright_symbols(text: str) -> str:
     Returns:
         Text with the copyright symbols removed
     """
-    settings.logger.debug(f"Text before: {text}")
+    settings.logger.debug("Text before: %s", text)
 
     symbols: list[str] = ["®", "™", "©"]
     replaced_text: str = text
     for symbol in symbols:
         replaced_text: str = replaced_text.replace(symbol, "")
 
-    settings.logger.debug(f"copyright_symbols() - Text after: {replaced_text}")
+    settings.logger.debug("copyright_symbols() - Text after: %s", replaced_text)
     return replaced_text
 
 
 def remove_media_links(entities: dict, text: str) -> str:
-    """Twitter appends a link to the media. It is not needed in Discord,
-    so we remove it.
-
+    """Twitter appends a link to the media. It is not needed in Discord, so we remove it.
 
     Args:
         entities: Object with the entities from the tweet
@@ -102,8 +99,8 @@ def remove_media_links(entities: dict, text: str) -> str:
             # https://twitter.com/SteamDB/status/1528783609833865217
             # Because of that we check if the url is from the twitter.com domain.
             if url["expanded_url"].startswith("https://twitter.com/"):
-                settings.logger.debug(f"remove_media_links() - Removing url: {url}")
+                settings.logger.debug("remove_media_links() - Removing url: %s", url)
                 replaced_text: str = replaced_text.replace(url["url"], "")
             else:
-                settings.logger.warning(f"remove_media_links() - Found URL without status: {url}")
+                settings.logger.warning("remove_media_links() - Found URL without status: %s", url)
     return replaced_text

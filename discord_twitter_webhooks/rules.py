@@ -18,10 +18,9 @@ def delete_old_rules(stream: StreamingClient) -> None:
     Args:
         stream: The tweepy stream object
     """
-
     # Check Twitter app for rules that already have been created.
     old_rules = stream.get_rules()
-    settings.logger.debug(f"Old rules: {old_rules}")
+    settings.logger.debug("Old rules: %s", old_rules)
 
     # Get rules and add to list, so we can delete them later.
     rules_to_delete = []
@@ -29,13 +28,13 @@ def delete_old_rules(stream: StreamingClient) -> None:
     if old_rules.data is not None:  # type: ignore
         rules_data: list[StreamRule] = old_rules.data  # type: ignore
         for old_rule in rules_data:
-            settings.logger.debug(f"Added {old_rule.value} - {old_rule.id} for deletion")
+            settings.logger.debug("Added %s - %s for deletion" % (old_rule.value, old_rule.id))
             rules_to_delete.append(old_rule.id)
 
     # TODO: Only remove rule if the user list has changed?
     # If the app already has rules, delete them first before adding our own
     if rules_to_delete:
-        settings.logger.debug(f"Deleting rules: {rules_to_delete}")
+        settings.logger.debug("Deleting rules: %s", rules_to_delete)
         stream.delete_rules(rules_to_delete)
     else:
         settings.logger.debug("App had no rules to delete")
@@ -49,20 +48,30 @@ def new_rule(rule: str, rule_tag: str, stream: StreamingClient) -> str:
         rule_tag: The tag label. This is a free-form text you can use to identify the rules.
         stream: The tweepy stream object.
     """
-    settings.logger.debug(f"Adding rule: {rule!r} for stream: {stream!r}")
+    settings.logger.debug("Adding rule: %s for stream: %s" % (rule, stream))
     if rule:
         rule_to_add: StreamRule = tweepy.StreamRule(value=rule, tag=rule_tag)
         rule_response = stream.add_rules(add=rule_to_add)
 
         if rule_response.errors:  # type: ignore
             for error in rule_response.errors:  # type: ignore
-                error_msg: str = f"Error adding rule: {error['value']!r}{error['title']!r} - Error details: {error['details'][0]!r}"  # noqa: E501
-                send_error_webhook(error_msg)
+                if error["title"] == "DuplicateRule":
+                    settings.logger.error(
+                        "\nRule already exists '%s'. Each rule must be unique, if you want to send the same rule to two"
+                        " different servers you can append another rule to the webhook by typing ;second_webhook"
+                        % rule,
+                    )
+                    sys.exit("Rule already exists.")
+                if error:
+                    error_value: str = error["value"] or "Error_value_not_found"
+                    error_title: str = error["title"] or "Error_title_not_found"
+                    error_details: str = error["details"][0] or "Error_details_not_found"
+                    error_msg: str = f"Error adding rule: {error_value}{error_title} - Error details: {error_details}"
+                    send_error_webhook(error_msg)
             sys.exit("Error adding rule.")
 
         rule_data = rule_response.data  # type: ignore
-        settings.logger.debug(f"Rule data: {rule_data} for rule: {rule!r}")
+        settings.logger.debug("Rule data: %s for rule: %s" % (rule_data, rule))
 
         return rule_data[0].id
-    else:
-        sys.exit("No rule to add")
+    sys.exit("No rule to add")

@@ -1,11 +1,11 @@
 """Loading and parsing settings from .env file or environment variables.
 
-If we have both a .env file and environment variables, we will use the environment variables."""
+If we have both a .env file and environment variables, we will use the environment variables.
+"""
 import logging
 import os
 import re
 import sys
-from typing import Dict
 
 from dotenv import load_dotenv
 
@@ -22,13 +22,12 @@ logger.basicConfig(format="%(asctime)s %(levelname)s %(message)s", datefmt="%H:%
 # https://developer.twitter.com/en/portal/projects-and-apps
 bearer_token: str = os.getenv("BEARER_TOKEN", default="")
 
-webhooks: Dict[int, str] = {}
-rules: Dict[int, str] = {}
+webhooks: dict[int, str] = {}
+rules: dict[int, str] = {}
 
 
 def get_hook_and_rule() -> None:
-    """
-    Get webhook and rule with the corresponding number.
+    """Get webhook and rule with the corresponding number.
 
     For example:
         WEBHOOK_URL1 goes with RULE1.
@@ -41,9 +40,9 @@ def get_hook_and_rule() -> None:
             webhooks[0] = os.getenv("WEBHOOK_URL", default="")
 
             # If we can't get the webhook, exit.
-            if webhooks[0] == "":
+            if not webhooks[0]:
                 sys.exit("I failed to get WEBHOOK_URL")
-            logger.info(f"Rule 0: {rule_name}={rule_value} will get send to {webhooks[0]!r}")
+            logger.info("Rule 0: %s=%s will get send to %s" % (rule_name, rule_value, webhooks[0]))
 
         # Check for multiple rules
         elif rule_name.startswith("RULE"):
@@ -53,12 +52,14 @@ def get_hook_and_rule() -> None:
 
             # If we can't get the digit, log an error and continue.
             if get_digit is None:
-                logger.error(f"I couldn't figure out what {get_digit!r} was when parsing {rule_name}={rule_value}.")
+                logger.error(
+                    "I couldn't figure out what %s was when parsing %s=%s." % (get_digit, rule_name, rule_value),
+                )
             else:
                 rules[get_digit] = rule_value
                 webhooks[get_digit] = os.getenv(f"WEBHOOK_URL{get_digit}")  # type: ignore
 
-                logger.info(f"Rule {get_digit}: {rule_value!r} will get sent to {webhooks[get_digit]!r}")
+                logger.info("Rule %s: %s will get sent to %s" % (get_digit, rule_value, webhooks[get_digit]))
 
 
 # Get webhook and rule from the environment.
@@ -71,11 +72,20 @@ collage_maker_url: str = os.getenv("TWITTER_IMAGE_COLLAGE_API", default="https:/
 if len(rules) == 0:
     sys.exit("No rules found, you should edit the .env or environment variables to add rules.")
 
+max_rules_elevated: int = 26
+max_rules_pleb: int = 5
+
 # Tell the user he needs Elevated Twitter API access if he has more than 5 webhooks.
-if len(rules) > 26:
-    logger.warning("You have more than 26 rules. If this doesn't work, you need Academic Research API access.")
-elif len(rules) > 5:
-    logger.warning("You have more than 5 rules. If this doesn't work, you need Elevated Twitter API access.")
+if len(rules) > max_rules_elevated:
+    logger.warning(
+        "You have more than %s rules. If this doesn't work, you need Academic Research API access.",
+        max_rules_elevated,
+    )
+elif len(rules) > max_rules_pleb:
+    logger.warning(
+        "You have more than %s rules. If this doesn't work, you need Elevated Twitter API access.",
+        max_rules_pleb,
+    )
 
 # If we should send errors to Discord. Can be True or False.
 send_errors: str = os.getenv("SEND_ERRORS", default="False")
@@ -108,19 +118,19 @@ disable_remove_trailing_whitespace: str = os.getenv("DISABLE_REMOVE_TRAILING_WHI
 disable_remove_copyright_symbols: str = os.getenv("DISABLE_REMOVE_COPYRIGHT_SYMBOLS", default="")
 
 if webhook_author_name:
-    logger.info(f"Note that you have customized webhook_author_name to '{webhook_author_name}'.")
+    logger.info("Note that you have customized webhook_author_name to '%s'." % webhook_author_name)
 if webhook_author_url:
-    logger.info(f"Note that you have customized webhook_author_url to '{webhook_author_url}'.")
+    logger.info("Note that you have customized webhook_author_url to '%s'." % webhook_author_url)
 if webhook_author_icon:
-    logger.info(f"Note that you have customized webhook_author_icon to '{webhook_author_icon}'.")
+    logger.info("Note that you have customized webhook_author_icon to '%s'." % webhook_author_icon)
 if webhook_image:
-    logger.info(f"Note that you have customized webhook_image to '{webhook_image}'.")
+    logger.info("Note that you have customized webhook_image to '%s'." % webhook_image)
 if webhook_thumbnail:
-    logger.info(f"Note that you have customized webhook_thumbnail to '{webhook_thumbnail}'.")
+    logger.info("Note that you have customized webhook_thumbnail to '%s'." % webhook_thumbnail)
 if webhook_footer_text:
-    logger.info(f"Note that you have customized webhook_footer_text to '{webhook_footer_text}'.")
+    logger.info("Note that you have customized webhook_footer_text to '%s'." % webhook_footer_text)
 if webhook_footer_icon:
-    logger.info(f"Note that you have customized webhook_footer_icon to '{webhook_footer_icon}'.")
+    logger.info("Note that you have customized webhook_footer_icon to '%s'." % webhook_footer_icon)
 
 
 def str_to_bool(val: str, setting_name: str) -> bool:
@@ -137,14 +147,14 @@ def str_to_bool(val: str, setting_name: str) -> bool:
         The boolean value.
     """
     if val.lower() in {"y", "yes", "true", "on", "1", "enable", "enabled"}:
-        logger.info(f"{setting_name} is enabled.")
+        logger.info("%s is enabled.", setting_name)
         return True
-    elif val.lower() in {"n", "no", "false", "off", "0", "disable", "disabled"}:
-        logger.debug(f"{setting_name} is not enabled.")
-        return False
+    if val.lower() in {"n", "no", "false", "off", "0", "disable", "disabled"}:
+        logger.debug("%s is disabled.", setting_name)
     else:
-        logger.warning(f"{setting_name} is not a boolean. Got '{val}'. Defaulting to False.")
-        return False
+        logger.warning("%s is not a boolean. Got '%s'. Defaulting to False." % (setting_name, val))
+
+    return False
 
 
 show_timestamp_value: str = os.getenv("SHOW_TIMESTAMP", default="False")

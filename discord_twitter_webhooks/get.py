@@ -1,10 +1,4 @@
-"""
-media_links - Get media links from tweet.
-meta_image - Get twitter:image meta tag from url.
-tweet_urls - Get URLs in the tweet.
-"""
 import re
-from typing import List
 
 import requests
 from bs4 import BeautifulSoup
@@ -34,7 +28,7 @@ def media_links(media: list[dict]) -> list[str]:
             # TODO: Add actual .mp4 or add play button overlay so you can see that it's a video
         else:
             return []
-        settings.logger.debug(f"Image: {image}")
+        settings.logger.debug("Image: %s", image)
 
     return link_list
 
@@ -53,38 +47,39 @@ def meta_image(entities) -> str:
         twitter:image found in url
     """
     image_url: str = ""
-    url_list: List[str] = []
+    url_list: list[str] = []
 
     for url in entities["urls"]:
-        settings.logger.debug(f"url found in tweet: {url['expanded_url']}")
+        settings.logger.debug("url found in tweet: %s", url["expanded_url"])
 
         # We only want to add external links to the list and entities["urls"] has URLs for images, videos that are
         # uploaded with the tweet.
         if "status" in url:
-            settings.logger.debug(f"{url['expanded_url']} has a HTTP status code - adding to tweet_urls")
+            settings.logger.debug("%s has a HTTP status code - adding to tweet_urls", url["expanded_url"])
             url_list.append(url["expanded_url"])
 
     for url in url_list:
-        settings.logger.debug(f"meta_image() - url in url_list: {url}")
+        settings.logger.debug("meta_image() - url in url_list: %s", url)
     if url_list:
-        response: requests.Response = requests.get(url_list[0])
-        settings.logger.debug(f"meta_image() - Response: {response}")
+        response: requests.Response = requests.get(url_list[0], timeout=5)
+        settings.logger.debug("meta_image() - Response: %s", response)
 
         if not response.ok:
-            settings.logger.error(f"meta_image() - Response not ok: {response!r}")
+            settings.logger.error("meta_image() - Response not ok: %r", response)
             return image_url
 
         soup: BeautifulSoup = BeautifulSoup(response.content, "html.parser")
 
         if og_image := soup.find_all("meta", attrs={"property": "og:image"}):
             image_url = og_image[0].get("content")
-            settings.logger.debug(f"meta_image() - og_image: {og_image}")
+            settings.logger.debug("meta_image() - og_image: %s", og_image)
 
         if twitter_image := soup.find_all("meta", attrs={"name": "twitter:image"}):
             image_url = twitter_image[0].get("content")
-            settings.logger.debug(f"meta_image() - twitter_image: {twitter_image}")
+            settings.logger.debug("meta_image() - twitter_image: %s", twitter_image)
 
-        settings.logger.debug(f"meta_image() - image_url: {image_url}")
+        settings.logger.debug("meta_image() - image_url: %s", image_url)
+
     return image_url
 
 
@@ -101,7 +96,7 @@ def get_entities(response: StreamResponse) -> dict:
     entities = []
     if data["entities"]:
         entities = data.entities
-        settings.logger.debug(f"Entities: {entities}")
+        settings.logger.debug("Entities: %s", entities)
     return entities  # type: ignore
 
 
@@ -129,7 +124,8 @@ def get_webhook_url(response: StreamResponse) -> str:
 
         send_error_webhook(matching_rule_error)
 
-    settings.logger.debug(f"webhook_url: {webhook_url}")
+    settings.logger.debug("webhook_url: %s", webhook_url)
+
     return webhook_url
 
 
@@ -141,9 +137,12 @@ def get_webhook_from_tag(matching_rules: list[StreamRule]) -> str:
     tag_number: int | None = int(m.group()) if m else None
     if tag_number is None:
         settings.logger.error(
-            f"I couldn't figure out what {tag_number!r} was when parsing {tag}. Contact TheLovinator if this should work."  # noqa: E501
+            "I couldn't figure out what %s was when parsing %s. Contact TheLovinator if this should work."
+            % (tag_number, tag),
         )
-    settings.logger.debug(f"tag_number: {tag_number} for tag: {tag}")
+    settings.logger.debug("tag_number: %s for tag: %s", tag_number, tag)
+    if tag_number is None:
+        settings.logger.error("tag_number is None")
     return settings.webhooks.get(tag_number)  # type: ignore
 
 
@@ -164,7 +163,7 @@ def get_text(response: StreamResponse) -> str:
 
         error_msg: str = f"No text found {data!r} for tweet {data.id}"
         send_error_webhook(error_msg)
-    settings.logger.debug(f"Text: {text}")
+    settings.logger.debug("Text: %s", text)
     return text
 
 
@@ -179,7 +178,7 @@ def get_avatar_and_username(response: StreamResponse) -> tuple[str, str]:
     """
     users = [users.data for users in response.includes["users"]]
     for user in users:
-        settings.logger.debug(f"User: {user}")
+        settings.logger.debug("User: %s", user)
     avatar: str = users[0]["profile_image_url"]
     user_name: str = users[0]["name"]
     return avatar, user_name

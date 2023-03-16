@@ -1,4 +1,4 @@
-"""Functions for Reddit specific stuff
+"""Functions for Reddit specific stuff.
 
 username_to_link: Change /u/username to clickable link.
 subreddit_to_link: Change /r/subreddit to clickable link.
@@ -26,8 +26,8 @@ def username_to_link(text: str) -> str:
         text,
         flags=re.MULTILINE,
     )
-    settings.logger.debug(f"username_to_link() - Text before: {text}")
-    settings.logger.debug(f"username_to_link() - Text after: {regex}")
+    settings.logger.debug("username_to_link() - Text before: %s", text)
+    settings.logger.debug("username_to_link() - Text after: %s", regex)
     return regex
 
 
@@ -51,6 +51,6 @@ def subreddit_to_link(text: str) -> str:
         text,
         flags=re.MULTILINE,
     )
-    settings.logger.debug(f"subreddit_to_link() - Text before: {text}")
-    settings.logger.debug(f"subreddit_to_link() - Text after: {regex}")
+    settings.logger.debug("subreddit_to_link() - Text before: %s", text)
+    settings.logger.debug("subreddit_to_link() - Text after: %s", regex)
     return regex

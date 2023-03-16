@@ -1,4 +1,4 @@
-""" Discord webhook stuff
+"""Discord webhook stuff.
 
 send_embed_webhook - Send an embed to Discord webhook.
 send_normal_webhook - Send a normal message to Discord webhook. We use this for sending errors.
@@ -17,15 +17,17 @@ def customize_footer(embed: DiscordEmbed) -> DiscordEmbed:
     footer_text: str = settings.webhook_footer_text
 
     if footer_icon and footer_text:
-        settings.logger.debug(f"User has customized the footer icon: {footer_icon} and footer text: {footer_text}")
+        settings.logger.debug(
+            "User has customized the footer icon: %s and footer text: %s" % (footer_icon, footer_text),
+        )
         embed.set_footer(icon_url=footer_icon, text=footer_text)
 
     elif footer_icon:
-        settings.logger.debug(f"User has customized the footer icon: {footer_icon}")
+        settings.logger.debug("User has customized the footer icon: %s", footer_icon)
         embed.set_footer(icon_url=footer_icon)
 
     elif footer_text:
-        settings.logger.debug(f"User has customized the footer text: {footer_text}")
+        settings.logger.debug("User has customized the footer text: %s", footer_text)
         embed.set_footer(text=footer_text)
     return embed
 
@@ -35,8 +37,8 @@ def send_embed_webhook(
     media_links: list[str],
     text: str,
     twitter_card_image: str,
-    avatar_url: str,  # type: ignore
-    screen_name: str,  # type: ignore
+    avatar_url: str,
+    screen_name: str,
     webhook: str,
 ) -> None:
     """Send an embed to Discord webhook.
@@ -52,15 +54,15 @@ def send_embed_webhook(
     """
     tweet_url: str = f"https://twitter.com/i/web/status/{tweet_id}"
 
-    settings.logger.debug(f"send_normal_webhook() - Tweet ID: {tweet_id}")
-    settings.logger.debug(f"send_normal_webhook() - Text: {text}")
-    settings.logger.debug(f"send_normal_webhook() - Twitter card image: {twitter_card_image}")
-    settings.logger.debug(f"send_normal_webhook() - Avatar URL: {avatar_url}")
-    settings.logger.debug(f"send_normal_webhook() - Screen name: {screen_name}")
-    settings.logger.debug(f"send_normal_webhook() - Webhook URL: {webhook}")
-    settings.logger.debug(f"send_normal_webhook() - Tweet URL: {tweet_url}")
-    for media_link in media_links:
-        settings.logger.debug(f"send_normal_webhook() - Media link: {media_link}")
+    settings.logger.debug("send_normal_webhook() - Tweet ID: %s", tweet_id)
+    settings.logger.debug("send_normal_webhook() - Text: %s", text)
+    settings.logger.debug("send_normal_webhook() - Twitter card image: %s", twitter_card_image)
+    settings.logger.debug("send_normal_webhook() - Avatar URL: %s", avatar_url)
+    settings.logger.debug("send_normal_webhook() - Screen name: %s", screen_name)
+    settings.logger.debug("send_normal_webhook() - Webhook URL: %s", webhook)
+    settings.logger.debug("send_normal_webhook() - Tweet URL: %s", tweet_url)
+    for _media_link in media_links:
+        settings.logger.debug("send_normal_webhook() - Media link: %s", _media_link)
 
     if not webhook:
         settings.logger.error("No webhook URL found")
@@ -77,29 +79,29 @@ def send_embed_webhook(
         embed.set_image(url=embed_image)
 
     if settings.webhook_author_icon:
-        settings.logger.debug(f"User has customized the author icon: {settings.webhook_author_icon}")
-        avatar_url: str = settings.webhook_author_icon
+        settings.logger.debug("User has customized the author icon: %s", settings.webhook_author_icon)
+        avatar_url = settings.webhook_author_icon
 
     if settings.webhook_author_name:
-        settings.logger.debug(f"User has customized the author name: {settings.webhook_author_name}")
-        screen_name: str = settings.webhook_author_name
+        settings.logger.debug("User has customized the author name: %s", settings.webhook_author_name)
+        screen_name = settings.webhook_author_name
 
     if settings.webhook_author_url:
-        settings.logger.debug(f"User has customized the author url: {settings.webhook_author_url}")
+        settings.logger.debug("User has customized the author url: %s", settings.webhook_author_url)
         tweet_url = settings.webhook_author_url
 
     embed.set_author(icon_url=avatar_url, name=screen_name, url=tweet_url)
 
     if webhook_image := settings.webhook_image:
-        settings.logger.debug(f"User has customized the embedded image: {webhook_image}")
+        settings.logger.debug("User has customized the embedded image: %s", webhook_image)
         embed.set_image(url=webhook_image)
 
     if thumbnail := settings.webhook_thumbnail:
-        settings.logger.debug(f"User has customized the thumbnail: {thumbnail}")
+        settings.logger.debug("User has customized the thumbnail: %s", thumbnail)
         embed.set_thumbnail(url=thumbnail)
 
     if show_timestamp := settings.webhook_show_timestamp:
-        settings.logger.debug(f"User has customized the timestamp: {show_timestamp}")
+        settings.logger.debug("User has customized the timestamp: %s", show_timestamp)
         embed.set_timestamp()
 
     embed = customize_footer(embed)
@@ -109,12 +111,12 @@ def send_embed_webhook(
 
     response: requests.Response = hook.execute()
     if response.ok:
-        settings.logger.info(f"Webhook posted for tweet https://twitter.com/i/web/status/{tweet_id}")
-        settings.logger.debug(f"Webhook response: {response!r}")
+        settings.logger.info("Webhook posted for tweet https://twitter.com/i/web/status/%s", tweet_id)
+        settings.logger.debug("Webhook response: %s", response.text)
     else:
-        settings.logger.error(f"Got {response.status_code!r} from {webhook!r}")
-        settings.logger.error(f"Response: {response.text!r}")
-        send_error_webhook(f"Got {response.status_code!r} from {webhook!r}")
+        settings.logger.error("Got %s from %s" % (response.status_code, webhook))
+        settings.logger.error("Response: %s", response.text)
+        send_error_webhook(f"Got {response.status_code} from {webhook}")
 
 
 def get_embed_image(media_links, tweet_id) -> str:
@@ -129,7 +131,7 @@ def get_embed_image(media_links, tweet_id) -> str:
     """
     embed_image: str = ""
 
-    settings.logger.debug(f"get_embed_image() - media_links {media_links!r}")
+    settings.logger.debug("get_embed_image() - media_links %s", media_links)
     if len(media_links):
         if len(media_links) == 1:
             embed_image = media_links[0]
@@ -137,26 +139,32 @@ def get_embed_image(media_links, tweet_id) -> str:
         elif len(media_links) > 1:
             # Send images to twitter-image-collage-maker
             # (e.g https://twitter.lovinator.space/) and get a collage back.
-            response: requests.Response = requests.get(url=settings.collage_maker_url, params={"tweet_id": tweet_id})
+            response: requests.Response = requests.get(
+                url=settings.collage_maker_url,
+                params={"tweet_id": tweet_id},
+                timeout=5,
+            )
 
             if response.ok:
                 json_data = json.loads(response.text)
-                settings.logger.debug(f"JSON data from twitter-image-collage-maker: {json_data}")
+                settings.logger.debug("JSON data from twitter-image-collage-maker: %s", json_data)
                 embed_image = json_data["url"]
 
                 # Check if image exists
-                if_exists: requests.Response = requests.head(url=embed_image)
+                if_exists: requests.Response = requests.head(url=embed_image, timeout=5)
                 if if_exists.ok:
-                    settings.logger.debug(f"Image {embed_image!r} exists")
+                    settings.logger.debug("Image %s exists", embed_image)
                 else:
-                    settings.logger.error(f"Image {embed_image!r} does not exist")
+                    settings.logger.error("Image %s does not exist", embed_image)
                     send_error_webhook(
-                        f"Image {embed_image!r} does not exist, but that is the URL we got from "
-                        f"{settings.collage_maker_url}. It looks like the collage maker is broken."
+                        (
+                            f"Image {embed_image} does not exist, but that is the URL we got from "
+                            f"{settings.collage_maker_url}. It looks like the collage maker is broken."
+                        ),
                     )
                     embed_image = media_links[0]
             else:
-                error_msg: str = f"Got {response.status_code!r} from {settings.collage_maker_url!r} for tweet {tweet_id!r}"  # noqa: E501
+                error_msg: str = f"Got {response.status_code} from {settings.collage_maker_url} for tweet {tweet_id}"
                 settings.logger.error(error_msg)
                 embed_image = media_links[0]
                 send_error_webhook(error_msg)
@@ -182,22 +190,22 @@ def _send_webhook(message: str, webhook: str, func_name: str) -> None:
         webhook: Webhook URL.
         func_name: Name of the function that called this function. Used for logging.
     """
-    settings.logger.debug(f"{func_name} - Message: {message}")
-    settings.logger.debug(f"{func_name} - Webhook URL: {webhook}")
+    settings.logger.debug("%s - Message: %s" % (func_name, message))
+    settings.logger.debug("%s - Webhook URL: %s" % (func_name, webhook))
 
     if not webhook:
         settings.logger.error("No webhook URL found")
-        send_error_webhook(f"No webhook URL found. Trying to send {message!r}")
+        send_error_webhook(f"No webhook URL found. Trying to send {message}")
         return
 
     hook: DiscordWebhook = DiscordWebhook(url=webhook, content=message, rate_limit_retry=True)
     response: requests.Response = hook.execute()
     if response.ok:
-        settings.logger.debug(f"Webhook response: {response!r}")
+        settings.logger.debug("Webhook response: %s", response.text)
     else:
-        settings.logger.error(f"Got {response.status_code!r} from {webhook!r}")
-        settings.logger.error(f"Response: {response.text!r}")
-        send_error_webhook(f"Got {response.status_code!r} from {webhook!r}")
+        settings.logger.error("Got %s from %s" % (response.status_code, webhook))
+        settings.logger.error("Response: %s" % response.text)
+        send_error_webhook(f"Got {response.status_code} from {webhook}")
 
 
 def send_error_webhook(msg: str, webhook: str = settings.error_webhook) -> None:
@@ -207,7 +215,7 @@ def send_error_webhook(msg: str, webhook: str = settings.error_webhook) -> None:
         msg: Message to send
         webhook: Webhook URL. Defaults to environment variable ERROR_WEBHOOK.
     """
-    settings.logger.error(f"Got an error: {msg}")
+    settings.logger.error("Got an error: %s", msg)
 
     if settings.send_errors == "True":
         _send_webhook(message=msg, webhook=webhook, func_name="send_error_webhook()")

@@ -30,14 +30,13 @@ def username_with_link(text: str) -> str:
         text,
     )
 
-    settings.logger.debug(f"username_with_link() - Text before: {text}")
-    settings.logger.debug(f"username_with_link() - Text after: {regex}")
+    settings.logger.debug("username_with_link() - Text before: %s", text)
+    settings.logger.debug("username_with_link() - Text after: %s", regex)
     return regex
 
 
 def tco_url_link_with_real_link(entities: dict, text: str) -> str:
-    """Replace the t.co url with the real url so users know where the
-    link goes to.
+    """Replace the t.co url with the real url so users know where the link goes to.
 
     Before: https://t.co/1YC2hc8iUq
 
@@ -61,7 +60,7 @@ def tco_url_link_with_real_link(entities: dict, text: str) -> str:
         # Replace the old URL with the new URL.
         replaced_text: str = text.replace(old_url, new_url)
 
-    settings.logger.debug(f"tco_url_link_with_real_link: {replaced_text}")
+    settings.logger.debug("tco_url_link_with_real_link: %s", replaced_text)
     return replaced_text
 
 
@@ -84,6 +83,6 @@ def hashtag_with_link(text: str) -> str:
         text,
     )
 
-    settings.logger.debug(f"hashtag_with_link() - Text before: {text}")
-    settings.logger.debug(f"hashtag_with_link() - Text after: {regex}")
+    settings.logger.debug("hashtag_with_link() - Text before: %s", text)
+    settings.logger.debug("hashtag_with_link() - Text after: %s", regex)
     return regex

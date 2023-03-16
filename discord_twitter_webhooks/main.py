@@ -1,13 +1,22 @@
 import html
 import sys
-from typing import Any, Dict, List
+from typing import Any
 
 from tweepy.streaming import StreamingClient, StreamResponse
 
 from discord_twitter_webhooks import get, reddit, remove, replace, settings
-from discord_twitter_webhooks.get import get_avatar_and_username, get_entities, get_text, get_webhook_url
+from discord_twitter_webhooks.get import (
+    get_avatar_and_username,
+    get_entities,
+    get_text,
+    get_webhook_url,
+)
 from discord_twitter_webhooks.rules import delete_old_rules, new_rule
-from discord_twitter_webhooks.send_webhook import send_embed_webhook, send_error_webhook, send_normal_webhook
+from discord_twitter_webhooks.send_webhook import (
+    send_embed_webhook,
+    send_error_webhook,
+    send_normal_webhook,
+)
 from discord_twitter_webhooks.settings import (
     disable_remove_copyright_symbols,
     disable_remove_discord_link_previews,
@@ -34,7 +43,7 @@ rule_ids = {}
 
 def main(response: StreamResponse) -> None:
     """The main function for the bot. This is where the magic happens."""
-    settings.logger.debug(f"Response: {response}")
+    settings.logger.debug("Response: %s", response)
 
     twitter_card_image: str = ""
     media_links: list[str] = []
@@ -46,22 +55,21 @@ def main(response: StreamResponse) -> None:
     data = response.data
 
     if response.includes:
-        includes: Dict[str, List[Any]] = response.includes
+        includes: dict[str, list[Any]] = response.includes
         if "media" in includes:
             media_list: list[dict] = [media.data for media in response.includes["media"]]
-            settings.logger.debug(f"Media list: {media_list}")
+            settings.logger.debug("Media list: %s", media_list)
 
             # Get the images from the tweet and remove the URLs from the text.
             media_links = get.media_links(media_list)
 
-    if entities := get_entities(response):
-        if "urls" in entities:
-            text = remove.remove_media_links(entities, text)
-            twitter_card_image = get.meta_image(entities)
+    if (entities := get_entities(response)) and "urls" in entities:
+        text = remove.remove_media_links(entities, text)
+        twitter_card_image = get.meta_image(entities)
 
-            if disable_remove_tco_links != "True":
-                # Replace Twitters shortened URLs with the original URL.
-                text = replace.tco_url_link_with_real_link(entities, text)
+        if disable_remove_tco_links != "True":
+            # Replace Twitters shortened URLs with the original URL.
+            text = replace.tco_url_link_with_real_link(entities, text)
 
     if disable_unescape_text != "True":
         # We coverts &gt; and &lt; to > and < to make the text look nicer.
@@ -115,16 +123,14 @@ def main(response: StreamResponse) -> None:
 
 
 class MyStreamListener(StreamingClient):
-    """https://docs.tweepy.org/en/latest/streaming.html#using-streamingclient
+    """https://docs.tweepy.org/en/latest/streaming.html#using-streamingclient.
 
     Stream tweets in realtime.
     """
 
     def on_exception(self, exception: Exception) -> None:
         """An unhandled exception was raised while streaming. Shutting down."""
-        error_msg: str = (
-            f"discord-twitter-webhooks: An unhandled exception was raised while streaming. Shutting down\nException: {exception!r}"  # noqa: E501
-        )
+        error_msg: str = f"discord-twitter-webhooks: An unhandled exception was raised while streaming. Shutting down\nException: {exception!r}"  # noqa: E501
         send_error_webhook(error_msg)
 
         self.disconnect()
@@ -149,20 +155,22 @@ def start() -> None:
     delete_old_rules(stream=stream)
 
     # Create the rules
-    rules = settings.rules
+    rules: dict[int, str] = settings.rules
     for rule_num in rules:
         rule: str = str(rules[rule_num])
         rule_id: str = new_rule(stream=stream, rule=rule, rule_tag=f"rule{rule_num}")
-        settings.logger.info(f"Rule {rule_id!r} added to Twitter.com")
+        settings.logger.info("Rule %s added to Twitter.com", rule_id)
         rule_ids[rule_num] = {rule_id}
 
-    settings.logger.debug(f"Rule IDs: {rule_ids}")
+    settings.logger.debug("Rule IDs: %s", rule_ids)
 
     # TODO: dry_run before to make sure everything works?
     try:
         settings.logger.info(
-            "Starting stream! (Press CTRL+C to stop, it will take 20 seconds to stop, because we have"
-            " to wait for the next signal to be sent from the Twitter API)"
+            (
+                "Starting stream! (Press CTRL+C to stop, it will take 20 seconds to stop, because we have"
+                " to wait for the next signal to be sent from the Twitter API)"
+            ),
         )
         stream.filter(
             expansions=[

@@ -1,10 +1,10 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from discord_twitter_webhooks.replace import hashtag_with_link, tco_url_link_with_real_link, username_with_link
 
 
 class TestReplace:
-    """Test things from discord_twitter_webhooks/replace.py"""
+    """Test things from discord_twitter_webhooks/replace.py."""
 
     hello_txt: str = "Hello @TheLovinator1 #Hello /u/test /r/aww"
     hello2_txt: str = "/r/hello r/hello hello/r/hello /u/hello u/hello hello/u/hello"
@@ -23,7 +23,7 @@ class TestReplace:
 
     def test_tco_url_link_with_real_link(self) -> None:
         """Test if the t.co url is replaced with the real url."""
-        entities: Dict[str, List[Dict[str, Any]]] = {
+        entities: dict[str, list[dict[str, Any]]] = {
             "urls": [
                 {
                     "start": 18,
@@ -57,7 +57,7 @@ class TestReplace:
                     "display_url": "pic.twitter.com/x5R5a8MWYW",
                     "media_key": "3_1556986120512192514",
                 },
-            ]
+            ],
         }
         assert (
             tco_url_link_with_real_link(entities, "Hello https://t.co/x5R5a8MWYW")

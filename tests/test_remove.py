@@ -1,10 +1,12 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from discord_twitter_webhooks.remove import copyright_symbols, discord_link_previews, remove_media_links, utm_source
 
+# ruff: noqa: ANN101
+
 
 class TestRemove:
-    """Test things from discord_twitter_webhooks/remove.py"""
+    """Test things from discord_twitter_webhooks/remove.py."""
 
     hello_txt: str = "Hello @TheLovinator1 #Hello /u/test /r/aww"
     hello2_txt: str = "/r/hello r/hello hello/r/hello /u/hello u/hello hello/u/hello"
@@ -12,15 +14,14 @@ class TestRemove:
     short: str = "Hello I am short Sadge"
 
     def test_discord_link_previews(self) -> None:
-        """Test if the discord link previews are removed, aka < and >
-        are added."""
+        """Test if the discord link previews are removed, aka < and > are added."""
         before: str = "https://pbs.twimg.com/tweet_video_thumb/E6daSHUX0AYR9ap.jpg"
         after: str = "<https://pbs.twimg.com/tweet_video_thumb/E6daSHUX0AYR9ap.jpg>"
         assert discord_link_previews(before) == after
 
     def test_utm_source(self) -> None:
         """Test if the utm source is removed."""
-        before: str = "https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter"  # noqa
+        before: str = "https://store.steampowered.com/app/457140/Oxygen_Not_Included/?utm_source=Steam&utm_campaign=Sale&utm_medium=Twitter"  # noqa: E501
         after: str = "https://store.steampowered.com/app/457140/Oxygen_Not_Included/"
         assert utm_source(before) == after
 
@@ -32,7 +33,7 @@ class TestRemove:
 
     def test_remove_media_links(self) -> None:
         """Test if the media links are removed."""
-        entities: Dict[str, List[Dict[str, Any]]] = {
+        entities: dict[str, list[dict[str, Any]]] = {
             "urls": [
                 {
                     "start": 18,
@@ -66,6 +67,9 @@ class TestRemove:
                     "display_url": "pic.twitter.com/x5R5a8MWYW",
                     "media_key": "3_1556986120512192514",
                 },
-            ]
+            ],
         }
-        assert remove_media_links(entities=entities, text="fs fsf fa fafa af https://t.co/x5R5a8MWYW") == "fs fsf fa fafa af "  # noqa
+        assert (
+            remove_media_links(entities=entities, text="fs fsf fa fafa af https://t.co/x5R5a8MWYW")
+            == "fs fsf fa fafa af "
+        )
