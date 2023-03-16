@@ -69,7 +69,8 @@ def send_embed_webhook(
         send_error_webhook(f"No webhook URL found. Trying to send tweet embed for {tweet_id}")
         return
 
-    hook: DiscordWebhook = DiscordWebhook(url=webhook, rate_limit_retry=True)
+    # We will add the webhook when we send it. This is so we can have several webhooks for each tweet.
+    hook: DiscordWebhook = DiscordWebhook(url="", rate_limit_retry=True)
     embed: DiscordEmbed = DiscordEmbed(description=text)
 
     if twitter_card_image:
@@ -109,14 +110,20 @@ def send_embed_webhook(
     # Add embed to webhook.
     hook.add_embed(embed)
 
-    response: requests.Response = hook.execute()
-    if response.ok:
-        settings.logger.info("Webhook posted for tweet https://twitter.com/i/web/status/%s", tweet_id)
-        settings.logger.debug("Webhook response: %s", response.text)
-    else:
-        settings.logger.error("Got %s from %s" % (response.status_code, webhook))
-        settings.logger.error("Response: %s", response.text)
-        send_error_webhook(f"Got {response.status_code} from {webhook}")
+    # Split the webhook URL into a list if it contains multiple webhooks.
+    webhook_list: list[str] = webhook.split(",")
+    for _webhook in webhook_list:
+        settings.logger.debug("Webhook URL: %s", _webhook)
+        hook.url = _webhook
+        response: requests.Response = hook.execute()
+
+        if response.ok:
+            settings.logger.info("Webhook posted for tweet https://twitter.com/i/web/status/%s", tweet_id)
+            settings.logger.debug("Webhook response: %s", response.text)
+        else:
+            settings.logger.error("Got %s from %s" % (response.status_code, webhook))
+            settings.logger.error("Response: %s", response.text)
+            send_error_webhook(f"Got {response.status_code} from {webhook}")
 
 
 def get_embed_image(media_links, tweet_id) -> str:
@@ -198,14 +205,18 @@ def _send_webhook(message: str, webhook: str, func_name: str) -> None:
         send_error_webhook(f"No webhook URL found. Trying to send {message}")
         return
 
-    hook: DiscordWebhook = DiscordWebhook(url=webhook, content=message, rate_limit_retry=True)
-    response: requests.Response = hook.execute()
-    if response.ok:
-        settings.logger.debug("Webhook response: %s", response.text)
-    else:
-        settings.logger.error("Got %s from %s" % (response.status_code, webhook))
-        settings.logger.error("Response: %s" % response.text)
-        send_error_webhook(f"Got {response.status_code} from {webhook}")
+    webhook_list: list[str] = webhook.split(",")
+    for _webhook in webhook_list:
+        settings.logger.debug("Webhook URL: %s", _webhook)
+        hook: DiscordWebhook = DiscordWebhook(url=_webhook, content=message, rate_limit_retry=True)
+
+        response: requests.Response = hook.execute()
+        if response.ok:
+            settings.logger.debug("Webhook response: %s", response.text)
+        else:
+            settings.logger.error("Got %s from %s" % (response.status_code, webhook))
+            settings.logger.error("Response: %s" % response.text)
+            send_error_webhook(f"Got {response.status_code} from {webhook}")
 
 
 def send_error_webhook(msg: str, webhook: str = settings.error_webhook) -> None:

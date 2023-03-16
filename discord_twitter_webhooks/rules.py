@@ -58,8 +58,8 @@ def new_rule(rule: str, rule_tag: str, stream: StreamingClient) -> str:
                 if error["title"] == "DuplicateRule":
                     settings.logger.error(
                         "\nRule already exists '%s'. Each rule must be unique, if you want to send the same rule to two"
-                        " different servers you can append another rule to the webhook by typing ;second_webhook"
-                        % rule,
+                        " different servers you can append another rule to the webhook by typing"
+                        " first_webhook,second_webhook" % rule,
                     )
                     sys.exit("Rule already exists.")
                 if error:

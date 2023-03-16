@@ -9,19 +9,19 @@ class TestReplace:
     hello_txt: str = "Hello @TheLovinator1 #Hello /u/test /r/aww"
     hello2_txt: str = "/r/hello r/hello hello/r/hello /u/hello u/hello hello/u/hello"
 
-    def test_username_with_link(self) -> None:
+    def test_username_with_link(self) -> None:  # noqa: ANN101
         """Test if the username is replaced with a link."""
         text: str = self.hello_txt
         after: str = "Hello [@TheLovinator1](https://twitter.com/TheLovinator1) #Hello /u/test /r/aww"
         assert username_with_link(text) == after
 
-    def test_hashtag_with_link(self) -> None:
+    def test_hashtag_with_link(self) -> None:  # noqa: ANN101
         """Test if the hashtag is replaced with a link."""
         text: str = self.hello_txt
         after: str = "Hello @TheLovinator1 [#Hello](https://twitter.com/hashtag/Hello) /u/test /r/aww"
         assert hashtag_with_link(text) == after
 
-    def test_tco_url_link_with_real_link(self) -> None:
+    def test_tco_url_link_with_real_link(self) -> None:  # noqa: ANN101
         """Test if the t.co url is replaced with the real url."""
         entities: dict[str, list[dict[str, Any]]] = {
             "urls": [
@@ -64,7 +64,7 @@ class TestReplace:
             == "Hello https://twitter.com/Bot2Lovi/status/1556986132813971458/photo/1"
         )
 
-    def test_mastodon_links(self) -> None:
+    def test_mastodon_links(self) -> None:  # noqa: ANN101
         link: str = "https://mastodon.gamedev.place/@eloraam?hello#something"
         link_and_twitter: str = "https://mastodon.gamedev.place/@eloraam?hello#something @eloraam #Hello"
         assert username_with_link(link) == link

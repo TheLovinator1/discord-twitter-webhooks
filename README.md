@@ -91,8 +91,8 @@ Note: You will need to run `poetry install` again if [poetry.lock](poetry.lock) 
 ## Rules
 
 More information about the rules can be found in
-the [Twitter Documentation](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule)
-.
+the [Twitter Documentation](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule).
+
 Operator (AND, OR, NOT) examples can be found [here](rule-operators.md).
 
 ### Get everything from a user
