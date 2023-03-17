@@ -130,20 +130,41 @@ def get_webhook_url(response: StreamResponse) -> str:
 
 
 def get_webhook_from_tag(matching_rules: list[StreamRule]) -> str:
-    tag: str = matching_rules[0].tag
+    our_webhooks: str = ""
+    for rules in matching_rules:
+        tag: str = rules.tag
 
-    # Get the number from the tag
-    m: re.Match[str] | None = re.search(r"\d+$", tag)  # Get digits at the end of the string
-    tag_number: int | None = int(m.group()) if m else None
-    if tag_number is None:
-        settings.logger.error(
-            "I couldn't figure out what %s was when parsing %s. Contact TheLovinator if this should work."
-            % (tag_number, tag),
-        )
-    settings.logger.debug("tag_number: %s for tag: %s", tag_number, tag)
-    if tag_number is None:
-        settings.logger.error("tag_number is None")
-    return settings.webhooks.get(tag_number)  # type: ignore
+        # Get digits at the end of the string
+        m: re.Match[str] | None = re.search(r"\d+$", tag)
+
+        # Convert the string to an int
+        tag_number: int | None = int(m.group()) if m else None
+
+        if tag_number is None:
+            settings.logger.error(
+                "I couldn't figure out what %s was when parsing %s. Contact TheLovinator if this should work."
+                % (tag_number, tag),
+            )
+        settings.logger.debug("tag_number: %s for tag: %s", tag_number, tag)
+
+        if tag_number is not None:
+            webhook: str | None = settings.webhooks.get(tag_number)
+
+            if webhook is None:
+                settings.logger.error("webhook is None")
+
+            # Add the webhook to the list
+            our_webhooks = f"{our_webhooks}{webhook},"
+
+    # Remove the last comma if there is one
+    if our_webhooks[-1] == ",":
+        our_webhooks = our_webhooks[:-1]
+
+    # Convert the string to a list
+    our_webhooks_list: list[str] = our_webhooks.split(",")
+
+    # Remove duplicates and return the list as a string
+    return ",".join(set(our_webhooks_list))
 
 
 def get_text(response: StreamResponse) -> str:

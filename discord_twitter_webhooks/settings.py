@@ -1,7 +1,3 @@
-"""Loading and parsing settings from .env file or environment variables.
-
-If we have both a .env file and environment variables, we will use the environment variables.
-"""
 import logging
 import os
 import re

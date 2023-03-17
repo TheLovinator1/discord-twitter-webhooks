@@ -1,8 +1,3 @@
-"""Discord webhook stuff.
-
-send_embed_webhook - Send an embed to Discord webhook.
-send_normal_webhook - Send a normal message to Discord webhook. We use this for sending errors.
-"""
 import json
 
 import requests

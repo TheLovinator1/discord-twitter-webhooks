@@ -6,20 +6,21 @@ new_rule - Add new rules to Twitter.
 import sys
 
 import tweepy
-from tweepy import StreamingClient, StreamRule
+from tweepy import StreamRule
+from tweepy.asynchronous import AsyncStreamingClient
 
 from discord_twitter_webhooks import settings
 from discord_twitter_webhooks.send_webhook import send_error_webhook
 
 
-def delete_old_rules(stream: StreamingClient) -> None:
+async def delete_old_rules(stream: AsyncStreamingClient) -> None:
     """Check if we have any old rules and delete them if we do.
 
     Args:
         stream: The tweepy stream object
     """
     # Check Twitter app for rules that already have been created.
-    old_rules = stream.get_rules()
+    old_rules = await stream.get_rules()
     settings.logger.debug("Old rules: %s", old_rules)
 
     # Get rules and add to list, so we can delete them later.
@@ -35,12 +36,12 @@ def delete_old_rules(stream: StreamingClient) -> None:
     # If the app already has rules, delete them first before adding our own
     if rules_to_delete:
         settings.logger.debug("Deleting rules: %s", rules_to_delete)
-        stream.delete_rules(rules_to_delete)
+        await stream.delete_rules(rules_to_delete)
     else:
         settings.logger.debug("App had no rules to delete")
 
 
-def new_rule(rule: str, rule_tag: str, stream: StreamingClient) -> str:
+async def new_rule(rule: str, rule_tag: str, stream: AsyncStreamingClient) -> str:
     """Add rule to Twitter. If error, exit.
 
     Args:
@@ -48,10 +49,10 @@ def new_rule(rule: str, rule_tag: str, stream: StreamingClient) -> str:
         rule_tag: The tag label. This is a free-form text you can use to identify the rules.
         stream: The tweepy stream object.
     """
-    settings.logger.debug("Adding rule: %s for stream: %s" % (rule, stream))
+    settings.logger.debug("Adding rule: %s", rule)
     if rule:
         rule_to_add: StreamRule = tweepy.StreamRule(value=rule, tag=rule_tag)
-        rule_response = stream.add_rules(add=rule_to_add)
+        rule_response = await stream.add_rules(add=rule_to_add)
 
         if rule_response.errors:  # type: ignore
             for error in rule_response.errors:  # type: ignore

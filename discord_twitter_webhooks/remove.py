@@ -1,10 +1,3 @@
-"""Remove stuff from the tweet text.
-
-discord_link_previews: Remove the Discord link previews.
-utm_source: Remove the utm_source parameter from the url.
-copyright_symbols: Remove ®, ™ and © symbols.
-remove_media_links: Remove the media links.
-"""
 import re
 
 from discord_twitter_webhooks import settings

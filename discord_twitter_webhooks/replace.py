@@ -1,11 +1,3 @@
-"""Replace stuff in the tweet text.
-
-username_with_link: Replace @username with a link to their Twitter profile.
-tco_url_link_with_real_link: Replace the t.co url with the real url so users know where the
-    link goes to.
-hashtag_with_link: Replace the hashtag with a link to Twitter search.
-"""
-
 import re
 
 from discord_twitter_webhooks import settings

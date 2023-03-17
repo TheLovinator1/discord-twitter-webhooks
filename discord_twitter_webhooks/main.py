@@ -1,8 +1,10 @@
+import asyncio
 import html
 import sys
 from typing import Any
 
-from tweepy.streaming import StreamingClient, StreamResponse
+from tweepy.asynchronous import AsyncStreamingClient
+from tweepy.streaming import StreamResponse
 
 from discord_twitter_webhooks import get, reddit, remove, replace, settings
 from discord_twitter_webhooks.get import (
@@ -122,13 +124,13 @@ def main(response: StreamResponse) -> None:
         )
 
 
-class MyStreamListener(StreamingClient):
+class MyStreamListener(AsyncStreamingClient):
     """https://docs.tweepy.org/en/latest/streaming.html#using-streamingclient.
 
     Stream tweets in realtime.
     """
 
-    def on_exception(self, exception: Exception) -> None:
+    async def on_exception(self, exception: Exception) -> None:  # noqa: ANN101
         """An unhandled exception was raised while streaming. Shutting down."""
         error_msg: str = f"discord-twitter-webhooks: An unhandled exception was raised while streaming. Shutting down\nException: {exception!r}"  # noqa: E501
         send_error_webhook(error_msg)
@@ -136,13 +138,13 @@ class MyStreamListener(StreamingClient):
         self.disconnect()
         sys.exit(error_msg)
 
-    def on_response(self, response: StreamResponse) -> None:
+    async def on_response(self, response: StreamResponse) -> None:  # noqa: ANN101
         """This is called when a response is received."""
         if response.data:
             main(response)
 
 
-def start() -> None:
+async def start() -> None:
     """Authenticate to the Twitter API and start the filter."""
     # TODO: Add proxy support?
     stream: MyStreamListener = MyStreamListener(
@@ -152,13 +154,13 @@ def start() -> None:
 
     # Delete old rules
     # TODO: We should only delete the rules we created and if they are changed.
-    delete_old_rules(stream=stream)
+    await delete_old_rules(stream=stream)
 
     # Create the rules
     rules: dict[int, str] = settings.rules
     for rule_num in rules:
         rule: str = str(rules[rule_num])
-        rule_id: str = new_rule(stream=stream, rule=rule, rule_tag=f"rule{rule_num}")
+        rule_id: str = await new_rule(stream=stream, rule=rule, rule_tag=f"rule{rule_num}")
         settings.logger.info("Rule %s added to Twitter.com", rule_id)
         rule_ids[rule_num] = {rule_id}
 
@@ -166,13 +168,7 @@ def start() -> None:
 
     # TODO: dry_run before to make sure everything works?
     try:
-        settings.logger.info(
-            (
-                "Starting stream! (Press CTRL+C to stop, it will take 20 seconds to stop, because we have"
-                " to wait for the next signal to be sent from the Twitter API)"
-            ),
-        )
-        stream.filter(
+        await stream.filter(
             expansions=[
                 "author_id",
                 "referenced_tweets.id",
@@ -197,11 +193,10 @@ def start() -> None:
                 "profile_image_url",
             ],
         )
-
     except KeyboardInterrupt:
         stream.disconnect()
         sys.exit(0)
 
 
 if __name__ == "__main__":
-    start()
+    asyncio.run(start())
