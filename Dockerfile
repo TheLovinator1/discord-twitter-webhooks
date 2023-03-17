@@ -1,35 +1,41 @@
-FROM python:3.11-slim
 
-# We don't want apt-get to interact with us and we want the default answers to be used for all questions.
-ARG DEBIAN_FRONTEND=noninteractive
+FROM python:3.11-slim as base
 
-# Force the stdout and stderr streams to be unbuffered.
-# Will allow log messages to be immediately dumped instead of being buffered.
-# This is useful when the bot crashes before writing messages stuck in the buffer.
-ENV PYTHONUNBUFFERED 1
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+ENV POETRY_VIRTUALENVS_IN_PROJECT=1
+ENV POETRY_NO_INTERACTION=1
+ENV POETRY_HOME=/opt/poetry
+ENV PYSETUP_PATH=/opt/pysetup
+ENV VENV_PATH="/opt/pysetup/.venv"
+ENV PIP_NO_CACHE_DIR=off
+ENV PIP_DISABLE_PIP_VERSION_CHECK=on
+ENV PIP_DEFAULT_TIMEOUT=100
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONFAULTHANDLER=1
+ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
+ENV PYTHONPATH="${PYTHONPATH}:/discord_twitter_webhooks"
 
-# Update packages and install needed packages to build our requirements.
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc curl
+FROM base as python-deps
 
-# Create user so we don't run as root.
-RUN useradd --create-home botuser
-RUN chown -R botuser:botuser /home/botuser && chmod -R 755 /home/botuser
-USER botuser
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl build-essential
 
-# Install poetry
-RUN curl -sSL https://install.python-poetry.org | python3 -
+RUN --mount=type=cache,target=/root/.cache \
+    curl -sSL https://install.python-poetry.org | python3 -
 
-# Add poetry to our path
-ENV PATH="/home/botuser/.local/bin/:${PATH}"
+WORKDIR $PYSETUP_PATH
+COPY poetry.lock pyproject.toml ./
 
-COPY pyproject.toml poetry.lock README.md LICENSE /home/botuser/discord-twitter-webhooks/
+RUN --mount=type=cache,target=/root/.cache \
+    poetry install --only main
 
-# Change directory to where we will run the bot.
-WORKDIR /home/botuser/discord-twitter-webhooks
+FROM base as runtime
 
-RUN poetry install --no-interaction --no-ansi --no-dev
+# Copy virtual env from python-deps stage
+COPY --from=python-deps $PYSETUP_PATH $PYSETUP_PATH
 
-ADD discord_twitter_webhooks /home/botuser/discord-twitter-webhooks/discord_twitter_webhooks/
+# Copy source code
+COPY discord_twitter_webhooks /discord_twitter_webhooks/
 
-# Run bot.
-CMD [ "poetry", "run", "bot" ]
+CMD [ "python", "/discord_twitter_webhooks/main.py" ]
