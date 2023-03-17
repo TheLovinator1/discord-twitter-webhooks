@@ -52,6 +52,15 @@ Docker Hub: [thelovinator/discord-twitter-webhooks](https://hub.docker.com/r/the
 - You can update the container with `docker-compose pull`
   - You can automate this with [Watchtower](https://github.com/containrrr/watchtower)
       or [Diun](https://github.com/crazy-max/diun)
+- To use this project on ARM64 platform such as Raspberry Pi 4, you need to modify the docker-compose.yml file with the following.  
+  - Change this line ``image: thelovinator/discord-twitter-webhooks`` to      this:  
+  ```
+   build:
+      context: .
+      platforms:
+        - "linux/arm64"
+  ```
+  - And run normally
 
 ### Install directly on your computer
 
