@@ -43,13 +43,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Build and push Docker image
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: thelovinator/discord-twitter-webhooks
-          flavor: latest=${{ github.ref == 'refs/heads/master' }}
+      # Build and push the image to Docker Hub
       - name: Build and push Docker image
         id: build-and-push
         uses: docker/build-push-action@v4
@@ -57,5 +51,4 @@ jobs:
           context: .
           platforms: linux/amd64, linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: thelovinator/discord-twitter-webhooks:latest
