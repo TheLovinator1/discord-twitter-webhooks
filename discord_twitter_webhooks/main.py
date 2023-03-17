@@ -144,7 +144,7 @@ class MyStreamListener(AsyncStreamingClient):
             main(response)
 
 
-async def start() -> None:
+async def start_bot() -> None:
     """Authenticate to the Twitter API and start the filter."""
     # TODO: Add proxy support?
     stream: MyStreamListener = MyStreamListener(
@@ -198,5 +198,10 @@ async def start() -> None:
         sys.exit(0)
 
 
+def start() -> None:
+    """Start the bot."""
+    asyncio.run(start_bot())
+
+
 if __name__ == "__main__":
-    asyncio.run(start())
+    start()
