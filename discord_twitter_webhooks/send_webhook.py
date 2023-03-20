@@ -65,7 +65,7 @@ def send_embed_webhook(
         return
 
     # We will add the webhook when we send it. This is so we can have several webhooks for each tweet.
-    hook: DiscordWebhook = DiscordWebhook(url="", rate_limit_retry=True)
+    hook: DiscordWebhook = DiscordWebhook(url="", avatar_url=avatar_url, rate_limit_retry=True)
     embed: DiscordEmbed = DiscordEmbed(description=text)
 
     if twitter_card_image:
@@ -86,8 +86,6 @@ def send_embed_webhook(
         settings.logger.debug("User has customized the author url: %s", settings.webhook_author_url)
         tweet_url = settings.webhook_author_url
 
-    embed.set_author(icon_url=avatar_url, name=screen_name, url=tweet_url)
-
     if webhook_image := settings.webhook_image:
         settings.logger.debug("User has customized the embedded image: %s", webhook_image)
         embed.set_image(url=webhook_image)
@@ -100,7 +98,12 @@ def send_embed_webhook(
         settings.logger.debug("User has customized the timestamp: %s", show_timestamp)
         embed.set_timestamp()
 
+    # If the user has customized the footer, we will use that instead of the default which is nothing.
     embed = customize_footer(embed)
+
+    # Set name and URL of the embed. This is the blue text at the top of the embed.
+    embed.set_title(title=screen_name)
+    embed.set_url(url=tweet_url)
 
     # Add embed to webhook.
     hook.add_embed(embed)
@@ -221,6 +224,7 @@ def send_error_webhook(msg: str, webhook: str = settings.error_webhook) -> None:
         msg: Message to send
         webhook: Webhook URL. Defaults to environment variable ERROR_WEBHOOK.
     """
+    # TODO: Split webhook into multiple webhooks if it contains multiple webhooks.
     settings.logger.error("Got an error: %s", msg)
 
     if settings.send_errors == "True":
