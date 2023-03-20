@@ -47,7 +47,7 @@ def send_embed_webhook(
         webhook: Webhook URL. Defaults to environment variable WEBHOOK_URL.
         twitter_card_image: Twitter card image from the tweet.
     """
-    tweet_url: str = f"https://twitter.com/i/web/status/{tweet_id}"
+    tweet_url: str = f"https://twitter.com/i/status/{tweet_id}"
 
     settings.logger.debug("send_normal_webhook() - Tweet ID: %s", tweet_id)
     settings.logger.debug("send_normal_webhook() - Text: %s", text)
@@ -113,7 +113,7 @@ def send_embed_webhook(
         response: requests.Response = hook.execute()
 
         if response.ok:
-            settings.logger.info("Webhook posted for tweet https://twitter.com/i/web/status/%s", tweet_id)
+            settings.logger.info("Webhook posted for tweet https://twitter.com/i/status/%s", tweet_id)
             settings.logger.debug("Webhook response: %s", response.text)
         else:
             settings.logger.error("Got %s from %s" % (response.status_code, webhook))
