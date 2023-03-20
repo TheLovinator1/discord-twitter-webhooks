@@ -129,12 +129,11 @@ if webhook_footer_icon:
     logger.info("Note that you have customized webhook_footer_icon to '%s'." % webhook_footer_icon)
 
 
-def str_to_bool(val: str, setting_name: str) -> bool:
+def check_if_timestamp() -> bool:
     """Convert a string to a boolean.
 
     Args:
         val: The string to convert.
-        setting_name: The name of the setting. Used for logging.
 
     Raises:
         ValueError: If the string is not a boolean.
@@ -142,16 +141,11 @@ def str_to_bool(val: str, setting_name: str) -> bool:
     Returns:
         The boolean value.
     """
-    if val.lower() in {"y", "yes", "true", "on", "1", "enable", "enabled"}:
-        logger.info("%s is enabled.", setting_name)
-        return True
-    if val.lower() in {"n", "no", "false", "off", "0", "disable", "disabled"}:
-        logger.debug("%s is disabled.", setting_name)
-    else:
-        logger.warning("%s is not a boolean. Got '%s'. Defaulting to False." % (setting_name, val))
-
-    return False
+    show_timestamp_value: str = os.getenv("SHOW_TIMESTAMP", default="True")
+    if show_timestamp_value.lower() in {"n", "no", "false", "off", "0", "disable", "disabled"}:
+        logger.info("User has disabled timestamps.")
+        return False
+    return True
 
 
-show_timestamp_value: str = os.getenv("SHOW_TIMESTAMP", default="False")
-webhook_show_timestamp: bool = str_to_bool(show_timestamp_value, "SHOW_TIMESTAMP")
+webhook_show_timestamp: bool = check_if_timestamp()
