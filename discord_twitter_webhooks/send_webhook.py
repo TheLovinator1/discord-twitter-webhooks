@@ -84,7 +84,7 @@ def send_embed_webhook(
 
     if settings.use_title:
         # TODO: Truncate title if it's too long.
-        embed.set_title(display_name)
+        embed.set_title(f"{display_name} (@{username})")
 
     if settings.use_author:
         # TODO: Truncate author if it's too long.
