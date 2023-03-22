@@ -71,47 +71,47 @@ def main(response: StreamResponse) -> None:
         text = remove.remove_media_links(entities, text)
         twitter_card_image = get.meta_image(entities)
 
-        if disable_remove_tco_links != "True":
+        if disable_remove_tco_links:
             # Replace Twitters shortened URLs with the original URL.
             text = replace.tco_url_link_with_real_link(entities, text)
 
-    if disable_unescape_text != "True":
+    if disable_unescape_text:
         # We coverts &gt; and &lt; to > and < to make the text look nicer.
         text = html.unescape(text)
 
-    if disable_replace_username != "True":
+    if disable_replace_username:
         # Replace the @mentions with URLs.
         text = replace.username_with_link(text)
 
-    if disable_replace_hashtag != "True":
+    if disable_replace_hashtag:
         # Replace the hashtags with URLs.
         text = replace.hashtag_with_link(text)
 
-    if disable_remove_discord_link_previews != "True":
+    if disable_remove_discord_link_previews:
         # Append < and > to disable Discords link previews.
         text = remove.discord_link_previews(text)
 
-    if disable_replace_subreddit != "True":
+    if disable_replace_subreddit:
         # Change /r/subreddit to the subreddit URL.
         text = reddit.subreddit_to_link(text)
 
-    if disable_replace_reddit_username != "True":
+    if disable_replace_reddit_username:
         # Change /u/username to the user URL.
         text = reddit.username_to_link(text)
 
-    if disable_remove_utm_parameters != "True":
+    if disable_remove_utm_parameters:
         # Remove UTM parameters, this cleans up the URL.
         text = remove.utm_source(text)
 
-    if disable_remove_trailing_whitespace != "True":
+    if disable_remove_trailing_whitespace:
         # Remove trailing whitespace.
         text = text.rstrip()
 
-    if disable_remove_copyright_symbols != "True":
+    if disable_remove_copyright_symbols:
         # Remove copyright symbols.
         text = remove.copyright_symbols(text)
 
-    if no_embed == "True":
+    if no_embed:
         send_normal_webhook(msg=text, webhook=webhook_url)
 
     else:

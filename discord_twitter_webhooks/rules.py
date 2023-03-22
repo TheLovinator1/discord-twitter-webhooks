@@ -75,4 +75,4 @@ async def new_rule(rule: str, rule_tag: str, stream: AsyncStreamingClient) -> st
         settings.logger.debug("Rule data: %s for rule: %s" % (rule_data, rule))
 
         return rule_data[0].id
-    sys.exit("No rule to add")
+    sys.exit("No rule to add. You must add a rule to the config file.")

@@ -12,18 +12,12 @@ def customize_footer(embed: DiscordEmbed) -> DiscordEmbed:
     footer_text: str = settings.webhook_footer_text
 
     if footer_icon and footer_text:
-        settings.logger.debug(
-            "User has customized the footer icon: %s and footer text: %s" % (footer_icon, footer_text),
-        )
         embed.set_footer(icon_url=footer_icon, text=footer_text)
-
     elif footer_icon:
-        settings.logger.debug("User has customized the footer icon: %s", footer_icon)
         embed.set_footer(icon_url=footer_icon)
-
     elif footer_text:
-        settings.logger.debug("User has customized the footer text: %s", footer_text)
         embed.set_footer(text=footer_text)
+
     return embed
 
 
@@ -51,19 +45,8 @@ def send_embed_webhook(
     """
     tweet_url: str = f"https://twitter.com/{username}/status/{tweet_id}"
 
-    settings.logger.debug("send_normal_webhook() - Tweet ID: %s", tweet_id)
-    settings.logger.debug("send_normal_webhook() - Text: %s", text)
-    settings.logger.debug("send_normal_webhook() - Twitter card image: %s", twitter_card_image)
-    settings.logger.debug("send_normal_webhook() - Avatar URL: %s", avatar_url)
-    settings.logger.debug("send_normal_webhook() - Screen name: %s", display_name)
-    settings.logger.debug("send_normal_webhook() - Webhook URL: %s", webhook)
-    settings.logger.debug("send_normal_webhook() - Tweet URL: %s", tweet_url)
-    for _media_link in media_links:
-        settings.logger.debug("send_normal_webhook() - Media link: %s", _media_link)
-
     if not webhook:
-        settings.logger.error("No webhook URL found")
-        send_error_webhook(f"No webhook URL found. Trying to send tweet embed for {tweet_id}")
+        send_error_webhook(f"No webhook URL found. Tried to send tweet embed for {tweet_id}")
         return
 
     # We will add the webhook when we send it. This is so we can have several webhooks for each tweet.
@@ -71,46 +54,44 @@ def send_embed_webhook(
     embed: DiscordEmbed = DiscordEmbed(description=text)
 
     if twitter_card_image:
+        # TODO: Add support for local images.
+        # TODO: Add support for changing the height and width of the image.
         embed.set_image(url=twitter_card_image)
 
     if embed_image := get_embed_image(media_links, tweet_id):
         embed.set_image(url=embed_image)
 
-    if settings.webhook_author_icon:
-        settings.logger.debug("User has customized the author icon: %s", settings.webhook_author_icon)
-        avatar_url = settings.webhook_author_icon
-
-    if settings.webhook_author_name:
-        settings.logger.debug("User has customized the author name: %s", settings.webhook_author_name)
-        display_name = settings.webhook_author_name
-
-    if settings.webhook_author_url:
-        settings.logger.debug("User has customized the author url: %s", settings.webhook_author_url)
-        tweet_url = settings.webhook_author_url
+    avatar_url = settings.webhook_author_icon or avatar_url
+    display_name = settings.webhook_author_name or display_name
+    tweet_url = settings.webhook_author_url or tweet_url
 
     if webhook_image := settings.webhook_image:
-        settings.logger.debug("User has customized the embedded image: %s", webhook_image)
+        # TODO: Add support for local images.
+        # TODO: Add support for changing the height and width of the image.
         embed.set_image(url=webhook_image)
 
     if thumbnail := settings.webhook_thumbnail:
-        settings.logger.debug("User has customized the thumbnail: %s", thumbnail)
+        # TODO: Add support for local images.
+        # TODO: Add support for changing the height and width of the image.
         embed.set_thumbnail(url=thumbnail)
 
-    if show_timestamp := settings.webhook_show_timestamp:
-        settings.logger.debug("User has customized the timestamp: %s", show_timestamp)
+    if settings.webhook_show_timestamp:
         embed.set_timestamp()
 
     # If the user has customized the footer, we will use that instead of the default which is nothing.
     embed = customize_footer(embed)
 
     if settings.use_title:
+        # TODO: Truncate title if it's too long.
         embed.set_title(display_name)
 
-    if settings.use_author.lower() == "true":
-        # Show the tweeters display name, username and avatar on top of the embed. This defaults to True.
+    if settings.use_author:
+        # TODO: Truncate author if it's too long.
+        # TODO: Add support for local images.
         embed.set_author(f"{display_name} (@{username})", url=tweet_url, icon_url=avatar_url)
 
     # Add embed to webhook.
+    # TODO: Check if embed is working before adding it to the webhook.
     hook.add_embed(embed)
 
     # Split the webhook URL into a list if it contains multiple webhooks.
@@ -122,11 +103,8 @@ def send_embed_webhook(
 
         if response.ok:
             settings.logger.info("Webhook posted for tweet https://twitter.com/i/status/%s", tweet_id)
-            settings.logger.debug("Webhook response: %s", response.text)
         else:
-            settings.logger.error("Got %s from %s" % (response.status_code, webhook))
-            settings.logger.error("Response: %s", response.text)
-            send_error_webhook(f"Got {response.status_code} from {webhook}")
+            send_error_webhook(f"Got {response.status_code} from {webhook}. Response: {response.text}")
 
 
 def get_embed_image(media_links, tweet_id) -> str:
@@ -141,7 +119,6 @@ def get_embed_image(media_links, tweet_id) -> str:
     """
     embed_image: str = ""
 
-    settings.logger.debug("get_embed_image() - media_links %s", media_links)
     if len(media_links):
         if len(media_links) == 1:
             embed_image = media_links[0]
@@ -157,15 +134,11 @@ def get_embed_image(media_links, tweet_id) -> str:
 
             if response.ok:
                 json_data = json.loads(response.text)
-                settings.logger.debug("JSON data from twitter-image-collage-maker: %s", json_data)
                 embed_image = json_data["url"]
 
                 # Check if image exists
                 if_exists: requests.Response = requests.head(url=embed_image, timeout=5)
-                if if_exists.ok:
-                    settings.logger.debug("Image %s exists", embed_image)
-                else:
-                    settings.logger.error("Image %s does not exist", embed_image)
+                if not if_exists.ok:
                     send_error_webhook(
                         (
                             f"Image {embed_image} does not exist, but that is the URL we got from "
@@ -175,7 +148,6 @@ def get_embed_image(media_links, tweet_id) -> str:
                     embed_image = media_links[0]
             else:
                 error_msg: str = f"Got {response.status_code} from {settings.collage_maker_url} for tweet {tweet_id}"
-                settings.logger.error(error_msg)
                 embed_image = media_links[0]
                 send_error_webhook(error_msg)
 
@@ -204,7 +176,6 @@ def _send_webhook(message: str, webhook: str, func_name: str) -> None:
     settings.logger.debug("%s - Webhook URL: %s" % (func_name, webhook))
 
     if not webhook:
-        settings.logger.error("No webhook URL found")
         send_error_webhook(f"No webhook URL found. Trying to send {message}")
         return
 
@@ -214,12 +185,8 @@ def _send_webhook(message: str, webhook: str, func_name: str) -> None:
         hook: DiscordWebhook = DiscordWebhook(url=_webhook, content=message, rate_limit_retry=True)
 
         response: requests.Response = hook.execute()
-        if response.ok:
-            settings.logger.debug("Webhook response: %s", response.text)
-        else:
-            settings.logger.error("Got %s from %s" % (response.status_code, webhook))
-            settings.logger.error("Response: %s" % response.text)
-            send_error_webhook(f"Got {response.status_code} from {webhook}")
+        if not response.ok:
+            send_error_webhook(f"Got {response.status_code} from {webhook}, response: {response.text}")
 
 
 def send_error_webhook(msg: str, webhook: str = settings.error_webhook) -> None:
