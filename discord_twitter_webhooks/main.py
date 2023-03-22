@@ -174,7 +174,6 @@ async def start_bot() -> None:
     for rule_num in rules:
         rule: str = str(rules[rule_num])
         rule_id: str = await new_rule(stream=stream, rule=rule, rule_tag=f"rule{rule_num}")
-        logger.info("Rule {} added to Twitter.com", rule_id)
         rule_ids[rule_num] = {rule_id}
 
     logger.debug("Rule IDs: {}", rule_ids)

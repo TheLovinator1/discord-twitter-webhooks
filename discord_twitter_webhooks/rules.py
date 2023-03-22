@@ -49,7 +49,7 @@ async def new_rule(rule: str, rule_tag: str, stream: AsyncStreamingClient) -> st
         rule_tag: The tag label. This is a free-form text you can use to identify the rules.
         stream: The tweepy stream object.
     """
-    logger.debug("Adding rule: {}", rule)
+    logger.info("Adding rule: {} to Twitter", rule)
     if rule:
         rule_to_add: StreamRule = tweepy.StreamRule(value=rule, tag=rule_tag)
         rule_response = await stream.add_rules(add=rule_to_add)

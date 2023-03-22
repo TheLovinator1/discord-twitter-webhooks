@@ -61,7 +61,7 @@ def get_setting_value(setting_name: str, default_value: bool) -> bool:
     if env_var.lower() in {"y", "yes", "true", "on", "1", "enable", "enabled"}:
         logger.debug("'{}' is set to '{}', enabling.", setting_name, env_var)
         return True
-    logger.error(
+    logger.debug(
         "Failed to get a valid value for '{}' which is set to '{}'. Defaulting to '{}'.",
         setting_name,
         env_var,
@@ -113,7 +113,10 @@ def get_error_webhook() -> str:
         str: The error webhook. Defaults to "".
     """
     # Only get the error webhook if we should send errors.
-    return os.getenv("ERROR_WEBHOOK", default="") if get_send_errors() else ""
+    value: str = os.getenv("ERROR_WEBHOOK", default="")
+    if not get_setting_value(setting_name="SEND_ERRORS", default_value=False):
+        logger.warning("SEND_ERRORS is set to False, but ERROR_WEBHOOK is set to '{}'.", value)
+    return value
 
 
 def get_webhook_author_name() -> str:
@@ -182,8 +185,15 @@ def get_webhook_footer_icon() -> str:
         str: The webhook footer icon. Defaults to "". If WEBHOOK_FOOTER_TEXT is not set, this will also return "".
     """
     # TODO: Check if valid url.
-    footer_text: str = os.getenv("WEBHOOK_FOOTER_TEXT", default="")
-    return os.getenv("WEBHOOK_FOOTER_ICON", default="") if footer_text else ""
+    value: str = os.getenv("WEBHOOK_FOOTER_ICON", default="")
+    if value and not os.getenv("WEBHOOK_FOOTER_TEXT", default=""):
+        logger.warning(
+            (
+                "WEBHOOK_FOOTER_ICON is set, but WEBHOOK_FOOTER_TEXT is not. I think you need to enable this to show"
+                " the icon."
+            ),
+        )
+    return value
 
 
 def get_show_timestamp() -> bool:
@@ -210,12 +220,13 @@ def get_make_text_link() -> bool:
     Returns:
         bool: The value of the setting. Defaults to False.
     """
-    if not get_no_embed():
+    value: bool = get_setting_value(setting_name="MAKE_TEXT_LINK", default_value=False)
+    if value and not get_no_embed():
         logger.warning(
             "You need to set NO_EMBED to True to use MAKE_TEXT_LINK. Defaulting to False.",
         )
         return False
-    return get_setting_value(setting_name="MAKE_TEXT_LINK", default_value=False)
+    return value
 
 
 def get_make_text_link_twitter_embed() -> bool:
@@ -224,12 +235,14 @@ def get_make_text_link_twitter_embed() -> bool:
     Returns:
         bool: The value of the setting. Defaults to False.
     """
-    if not get_no_embed():
+    value: bool = get_setting_value(setting_name="MAKE_TEXT_LINK_TWITTER_EMBED", default_value=False)
+    if value and not get_no_embed():
         logger.warning(
             "You need to set NO_EMBED to True to use MAKE_TEXT_LINK_TWITTER_EMBED. Defaulting to False.",
         )
         return False
-    return get_setting_value(setting_name="MAKE_TEXT_LINK_TWITTER_EMBED", default_value=False)
+
+    return value
 
 
 def get_make_text_link_url() -> str:
@@ -238,18 +251,19 @@ def get_make_text_link_url() -> str:
     Returns:
         str: The value of the setting. If it is "" it will default to "https://twitter.com/{username}/web/status/{tweet_id}".
     """  # noqa: E501
-    if not get_make_text_link():
-        logger.warning(
-            "You need to set MAKE_TEXT_LINK to True to use MAKE_TEXT_LINK_URL. Defaulting to tweet URL.",
-        )
-        return ""
-
-    if not get_no_embed():
-        logger.warning(
-            "You need to set NO_EMBED to True to use MAKE_TEXT_LINK.",
-        )
-        return ""
-    return os.getenv("MAKE_TEXT_LINK_URL", default="")
+    value: str = os.getenv("MAKE_TEXT_LINK_URL", default="")
+    if value:
+        if not get_make_text_link():
+            logger.warning(
+                "You need to set MAKE_TEXT_LINK to True to use MAKE_TEXT_LINK_URL. Defaulting to tweet URL.",
+            )
+            return ""
+        if not get_no_embed():
+            logger.warning(
+                "You need to set NO_EMBED to True to use MAKE_TEXT_LINK.",
+            )
+            return ""
+    return value
 
 
 def get_use_title() -> bool:
