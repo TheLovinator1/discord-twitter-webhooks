@@ -101,6 +101,16 @@ webhook_footer_icon: str = os.getenv("WEBHOOK_FOOTER_ICON", default="")
 # Only send the text
 no_embed: str = os.getenv("NO_EMBED", default="")
 
+# Set the embed title to the tweeter's name
+use_title: str = os.getenv("USE_TITLE", default="")
+
+# Set the embed author to the tweeter's name
+use_author: str = os.getenv("USE_AUTHOR", default="True")
+
+if (use_author.lower() == "false" or use_author == "") and not use_title:  # noqa: PLC1901
+    logger.warning("USE_AUTHOR is set to False but USE_TITLE is not set to True. USE_TITLE will be set to True.")
+    use_title = "True"
+
 # Disable features
 disable_remove_tco_links: str = os.getenv("DISABLE_REMOVE_TCO_LINKS", default="")
 disable_unescape_text: str = os.getenv("DISABLE_UNESCAPE_TEXT", default="")

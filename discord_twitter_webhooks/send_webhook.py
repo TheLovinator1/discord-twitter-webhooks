@@ -103,9 +103,12 @@ def send_embed_webhook(
     # If the user has customized the footer, we will use that instead of the default which is nothing.
     embed = customize_footer(embed)
 
-    # Set name and URL of the embed. This is the blue text at the top of the embed.
-    embed.set_title(title=screen_name)
-    embed.set_url(url=tweet_url)
+    if settings.use_title:
+        embed.set_title(display_name)
+
+    if settings.use_author.lower() == "true":
+        # Show the tweeters display name, username and avatar on top of the embed. This defaults to True.
+        embed.set_author(f"{display_name} (@{username})", url=tweet_url, icon_url=avatar_url)
 
     # Add embed to webhook.
     hook.add_embed(embed)
