@@ -67,9 +67,14 @@ webhook_thumbnail: str = get_settings.get_webhook_thumbnail()
 webhook_footer_text: str = get_settings.get_webhook_footer_text()
 webhook_footer_icon: str = get_settings.get_webhook_footer_icon()
 webhook_show_timestamp: bool = get_settings.get_show_timestamp()
-no_embed: bool = get_settings.get_no_embed()
 use_title: bool = get_settings.get_use_title()
 use_author: bool = get_settings.get_use_author()
+
+# Text instead of embed
+no_embed: bool = get_settings.get_no_embed()
+make_text_link: bool = get_settings.get_make_text_link()
+make_text_link_twitter_embed: bool = get_settings.get_make_text_link_twitter_embed()
+make_text_link_url: str = get_settings.get_make_text_link_url()
 
 # If we should disable certain features.
 disable_remove_tco_links: bool = get_settings.get_disable_remove_tco_links()

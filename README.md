@@ -17,14 +17,17 @@ This bot is configured with a config file (.env) or environment variables.
 
 ## Features
 
+You can contact me if a feature is missing or you have a suggestion :-)
+
 - Change Reddit username and subreddits to clickable links.
 - Change Twitter username and hashtags to clickable links.
 - Change t.co url to the actual url.
 - If the tweet has more than one image, it will merge them into one
   image in the embed.
 - Remove ®, ™ and © from the tweet text.
-- Five rules can be configured, each with a different webhook.
 - Customize the Discord embed.
+- You can choose if you want to send a text message or an embed to Discord.
+- More features are documented in the [.env.example](.env.example) file.
 
 ## Installation
 

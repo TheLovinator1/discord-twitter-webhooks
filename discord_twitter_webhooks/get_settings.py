@@ -204,6 +204,54 @@ def get_no_embed() -> bool:
     return get_setting_value(setting_name="NO_EMBED", default_value=False)
 
 
+def get_make_text_link() -> bool:
+    """If we should make the tweet text a link to the tweet.
+
+    Returns:
+        bool: The value of the setting. Defaults to False.
+    """
+    if not get_no_embed():
+        logger.warning(
+            "You need to set NO_EMBED to True to use MAKE_TEXT_LINK. Defaulting to False.",
+        )
+        return False
+    return get_setting_value(setting_name="MAKE_TEXT_LINK", default_value=False)
+
+
+def get_make_text_link_twitter_embed() -> bool:
+    """If we should make the tweet text a link to the tweet.
+
+    Returns:
+        bool: The value of the setting. Defaults to False.
+    """
+    if not get_no_embed():
+        logger.warning(
+            "You need to set NO_EMBED to True to use MAKE_TEXT_LINK_TWITTER_EMBED. Defaulting to False.",
+        )
+        return False
+    return get_setting_value(setting_name="MAKE_TEXT_LINK_TWITTER_EMBED", default_value=False)
+
+
+def get_make_text_link_url() -> str:
+    """The URL to use for the tweet text link. It defaults to the tweet URL if not set.
+
+    Returns:
+        str: The value of the setting. If it is "" it will default to "https://twitter.com/{username}/web/status/{tweet_id}".
+    """  # noqa: E501
+    if not get_make_text_link():
+        logger.warning(
+            "You need to set MAKE_TEXT_LINK to True to use MAKE_TEXT_LINK_URL. Defaulting to tweet URL.",
+        )
+        return ""
+
+    if not get_no_embed():
+        logger.warning(
+            "You need to set NO_EMBED to True to use MAKE_TEXT_LINK.",
+        )
+        return ""
+    return os.getenv("MAKE_TEXT_LINK_URL", default="")
+
+
 def get_use_title() -> bool:
     """If we should set the embed title to the tweet authors name.
 
