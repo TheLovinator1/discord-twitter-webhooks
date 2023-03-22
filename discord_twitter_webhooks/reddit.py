@@ -1,6 +1,6 @@
 import re
 
-from discord_twitter_webhooks import settings
+from loguru import logger
 
 
 def username_to_link(text: str) -> str:
@@ -21,8 +21,8 @@ def username_to_link(text: str) -> str:
         text,
         flags=re.MULTILINE,
     )
-    settings.logger.debug("username_to_link() - Text before: %s", text)
-    settings.logger.debug("username_to_link() - Text after: %s", regex)
+    logger.debug("Text before: {}", text)
+    logger.debug("Text after: {}", regex)
     return regex
 
 
@@ -46,6 +46,6 @@ def subreddit_to_link(text: str) -> str:
         text,
         flags=re.MULTILINE,
     )
-    settings.logger.debug("subreddit_to_link() - Text before: %s", text)
-    settings.logger.debug("subreddit_to_link() - Text after: %s", regex)
+    logger.debug("Text before: {}", text)
+    logger.debug("Text after: {}", regex)
     return regex

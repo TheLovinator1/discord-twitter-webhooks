@@ -1,6 +1,6 @@
 import re
 
-from discord_twitter_webhooks import settings
+from loguru import logger
 
 
 def discord_link_previews(text: str) -> str:
@@ -26,8 +26,8 @@ def discord_link_previews(text: str) -> str:
         text,
     )
 
-    settings.logger.debug("discord_link_previews() - Text before: %s", text)
-    settings.logger.debug("discord_link_previews() - Text after: %s", regex)
+    logger.debug("Text before: {}", text)
+    logger.debug("Text after: {}", regex)
     return regex
 
 
@@ -50,8 +50,8 @@ def utm_source(text: str) -> str:
         text,
     )
 
-    settings.logger.debug("utm_source() - Text before %s", text)
-    settings.logger.debug("utm_source() - Text after: %s", regex)
+    logger.debug("Text before {}", text)
+    logger.debug("Text after: {}", regex)
     return regex
 
 
@@ -64,14 +64,14 @@ def copyright_symbols(text: str) -> str:
     Returns:
         Text with the copyright symbols removed
     """
-    settings.logger.debug("Text before: %s", text)
+    logger.debug("Text before: {}", text)
 
     symbols: list[str] = ["®", "™", "©"]
     replaced_text: str = text
     for symbol in symbols:
         replaced_text: str = replaced_text.replace(symbol, "")
 
-    settings.logger.debug("copyright_symbols() - Text after: %s", replaced_text)
+    logger.debug("Text after: {}", replaced_text)
     return replaced_text
 
 
@@ -92,8 +92,8 @@ def remove_media_links(entities: dict, text: str) -> str:
             # https://twitter.com/SteamDB/status/1528783609833865217
             # Because of that we check if the url is from the twitter.com domain.
             if url["expanded_url"].startswith("https://twitter.com/"):
-                settings.logger.debug("remove_media_links() - Removing url: %s", url)
+                logger.debug("Removing url: {}", url)
                 replaced_text: str = replaced_text.replace(url["url"], "")
             else:
-                settings.logger.warning("remove_media_links() - Found URL without status: %s", url)
+                logger.warning("Found URL without status: {}", url)
     return replaced_text

@@ -2,6 +2,8 @@ import os
 import re
 import sys
 
+from loguru import logger
+
 
 def get_hook_and_rule() -> tuple[dict[int, str], dict[int, str]]:
     """Get webhook and rule with the corresponding number.
@@ -21,7 +23,7 @@ def get_hook_and_rule() -> tuple[dict[int, str], dict[int, str]]:
             # If we can't get the webhook, exit.
             if not webhooks[0]:
                 sys.exit("I failed to get WEBHOOK_URL")
-            print("Rule 0: %s=%s will get send to %s" % (rule_name, rule_value, webhooks[0]))
+            logger.debug("Rule 0: {} will get sent to {}", rule_value, webhooks[0])
 
         # Check for multiple rules
         elif rule_name.startswith("RULE"):
@@ -31,14 +33,14 @@ def get_hook_and_rule() -> tuple[dict[int, str], dict[int, str]]:
 
             # If we can't get the digit, log an error and continue.
             if get_digit is None:
-                print(
-                    "I couldn't figure out what %s was when parsing %s=%s." % (get_digit, rule_name, rule_value),
+                logger.debug(
+                    "I couldn't figure out what {} was when parsing {}. Contact TheLovinator if this should work.",
                 )
             else:
                 rules[get_digit] = rule_value
                 webhooks[get_digit] = os.getenv(f"WEBHOOK_URL{get_digit}")  # type: ignore
 
-                print("Rule %s: %s will get sent to %s" % (get_digit, rule_value, webhooks[get_digit]))
+                logger.debug("Rule {}: {} will get sent to {}", get_digit, rule_value, webhooks[get_digit])
     return webhooks, rules
 
 
@@ -54,13 +56,13 @@ def get_setting_value(setting_name: str, default_value: bool) -> bool:
     """
     env_var: str = os.getenv(setting_name, default="")
     if env_var.lower() in {"n", "no", "false", "off", "0", "disable", "disabled"}:
-        print("%s is set to %s, disabling.", setting_name, env_var)
+        logger.debug("'{}' is set to '{}', disabling.", setting_name, env_var)
         return False
     if env_var.lower() in {"y", "yes", "true", "on", "1", "enable", "enabled"}:
-        print("%s is set to %s, enabling.", setting_name, env_var)
+        logger.debug("'{}' is set to '{}', enabling.", setting_name, env_var)
         return True
-    print(
-        "Failed to get a valid value for %s which is set to %s. Defaulting to %s.",
+    logger.error(
+        "Failed to get a valid value for '{}' which is set to '{}'. Defaulting to '{}'.",
         setting_name,
         env_var,
         default_value,
@@ -84,8 +86,8 @@ def get_log_level() -> str:
     log_levels: list[str] = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
     log_level: str = os.getenv("LOG_LEVEL", default="INFO")
     if log_level not in log_levels:
-        print(
-            "LOG_LEVEL is set to %s, which is not a valid value. Defaulting to INFO.",
+        logger.warning(
+            "LOG_LEVEL is set to {}, which is not a valid value. Defaulting to INFO.",
             log_level,
         )
     return log_level

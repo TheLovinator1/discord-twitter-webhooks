@@ -1,19 +1,14 @@
-import logging
 import os
 import sys
 
 from dotenv import load_dotenv
+from loguru import logger
 
 from discord_twitter_webhooks import get_settings
+from discord_twitter_webhooks.logger import setup_logger
 
-# Get log severity. This also checks if the log level is CRITICAL, ERROR, WARNING, INFO or DEBUG.
-# We only use DEBUG, INFO, WARNING and ERROR.
-log_level: str = get_settings.get_log_level()
-
-# TODO: Add logging config file so you can customize the logging
-# TODO: Replace with loguru?
-logger = logging
-logger.basicConfig(format="%(asctime)s %(levelname)s %(message)s", datefmt="%H:%M:%S", level=log_level)
+# Setup the logger
+setup_logger()
 
 # Parse the .env file and then load all the variables found as environment variables.
 # TODO: Split .env into multiple files?

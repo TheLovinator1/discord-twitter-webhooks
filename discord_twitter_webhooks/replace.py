@@ -1,6 +1,6 @@
 import re
 
-from discord_twitter_webhooks import settings
+from loguru import logger
 
 
 def username_with_link(text: str) -> str:
@@ -22,8 +22,8 @@ def username_with_link(text: str) -> str:
         text,
     )
 
-    settings.logger.debug("username_with_link() - Text before: %s", text)
-    settings.logger.debug("username_with_link() - Text after: %s", regex)
+    logger.debug("Text before: {}", text)
+    logger.debug("Text after: {}", regex)
     return regex
 
 
@@ -52,7 +52,7 @@ def tco_url_link_with_real_link(entities: dict, text: str) -> str:
         # Replace the old URL with the new URL.
         replaced_text: str = text.replace(old_url, new_url)
 
-    settings.logger.debug("tco_url_link_with_real_link: %s", replaced_text)
+    logger.debug("Replaced text: {}", replaced_text)
     return replaced_text
 
 
@@ -75,6 +75,6 @@ def hashtag_with_link(text: str) -> str:
         text,
     )
 
-    settings.logger.debug("hashtag_with_link() - Text before: %s", text)
-    settings.logger.debug("hashtag_with_link() - Text after: %s", regex)
+    logger.debug("Text before: {}", text)
+    logger.debug("Text after: {}", regex)
     return regex

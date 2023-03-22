@@ -3,6 +3,7 @@ import html
 import sys
 from typing import Any
 
+from loguru import logger
 from tweepy.asynchronous import AsyncStreamingClient
 from tweepy.streaming import StreamResponse
 
@@ -46,7 +47,7 @@ rule_ids = {}
 
 def main(response: StreamResponse) -> None:
     """The main function for the bot. This is where the magic happens."""
-    settings.logger.debug("Response: %s", response)
+    logger.debug("Response: {}", response)
 
     twitter_card_image: str = ""
     media_links: list[str] = []
@@ -62,7 +63,7 @@ def main(response: StreamResponse) -> None:
         includes: dict[str, list[Any]] = response.includes
         if "media" in includes:
             media_list: list[dict] = [media.data for media in response.includes["media"]]
-            settings.logger.debug("Media list: %s", media_list)
+            logger.debug("Media list: {}", media_list)
 
             # Get the images from the tweet and remove the URLs from the text.
             media_links = get.media_links(media_list)
@@ -135,7 +136,7 @@ class MyStreamListener(AsyncStreamingClient):
 
     async def on_exception(self, exception: Exception) -> None:  # noqa: ANN101
         """An unhandled exception was raised while streaming. Shutting down."""
-        error_msg: str = f"discord-twitter-webhooks: An unhandled exception was raised while streaming. Shutting down\nException: {exception!r}"  # noqa: E501
+        error_msg: str = f"discord-twitter-webhooks: An unhandled exception was raised while streaming. Shutting down\nException: {exception}"  # noqa: E501
         send_error_webhook(error_msg)
 
         self.disconnect()
@@ -164,12 +165,13 @@ async def start_bot() -> None:
     for rule_num in rules:
         rule: str = str(rules[rule_num])
         rule_id: str = await new_rule(stream=stream, rule=rule, rule_tag=f"rule{rule_num}")
-        settings.logger.info("Rule %s added to Twitter.com", rule_id)
+        logger.info("Rule {} added to Twitter.com", rule_id)
         rule_ids[rule_num] = {rule_id}
 
-    settings.logger.debug("Rule IDs: %s", rule_ids)
+    logger.debug("Rule IDs: {}", rule_ids)
 
     # TODO: dry_run before to make sure everything works?
+    # TODO: We should remove everything that is not needed.
     try:
         await stream.filter(
             expansions=[
@@ -197,6 +199,7 @@ async def start_bot() -> None:
             ],
         )
     except KeyboardInterrupt:
+        logger.info("Bye!")
         stream.disconnect()
         sys.exit(0)
 

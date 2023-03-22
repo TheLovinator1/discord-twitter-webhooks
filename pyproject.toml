@@ -22,6 +22,7 @@ python-dotenv = "^1.0.0"
 beautifulsoup4 = "^4.11.2"
 discord-webhook = "^1.1.0"
 tweepy = { extras = ["async"], version = "^4.13.0" }
+loguru = "^0.6.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
@@ -88,16 +89,15 @@ select = [
     "RUF",
 ]
 ignore = [
-    "D100",  # pydocstyle - missing docstring in public module
-    "D101",  # pydocstyle - missing docstring in public class
-    "D102",  # pydocstyle - missing docstring in public method
-    "D103",  # pydocstyle - missing docstring in public function
-    "D104",  # pydocstyle - missing docstring in public package
-    "D105",  # pydocstyle - missing docstring in magic method
-    "D106",  # pydocstyle - missing docstring in public nested class
-    "D107",  # pydocstyle - missing docstring in __init__
-    "G002",  # Allow % in logging
-    "UP031", # Allow % in logging
+    "D100",    # pydocstyle - missing docstring in public module
+    "D101",    # pydocstyle - missing docstring in public class
+    "D102",    # pydocstyle - missing docstring in public method
+    "D103",    # pydocstyle - missing docstring in public function
+    "D104",    # pydocstyle - missing docstring in public package
+    "D105",    # pydocstyle - missing docstring in magic method
+    "D106",    # pydocstyle - missing docstring in public nested class
+    "D107",    # pydocstyle - missing docstring in __init__
+    "PLE1205", # https://github.com/charliermarsh/ruff/issues/3351
 ]
 
 [tool.ruff.pydocstyle]

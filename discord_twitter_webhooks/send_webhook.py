@@ -2,6 +2,7 @@ import json
 
 import requests
 from discord_webhook import DiscordEmbed, DiscordWebhook
+from loguru import logger
 
 from discord_twitter_webhooks import settings
 
@@ -97,12 +98,12 @@ def send_embed_webhook(
     # Split the webhook URL into a list if it contains multiple webhooks.
     webhook_list: list[str] = webhook.split(",")
     for _webhook in webhook_list:
-        settings.logger.debug("Webhook URL: %s", _webhook)
+        logger.debug("Webhook URL: {}", _webhook)
         hook.url = _webhook
         response: requests.Response = hook.execute()
 
         if response.ok:
-            settings.logger.info("Webhook posted for tweet https://twitter.com/i/status/%s", tweet_id)
+            logger.info("Webhook posted for tweet https://twitter.com/i/status/{}", tweet_id)
         else:
             send_error_webhook(f"Got {response.status_code} from {webhook}. Response: {response.text}")
 
@@ -172,8 +173,8 @@ def _send_webhook(message: str, webhook: str, func_name: str) -> None:
         webhook: Webhook URL.
         func_name: Name of the function that called this function. Used for logging.
     """
-    settings.logger.debug("%s - Message: %s" % (func_name, message))
-    settings.logger.debug("%s - Webhook URL: %s" % (func_name, webhook))
+    logger.debug("{} - Message: {}", func_name, message)
+    logger.debug("{} - Webhook URL: {}", func_name, webhook)
 
     if not webhook:
         send_error_webhook(f"No webhook URL found. Trying to send {message}")
@@ -181,7 +182,7 @@ def _send_webhook(message: str, webhook: str, func_name: str) -> None:
 
     webhook_list: list[str] = webhook.split(",")
     for _webhook in webhook_list:
-        settings.logger.debug("Webhook URL: %s", _webhook)
+        logger.debug("Webhook URL: {}", _webhook)
         hook: DiscordWebhook = DiscordWebhook(url=_webhook, content=message, rate_limit_retry=True)
 
         response: requests.Response = hook.execute()
@@ -197,9 +198,9 @@ def send_error_webhook(msg: str, webhook: str = settings.error_webhook) -> None:
         webhook: Webhook URL. Defaults to environment variable ERROR_WEBHOOK.
     """
     # TODO: Split webhook into multiple webhooks if it contains multiple webhooks.
-    settings.logger.error("Got an error: %s", msg)
+    logger.error("Got an error: {}", msg)
 
     if settings.send_errors == "True":
         _send_webhook(message=msg, webhook=webhook, func_name="send_error_webhook()")
     else:
-        settings.logger.debug("Tried to send error webhook but send_errors is not set to True")
+        logger.debug("Tried to send error webhook but send_errors is not set to True")
