@@ -33,27 +33,29 @@ def send_embed_webhook(
     text: str,
     twitter_card_image: str,
     avatar_url: str,
-    screen_name: str,
+    display_name: str,
     webhook: str,
+    username: str,
 ) -> None:
     """Send an embed to Discord webhook.
 
     Args:
         avatar_url: Avatar URL of the user. Will be used as the avatar for the embed.
-        screen_name: The username, we use this to show who the tweet is from in the embed.
+        display_name: Display name of the user. Will be used as the name for the embed.
         tweet_id: Tweet ID of the tweet. This is used to link to the tweet on Twitter.
         media_links: List of media links from the tweet. This is used to add the images to the embed.
         text: Text from the tweet to send in the embed.
         webhook: Webhook URL. Defaults to environment variable WEBHOOK_URL.
         twitter_card_image: Twitter card image from the tweet.
+        username: Username of the user.
     """
-    tweet_url: str = f"https://twitter.com/i/status/{tweet_id}"
+    tweet_url: str = f"https://twitter.com/{username}/status/{tweet_id}"
 
     settings.logger.debug("send_normal_webhook() - Tweet ID: %s", tweet_id)
     settings.logger.debug("send_normal_webhook() - Text: %s", text)
     settings.logger.debug("send_normal_webhook() - Twitter card image: %s", twitter_card_image)
     settings.logger.debug("send_normal_webhook() - Avatar URL: %s", avatar_url)
-    settings.logger.debug("send_normal_webhook() - Screen name: %s", screen_name)
+    settings.logger.debug("send_normal_webhook() - Screen name: %s", display_name)
     settings.logger.debug("send_normal_webhook() - Webhook URL: %s", webhook)
     settings.logger.debug("send_normal_webhook() - Tweet URL: %s", tweet_url)
     for _media_link in media_links:
@@ -65,7 +67,7 @@ def send_embed_webhook(
         return
 
     # We will add the webhook when we send it. This is so we can have several webhooks for each tweet.
-    hook: DiscordWebhook = DiscordWebhook(url="", avatar_url=avatar_url, rate_limit_retry=True)
+    hook: DiscordWebhook = DiscordWebhook(url="", rate_limit_retry=True)
     embed: DiscordEmbed = DiscordEmbed(description=text)
 
     if twitter_card_image:
@@ -80,7 +82,7 @@ def send_embed_webhook(
 
     if settings.webhook_author_name:
         settings.logger.debug("User has customized the author name: %s", settings.webhook_author_name)
-        screen_name = settings.webhook_author_name
+        display_name = settings.webhook_author_name
 
     if settings.webhook_author_url:
         settings.logger.debug("User has customized the author url: %s", settings.webhook_author_url)

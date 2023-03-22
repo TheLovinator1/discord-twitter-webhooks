@@ -8,9 +8,10 @@ from tweepy.streaming import StreamResponse
 
 from discord_twitter_webhooks import get, reddit, remove, replace, settings
 from discord_twitter_webhooks.get import (
-    get_avatar_and_username,
+    UserInformation,
     get_entities,
     get_text,
+    get_user_information,
     get_webhook_url,
 )
 from discord_twitter_webhooks.rules import delete_old_rules, new_rule
@@ -51,7 +52,8 @@ def main(response: StreamResponse) -> None:
     media_links: list[str] = []
 
     webhook_url: str = get_webhook_url(response)
-    avatar, user_name = get_avatar_and_username(response)
+    user_information: UserInformation = get_user_information(response)
+
     text: str = get_text(response)
 
     data = response.data
@@ -118,9 +120,10 @@ def main(response: StreamResponse) -> None:
             media_links=media_links,
             text=text,
             twitter_card_image=twitter_card_image,
-            avatar_url=avatar,
-            screen_name=user_name,
+            avatar_url=user_information.avatar_url,
+            display_name=user_information.display_name,
             webhook=webhook_url,
+            username=user_information.username,
         )
 
 

@@ -1,4 +1,5 @@
 import re
+from dataclasses import dataclass
 
 import requests
 from bs4 import BeautifulSoup
@@ -188,18 +189,31 @@ def get_text(response: StreamResponse) -> str:
     return text
 
 
-def get_avatar_and_username(response: StreamResponse) -> tuple[str, str]:
+@dataclass
+class UserInformation:
+    """User information for the embed."""
+
+    avatar_url: str
+    display_name: str
+    username: str
+
+
+def get_user_information(response: StreamResponse) -> UserInformation:
     """Get avatar and username, this is used for the embed avatar and name.
 
     Args:
         response: The response from the stream.
 
     Returns:
-        tuple: The avatar and username.
+        UserInformation: The user information. Avatar, display name and username.
     """
     users = [users.data for users in response.includes["users"]]
     for user in users:
         settings.logger.debug("User: %s", user)
-    avatar: str = users[0]["profile_image_url"]
-    user_name: str = users[0]["name"]
-    return avatar, user_name
+
+    # TODO: Check if this always is [0]
+    avatar_url: str = users[0]["profile_image_url"]
+    display_name: str = users[0]["name"]
+    username = users[0]["username"]
+
+    return UserInformation(avatar_url, display_name, username)
