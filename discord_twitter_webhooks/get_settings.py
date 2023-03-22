@@ -17,15 +17,7 @@ def get_hook_and_rule() -> tuple[dict[int, str], dict[int, str]]:
     for rule_name, rule_value in os.environ.items():
         # Check for single rule
         if rule_name == "RULE":
-            rules[0] = rule_value
-            webhooks[0] = os.getenv("WEBHOOK_URL", default="")
-
-            # If we can't get the webhook, exit.
-            if not webhooks[0]:
-                sys.exit("I failed to get WEBHOOK_URL")
-            logger.debug("Rule 0: {} will get sent to {}", rule_value, webhooks[0])
-
-        # Check for multiple rules
+            single_rule(rule_value, rules, webhooks)
         elif rule_name.startswith("RULE"):
             # Get digits at the end of the string
             match: re.Match[str] | None = re.search(r"\d+$", rule_name)
@@ -33,15 +25,54 @@ def get_hook_and_rule() -> tuple[dict[int, str], dict[int, str]]:
 
             # If we can't get the digit, log an error and continue.
             if get_digit is None:
-                logger.debug(
+                logger.error(
                     "I couldn't figure out what {} was when parsing {}. Contact TheLovinator if this should work.",
+                    get_digit,
+                    rule_name,
                 )
             else:
-                rules[get_digit] = rule_value
+                # Remove " and ' from the start and end if they exist
+                rules[get_digit] = rule_value.strip("'").strip('"')
+
                 webhooks[get_digit] = os.getenv(f"WEBHOOK_URL{get_digit}")  # type: ignore
+                if webhooks[get_digit] is None:
+                    logger.error("webhook is None for {}", get_digit)
+                    sys.exit("I failed to get WEBHOOK_URL")
+
+                # Remove " and ' from the start and end if they exist
+                webhooks[get_digit] = webhooks[get_digit].strip("'").strip('"')
 
                 logger.debug("Rule {}: {} will get sent to {}", get_digit, rule_value, webhooks[get_digit])
     return webhooks, rules
+
+
+def single_rule(rule_value: str, rules: dict[int, str], webhooks: dict[int, str]) -> None:
+    """Get the single rule.
+
+    Args:
+        rule_value: The value of the rule.
+        rules: The rule.
+        webhooks: The webhook or webhooks.
+    """
+    # TODO: Should we return something in this function?
+
+    # Remove " and ' from the start and end if they exist
+    rules[0] = rule_value.strip("'").strip('"')
+
+    webhooks[0] = os.getenv("WEBHOOK_URL", default="")
+
+    if webhooks[0] is None:
+        logger.error("Webhook is None for Rule 0")
+        sys.exit("I failed to get WEBHOOK_URL")
+
+    # Remove " and ' from the start and end if they exist
+    webhooks[0] = webhooks[0].strip("'").strip('"')
+
+    # If we can't get the webhook, exit.
+    if not webhooks[0]:
+        sys.exit("I failed to get WEBHOOK_URL")
+
+    logger.debug("Rule 0: {} will get sent to {}", rule_value, webhooks[0])
 
 
 def get_setting_value(setting_name: str, default_value: bool) -> bool:
