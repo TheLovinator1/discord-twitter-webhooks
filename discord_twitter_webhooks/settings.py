@@ -42,12 +42,19 @@ def check_rules_valid() -> None:
 
     if len(rules) > max_rules_elevated:
         logger.warning(
-            "You have more than %s rules. If this doesn't work, you need Academic Research API access.",
+            (
+                "You have more than %s rules. If this doesn't work, you need Academic Research API access. You can read"
+                " more about it here:"
+                " https://developer.twitter.com/en/products/twitter-api/academic-research/application-info"
+            ),
             max_rules_elevated,
         )
     elif len(rules) > max_rules_pleb:
         logger.warning(
-            "You have more than %s rules. If this doesn't work, you need Elevated Twitter API access.",
+            (
+                "You have more than %s rules. If this doesn't work, you need Elevated Twitter API access. You need to"
+                " apply for it on https://developer.twitter.com/en/portal/dashboard, under 'Projects and Apps'"
+            ),
             max_rules_pleb,
         )
 
