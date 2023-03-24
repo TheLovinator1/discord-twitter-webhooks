@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+from urllib.parse import urlparse
 
 from loguru import logger
 
@@ -135,6 +136,11 @@ def get_send_errors() -> bool:
     return get_setting_value(setting_name="SEND_ERRORS", default_value=False)
 
 
+def warn_if_http(url: str, hook_name: str) -> None:
+    if urlparse(url).scheme == "http":
+        logger.warning("{} should probably be a https url do to security reasons.", hook_name)
+
+
 def get_error_webhook() -> str:
     """Get the error webhook from the environment.
 
@@ -150,63 +156,106 @@ def get_error_webhook() -> str:
     return value
 
 
-def get_webhook_author_name() -> str:
+def get_webhook_author_name(author_name: str = "", max_author_name_length: int = 236) -> str:
     """Customize the name of the webhook author.
+
+    Embed titles can be up to 256 characters.
+    256 (max title) - 15 (max username) - 2 (spaces) - 1 (@) - 2 (parenthesis) = 236
+
+    Args:
+        author_name: The name of the webhook author.
+        max_author_name_length: The maximum length of the webhook author name.
 
     Returns:
         str: The webhook author name. Defaults to "".
     """
-    return os.getenv("WEBHOOK_AUTHOR_NAME", default="")
+    if not author_name:
+        author_name = os.getenv("WEBHOOK_AUTHOR_NAME", default="")
+    if len(author_name) > max_author_name_length:
+        logger.warning("WEBHOOK_AUTHOR_NAME has to be less than 236 characters. It will be truncated.")
+        author_name = author_name[:max_author_name_length]
+    return author_name
 
 
-def get_webhook_author_url() -> str:
+def get_webhook_author_url(author_url: str = "") -> str:
     """Customize the url of the webhook author.
+
+    Args:
+        author_url: Custom url for the webhook author. Otherwise defaults to the env var or "".
 
     Returns:
         str: The webhook author url. Defaults to "".
     """
-    # TODO: Check if valid url.
-    return os.getenv("WEBHOOK_AUTHOR_URL", default="")
+    if not author_url:
+        author_url = os.getenv("WEBHOOK_AUTHOR_URL", default="")
+    warn_if_http(author_url, "WEBHOOK_AUTHOR_URL")
+    return author_url
 
 
-def get_webhook_author_icon() -> str:
+def get_webhook_author_icon(author_icon: str = "") -> str:
     """Customize the icon of the webhook author.
+
+    Args:
+        author_icon: Custom icon for the webhook author. Otherwise defaults to the env var or "".
 
     Returns:
         str: The webhook author icon. Defaults to "".
     """
-    # TODO: Check if valid url.
-    return os.getenv("WEBHOOK_AUTHOR_ICON", default="")
+    if not author_icon:
+        author_icon = os.getenv("WEBHOOK_AUTHOR_ICON", default="")
+    warn_if_http(author_icon, "WEBHOOK_AUTHOR_ICON")
+    return author_icon
 
 
-def get_webhook_image() -> str:
+def get_webhook_image(webhook_image: str = "") -> str:
     """Customize the image of the webhook.
+
+    Args:
+        webhook_image: Custom image for the webhook. Otherwise defaults to the env var or "".
 
     Returns:
         str: The webhook image. Defaults to "".
     """
-    # TODO: Check if valid url.
-    return os.getenv("WEBHOOK_IMAGE", default="")
+    if not webhook_image:
+        os.getenv("WEBHOOK_IMAGE", default="")
+    warn_if_http(webhook_image, "WEBHOOK_IMAGE")
+    return webhook_image
 
 
-def get_webhook_thumbnail() -> str:
+def get_webhook_thumbnail(webhook_thumbnail: str = "") -> str:
     """Customize the thumbnail of the webhook.
+
+    Args:
+        webhook_thumbnail: Custom thumbnail for the webhook. Otherwise defaults to the env var or "".
 
     Returns:
         str: The webhook thumbnail. Defaults to "".
     """
-    # TODO: Check if valid url.
-    return os.getenv("WEBHOOK_THUMBNAIL", default="")
+    if not webhook_thumbnail:
+        os.getenv("WEBHOOK_THUMBNAIL", default="")
+    warn_if_http(webhook_thumbnail, "WEBHOOK_THUMBNAIL")
+    return webhook_thumbnail
 
 
-def get_webhook_footer_text() -> str:
+def get_webhook_footer_text(footer_text: str = "") -> str:
     """Customize the footer text of the webhook.
 
     Returns:
         str: The webhook footer text. Defaults to "".
     """
-    # TODO: Check max length.
-    return os.getenv("WEBHOOK_FOOTER_TEXT", default="")
+    # The footer text is limited to 2048 characters
+    max_footer_length: int = 2047
+    env_name: str = "WEBHOOK_FOOTER_TEXT"
+    if not footer_text:
+        footer_text = os.getenv(env_name, default="")
+    if len(footer_text) > max_footer_length:
+        logger.warning(
+            "{} has to be less than {} characters. It will be truncated.",
+            env_name,
+            max_footer_length,
+        )
+        footer_text = footer_text[:max_footer_length]
+    return footer_text
 
 
 def get_webhook_footer_icon() -> str:
