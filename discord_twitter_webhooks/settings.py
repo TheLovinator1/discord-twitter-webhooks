@@ -83,6 +83,9 @@ make_text_link: bool = get_settings.get_make_text_link()
 make_text_link_twitter_embed: bool = get_settings.get_make_text_link_twitter_embed()
 make_text_link_url: str = get_settings.get_make_text_link_url()
 
+# If we should only send the link to the tweet.
+only_link: bool = get_settings.get_setting_value(setting_name="ONLY_LINK", default_value=False)
+
 # If we should disable certain features.
 disable_remove_tco_links: bool = get_settings.get_disable_remove_tco_links()
 disable_unescape_text: bool = get_settings.get_disable_unescape_text()

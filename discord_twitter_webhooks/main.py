@@ -112,7 +112,11 @@ def main(response: StreamResponse) -> None:
         # Remove copyright symbols.
         text = remove.copyright_symbols(text)
 
-    if no_embed:
+    if settings.only_link:
+        url: str = f"https://twitter.com/{user_information.username}/status/{data.id}"
+        send_normal_webhook(msg=url, webhook=webhook_url)
+
+    elif no_embed:
         if settings.make_text_link:
             if settings.make_text_link_twitter_embed:
                 url: str = f"https://twitter.com/{user_information.username}/status/{data.id}"
