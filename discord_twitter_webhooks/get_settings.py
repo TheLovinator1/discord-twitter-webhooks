@@ -76,27 +76,29 @@ def single_rule(rule_value: str, rules: dict[int, str], webhooks: dict[int, str]
     logger.debug("Rule 0: {} will get sent to {}", rule_value, webhooks[0])
 
 
-def get_setting_value(setting_name: str, default_value: bool) -> bool:
+def get_setting_value(env_var: str, default_value: bool) -> bool:
     """Get the setting value from the environment.
 
+    Convert different values that the user might use to a boolean.
+
     Args:
-        setting_name (str): The name of the setting.
+        env_var (str): The environment variable to get the value from.
         default_value (bool): The default value of the setting.
 
     Returns:
         str: The value of the setting.
     """
-    env_var: str = os.getenv(setting_name, default="")
-    if env_var.lower() in {"n", "no", "false", "off", "0", "disable", "disabled"}:
-        logger.debug("'{}' is set to '{}', disabling.", setting_name, env_var)
+    value: str = os.getenv(env_var, default="")
+    if value.lower() in {"n", "no", "false", "off", "0", "disable", "disabled"}:
+        logger.debug("'{}' is set to '{}', disabling.", env_var, value)
         return False
-    if env_var.lower() in {"y", "yes", "true", "on", "1", "enable", "enabled"}:
-        logger.debug("'{}' is set to '{}', enabling.", setting_name, env_var)
+    if value.lower() in {"y", "yes", "true", "on", "1", "enable", "enabled"}:
+        logger.debug("'{}' is set to '{}', enabling.", env_var, value)
         return True
     logger.debug(
         "Failed to get a valid value for '{}' which is set to '{}'. Defaulting to '{}'.",
-        setting_name,
         env_var,
+        value,
         default_value,
     )
     return default_value
@@ -125,17 +127,6 @@ def get_log_level() -> str:
     return log_level
 
 
-def get_send_errors() -> bool:
-    """Get the send errors setting from the environment.
-
-    If we should send errors to Discord.
-
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="SEND_ERRORS", default_value=False)
-
-
 def warn_if_http(url: str, hook_name: str) -> None:
     if urlparse(url).scheme == "http":
         logger.warning("{} should probably be a https url do to security reasons.", hook_name)
@@ -151,7 +142,7 @@ def get_error_webhook() -> str:
     """
     # Only get the error webhook if we should send errors.
     value: str = os.getenv("ERROR_WEBHOOK", default="")
-    if not get_setting_value(setting_name="SEND_ERRORS", default_value=False):
+    if not get_setting_value(env_var="SEND_ERRORS", default_value=False):
         logger.warning("SEND_ERRORS is set to False, but ERROR_WEBHOOK is set to '{}'.", value)
     return value
 
@@ -276,32 +267,14 @@ def get_webhook_footer_icon() -> str:
     return value
 
 
-def get_show_timestamp() -> bool:
-    """If we should show the timestamp in the embed.
-
-    Returns:
-        bool: The value of the setting. Defaults to True.
-    """
-    return get_setting_value(setting_name="SHOW_TIMESTAMP", default_value=True)
-
-
-def get_no_embed() -> bool:
-    """If we should send the text only, without an embed.
-
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="NO_EMBED", default_value=False)
-
-
 def get_make_text_link() -> bool:
     """If we should make the tweet text a link to the tweet.
 
     Returns:
         bool: The value of the setting. Defaults to False.
     """
-    value: bool = get_setting_value(setting_name="MAKE_TEXT_LINK", default_value=False)
-    if value and not get_no_embed():
+    value: bool = get_setting_value(env_var="MAKE_TEXT_LINK", default_value=False)
+    if value and not get_setting_value(env_var="NO_EMBED", default_value=False):
         logger.warning(
             "You need to set NO_EMBED to True to use MAKE_TEXT_LINK. Defaulting to False.",
         )
@@ -315,8 +288,8 @@ def get_make_text_link_twitter_embed() -> bool:
     Returns:
         bool: The value of the setting. Defaults to False.
     """
-    value: bool = get_setting_value(setting_name="MAKE_TEXT_LINK_TWITTER_EMBED", default_value=False)
-    if value and not get_no_embed():
+    value: bool = get_setting_value(env_var="MAKE_TEXT_LINK_TWITTER_EMBED", default_value=False)
+    if value and not get_setting_value(env_var="NO_EMBED", default_value=False):
         logger.warning(
             "You need to set NO_EMBED to True to use MAKE_TEXT_LINK_TWITTER_EMBED. Defaulting to False.",
         )
@@ -338,129 +311,9 @@ def get_make_text_link_url() -> str:
                 "You need to set MAKE_TEXT_LINK to True to use MAKE_TEXT_LINK_URL. Defaulting to tweet URL.",
             )
             return ""
-        if not get_no_embed():
+        if not get_setting_value(env_var="NO_EMBED", default_value=False):
             logger.warning(
                 "You need to set NO_EMBED to True to use MAKE_TEXT_LINK.",
             )
             return ""
     return value
-
-
-def get_use_title() -> bool:
-    """If we should set the embed title to the tweet authors name.
-
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="USE_TITLE", default_value=False)
-
-
-def get_use_author() -> bool:
-    """If we should set the embed author to the tweet authors name.
-
-    Returns:
-        bool: The value of the setting. Defaults to True.
-    """
-    return get_setting_value(setting_name="USE_AUTHOR", default_value=True)
-
-
-def get_disable_remove_tco_links() -> bool:
-    """If we should disable removing t.co links.
-
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="DISABLE_REMOVE_TCO_LINKS", default_value=False)
-
-
-def get_disable_unescape_text() -> bool:
-    """If we should not unescape the tweet text.
-
-    Unescaping text means that we replace HTML entities with their unicode equivalent.
-    For example, "&amp;" becomes "&".
-
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="DISABLE_UNESCAPE_TEXT", default_value=False)
-
-
-def get_disable_replace_username() -> bool:
-    """If we should disable replacing usernames with mentions.
-
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="DISABLE_REPLACE_USERNAME", default_value=False)
-
-
-def get_disable_replace_hashtag() -> bool:
-    """If we should disable replacing hashtags with links.
-
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="DISABLE_REPLACE_HASHTAG", default_value=False)
-
-
-def get_disable_remove_discord_link_previews() -> bool:
-    """If we should disable replacing urls with links.
-
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="DISABLE_REMOVE_DISCORD_LINK_PREVIEWS", default_value=False)
-
-
-def get_disable_replace_subreddit() -> bool:
-    """If we should disable replacing urls with links.
-
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="DISABLE_REPLACE_SUBREDDIT", default_value=False)
-
-
-def get_disable_replace_reddit_username() -> bool:
-    """If we should disable replacing urls with links.
-
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="DISABLE_REPLACE_REDDIT_USERNAME", default_value=False)
-
-
-def get_disable_remove_utm_parameters() -> bool:
-    """If we should disable replacing urls with links.
-
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="DISABLE_REMOVE_UTM", default_value=False)
-
-
-def get_disable_remove_trailing_whitespace() -> bool:
-    """If we should disable removing trailing whitespace.
-
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="DISABLE_REMOVE_TRAILING_WHITESPACE", default_value=False)
-
-
-def get_disable_remove_copyright_symbols() -> bool:
-    """If we should disable removing copyright symbols.
-
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="DISABLE_REMOVE_COPYRIGHT_SYMBOLS", default_value=False)
-
-
-def get_webhook_show_timestamp() -> bool:
-    """If we should disable removing emoji.
-
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="SHOW_TIMESTAMP", default_value=False)

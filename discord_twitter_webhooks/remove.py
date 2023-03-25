@@ -44,6 +44,7 @@ def utm_source(text: str) -> str:
     Returns:
         Text with the utm_source parameter removed
     """
+    # TODO: We should remove more parameters from the url. Maybe check if ublock origin has a list of them?
     regex: str = re.sub(
         r"(\?utm_source)\S*",
         r"",
