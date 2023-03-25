@@ -294,7 +294,6 @@ def get_make_text_link_twitter_embed() -> bool:
             "You need to set NO_EMBED to True to use MAKE_TEXT_LINK_TWITTER_EMBED. Defaulting to False.",
         )
         return False
-
     return value
 
 

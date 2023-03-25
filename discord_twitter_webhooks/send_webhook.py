@@ -92,9 +92,8 @@ def send_embed_webhook(
         # TODO: Add support for local images.
         embed.set_author(f"{display_name} (@{username})", url=tweet_url, icon_url=avatar_url)
 
-    # Add random color to the embed webhook
-    if settings.webhook_randomize_embed_color:
-        embed.set_color(hex(randint(0, 16777215))[2:])
+    # Set the color of the embed.
+    set_color(embed)
 
     # Add embed to webhook.
     # TODO: Check if embed is working before adding it to the webhook.
@@ -111,6 +110,29 @@ def send_embed_webhook(
             logger.info("Webhook posted for tweet https://twitter.com/i/status/{}", tweet_id)
         else:
             send_error_webhook(f"Got {response.status_code} from {webhook}. Response: {response.text}")
+
+
+def set_color(embed: DiscordEmbed) -> None:
+    """Set the color of the embed.
+
+    Args:
+        embed: The embed to set the color of.
+    """
+    twitter_blue = "#1DA1F2"
+    if webhook_embed_color := settings.webhook_embed_color:
+        hex_color_length: int = 7  # 6 hex characters + 1 for the #
+        if len(webhook_embed_color) == hex_color_length and webhook_embed_color[0] == "#":
+            embed_color: str = webhook_embed_color
+        else:
+            logger.error("Invalid webhook embed color {}. Using default color.", webhook_embed_color)
+            embed_color: str = twitter_blue
+    elif settings.webhook_randomize_embed_color:
+        embed_color = hex(randint(0, 16777215))[2:]  # noqa: S311
+    else:
+        embed_color: str = twitter_blue
+
+    # Convert hex color to int.
+    embed.set_color(int(embed_color[1:], 16))
 
 
 def get_embed_image(media_links, tweet_id) -> str:

@@ -95,6 +95,9 @@ webhook_randomize_embed_color: bool = get_settings.get_setting_value(
     default_value=False,
 )
 
+# If we should use a custom embed color. This will override the randomize embed color setting.
+webhook_embed_color: str = os.getenv("WEBHOOK_EMBED_COLOR", default="")
+
 # If we should show a webhook title. This shows the tweet authors display name and username.
 use_title: bool = get_settings.get_setting_value(env_var="USE_TITLE", default_value=False)
 
