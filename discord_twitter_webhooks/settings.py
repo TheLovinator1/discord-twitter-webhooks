@@ -74,6 +74,7 @@ webhook_thumbnail: str = get_settings.get_webhook_thumbnail()
 webhook_footer_text: str = get_settings.get_webhook_footer_text()
 webhook_footer_icon: str = get_settings.get_webhook_footer_icon()
 webhook_show_timestamp: bool = get_settings.get_show_timestamp()
+webhook_random_embed_colors: bool = get_settings.get_embed_colors()
 use_title: bool = get_settings.get_use_title()
 use_author: bool = get_settings.get_use_author()
 
