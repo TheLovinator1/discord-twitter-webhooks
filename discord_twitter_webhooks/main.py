@@ -113,8 +113,16 @@ def main(response: StreamResponse) -> None:
         text = remove.copyright_symbols(text)
 
     if settings.only_link:
-        url: str = f"https://twitter.com/{user_information.username}/status/{data.id}"
-        send_normal_webhook(msg=url, webhook=webhook_url)
+        if settings.only_link_preview:
+            msg: str = f"https://twitter.com/{user_information.username}/status/{data.id}"
+        else:
+            msg: str = f"<https://twitter.com/{user_information.username}/status/{data.id}>"
+
+        if settings.append_image_links:
+            for media_link in media_links:
+                msg += f"\n{media_link}"
+
+        send_normal_webhook(msg=msg, webhook=webhook_url)
 
     elif no_embed:
         if settings.make_text_link:
@@ -124,8 +132,13 @@ def main(response: StreamResponse) -> None:
                 url: str = f"<https://twitter.com/{user_information.username}/status/{data.id}>"
             if settings.make_text_link_url:
                 url = settings.make_text_link_url
-            text = f"[{text}]({url})"
+            msg = f"[{text}]({url})"
 
+            if settings.append_image_links:
+                for media_link in media_links:
+                    msg += f"\n{media_link}"
+
+            send_normal_webhook(msg=msg, webhook=webhook_url)
         send_normal_webhook(msg=text, webhook=webhook_url)
 
     else:

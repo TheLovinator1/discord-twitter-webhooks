@@ -316,3 +316,16 @@ def get_make_text_link_url() -> str:
             )
             return ""
     return value
+
+
+def get_append_image_links() -> bool:
+    value: bool = get_setting_value(env_var="APPEND_IMAGE_LINKS", default_value=False)
+    if (
+        value
+        and not get_setting_value(env_var="NO_EMBED", default_value=False)
+        or not get_setting_value(env_var="ONLY_LINK", default_value=False)
+    ):
+        logger.warning(
+            "You need to set NO_EMBED or ONLY_LINK to True to use APPEND_IMAGE_LINKS. Defaulting to False.",
+        )
+    return value

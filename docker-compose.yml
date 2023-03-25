@@ -5,62 +5,12 @@ services:
       - .env
     container_name: discord-twitter-webhooks
     environment:
+      # Please read .env.example for more variables
       - WEBHOOK_URL=${WEBHOOK_URL}
-      # - WEBHOOK_URL2=${WEBHOOK_URL2}
-      # - WEBHOOK_URL3=${WEBHOOK_URL3}
-      # - WEBHOOK_URL4=${WEBHOOK_URL4}
-      # - WEBHOOK_URL5=${WEBHOOK_URL5}
       - BEARER_TOKEN=${BEARER_TOKEN}
       - RULE=${RULE}
-      # - RULE2=${RULE2}
-      # - RULE3=${RULE3}
-      # - RULE4=${RULE4}
-      # - RULE5=${RULE5}
       - LOG_LEVEL=${LOG_LEVEL}
       - TWITTER_IMAGE_COLLAGE_API=${TWITTER_IMAGE_COLLAGE_API}
-      # - ERROR_WEBHOOK=${ERROR_WEBHOOK}
-      # - SEND_ERRORS=False
-      # - WEBHOOK_AUTHOR_NAME=TheLovinator
-      # - WEBHOOK_AUTHOR_URL=https://github.com/TheLovinator1/discord-twitter-webhooks
-      # - WEBHOOK_AUTHOR_ICON=https://avatars.githubusercontent.com/u/4153203
-      # - WEBHOOK_IMAGE=https://upload.wikimedia.org/wikipedia/commons/0/0b/Cat_poster_1.jpg
-      # - WEBHOOK_THUMBNAIL=https://avatars.githubusercontent.com/u/4153203
-      # - WEBHOOK_FOOTER_TEXT=Hello!
-      # - WEBHOOK_FOOTER_ICON=https://avatars.githubusercontent.com/u/4153203
-      # Send a normal text message instead on an embed. Images won't work if you disable this.
-      # - NO_EMBED=True
-
-      # Don't convert t.co-urls to real urls.
-      # - DISABLE_REMOVE_TCO_LINKS=True
-
-      # Don't coverts &gt; and &lt; to > and < to make the text look nicer.
-      # - DISABLE_UNESCAPE_TEXT=True
-
-      # Don't replace the @mentions with URLs.
-      # - DISABLE_REPLACE_USERNAME=True
-
-      # Don't replace the hashtags with URLs.
-      # - DISABLE_REPLACE_HASHTAG=True
-
-      # Don't add < and > before and after the link to disable Discords link previews.
-      # Discord will add an image below the tweet for URLs found in the tweet.
-      # - DISABLE_REMOVE_DISCORD_LINK_PREVIEWS=True
-
-      # Change /r/subreddit to a clickable link.
-      # - DISABLE_REPLACE_SUBREDDIT=True
-
-      # Change /u/username to a clickable link.
-      # - DISABLE_REPLACE_REDDIT_USERNAME=True
-
-      # Clean up the URL by removing the ?utm-part
-      # https://en.wikipedia.org/wiki/UTM_parameters
-      # - DISABLE_REMOVE_UTM=True
-
-      # Don't remove trailing whitespace
-      # - DISABLE_REMOVE_TRAILING_WHITESPACE=True
-
-      # Don't remove copyright symbols (®, ™ and ©)
-      # - DISABLE_REMOVE_COPYRIGHT_SYMBOLS=True
 
     # The bot will only stop after we get a keep-alive signal from the
     # Twitter API, this can take 20 seconds.
