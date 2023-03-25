@@ -464,10 +464,3 @@ def get_webhook_show_timestamp() -> bool:
         bool: The value of the setting. Defaults to False.
     """
     return get_setting_value(setting_name="SHOW_TIMESTAMP", default_value=False)
-
-def get_embed_colors() -> bool:
-    """If we should use a random color in the embed.
-    Returns:
-        bool: The value of the setting. Defaults to False.
-    """
-    return get_setting_value(setting_name="RANDOM_EMBED_COLORS", default_value=False)

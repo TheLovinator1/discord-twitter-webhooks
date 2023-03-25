@@ -80,6 +80,12 @@ use_author: bool = get_settings.get_use_author()
 
 # Text instead of embed
 no_embed: bool = get_settings.get_no_embed()
+# If we should randomize the embed color. This will make the embed color a random color each time a tweet is sent.
+webhook_randomize_embed_color: bool = get_settings.get_setting_value(
+    env_var="RANDOMIZE_EMBED_COLOR",
+    default_value=False,
+)
+
 make_text_link: bool = get_settings.get_make_text_link()
 make_text_link_twitter_embed: bool = get_settings.get_make_text_link_twitter_embed()
 make_text_link_url: str = get_settings.get_make_text_link_url()
