@@ -3,6 +3,7 @@ import json
 import requests
 from discord_webhook import DiscordEmbed, DiscordWebhook
 from loguru import logger
+from random import randint
 
 from discord_twitter_webhooks import settings
 
@@ -90,6 +91,11 @@ def send_embed_webhook(
         # TODO: Truncate author if it's too long.
         # TODO: Add support for local images.
         embed.set_author(f"{display_name} (@{username})", url=tweet_url, icon_url=avatar_url)
+
+    # Add random color to the embed webhook
+    if settings.webhook_random_embed_colors:
+        embed.set_color(hex(randint(0, 16777215))[2:])
+
 
     # Add embed to webhook.
     # TODO: Check if embed is working before adding it to the webhook.
