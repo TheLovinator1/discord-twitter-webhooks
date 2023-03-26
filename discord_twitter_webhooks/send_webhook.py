@@ -1,4 +1,3 @@
-import json
 import tempfile
 from pathlib import Path
 from random import randint
@@ -48,37 +47,35 @@ def send_embed_webhook(
         username: Username of the user.
     """
     tweet_url: str = f"https://twitter.com/{username}/status/{tweet_id}"
+    embed: DiscordEmbed = DiscordEmbed(description=text, url=tweet_url)
 
     if not webhook:
         send_error_webhook(f"No webhook URL found. Tried to send tweet embed for {tweet_id}")
         return
-
-    # We will add the webhook when we send it. This is so we can have several webhooks for each tweet.
-    hook: DiscordWebhook = DiscordWebhook(url="", rate_limit_retry=True)
-    embed: DiscordEmbed = DiscordEmbed(description=text)
 
     if twitter_card_image:
         # TODO: Add support for local images.
         # TODO: Add support for changing the height and width of the image.
         embed.set_image(url=twitter_card_image)
 
-    if embed_image := get_embed_image(media_links, tweet_id):
-        embed.set_image(url=embed_image)
+    image_embeds: list[DiscordEmbed] = create_image_embeds(media_links=media_links, tweet_url=tweet_url)
 
     avatar_url = settings.webhook_author_icon or avatar_url
     display_name = settings.webhook_author_name or display_name
     tweet_url = settings.webhook_author_url or tweet_url
 
+    # If we should use a custom image.
     if webhook_image := settings.webhook_image:
         # TODO: Add support for local images.
-        # TODO: Add support for changing the height and width of the image.
         embed.set_image(url=webhook_image)
 
+    # If we should use a custom thumbnail.
     if thumbnail := settings.webhook_thumbnail:
         # TODO: Add support for local images.
         # TODO: Add support for changing the height and width of the image.
         embed.set_thumbnail(url=thumbnail)
 
+    # If we should show the timestamp. Defaults to True.
     if settings.webhook_show_timestamp:
         embed.set_timestamp()
 
@@ -97,9 +94,14 @@ def send_embed_webhook(
     # Set the color of the embed.
     set_color(embed)
 
-    # Add embed to webhook.
+    # Add embed to image_embeds as the first element.
+    image_embeds.insert(0, embed)
+
     # TODO: Check if embed is working before adding it to the webhook.
-    hook.add_embed(embed)
+    if image_embeds:
+        hook: DiscordWebhook = DiscordWebhook(url="", rate_limit_retry=True, embeds=image_embeds)  # type: ignore
+    else:
+        hook: DiscordWebhook = DiscordWebhook(url="", rate_limit_retry=True)
 
     # Split the webhook URL into a list if it contains multiple webhooks.
     webhook_list: list[str] = webhook.split(",")
@@ -112,6 +114,27 @@ def send_embed_webhook(
             logger.info("Webhook posted for tweet https://twitter.com/i/status/{}", tweet_id)
         else:
             send_error_webhook(f"Got {response.status_code} from {webhook}. Response: {response.text}")
+
+
+def create_image_embeds(
+    media_links: list[str],
+    tweet_url: str,
+) -> list[DiscordEmbed]:
+    """Create a list of embeds with the images.
+
+    Args:
+        media_links: List of media links from the tweet.
+        tweet_url: URL to the tweet.
+
+    Returns:
+        A list of embeds with the images.
+    """
+    embed_list: list[DiscordEmbed] = []
+    for media_link in media_links:
+        embed = DiscordEmbed(url=tweet_url)
+        embed.set_image(url=media_link)
+        embed_list.append(embed)
+    return embed_list
 
 
 def set_color(embed: DiscordEmbed) -> None:
@@ -135,53 +158,6 @@ def set_color(embed: DiscordEmbed) -> None:
 
     # Convert hex color to int.
     embed.set_color(int(embed_color[1:], 16))
-
-
-def get_embed_image(media_links, tweet_id) -> str:
-    """Get the image that will be in the Discord embed.
-
-    Args:
-        media_links: List of media links from the tweet. This is used to add the images to the embed.
-        tweet_id: Tweet ID of the tweet. This is used to link to the tweet on Twitter.
-
-    Returns:
-        The image that will be in the Discord embed.
-    """
-    embed_image: str = ""
-
-    if len(media_links):
-        if len(media_links) == 1:
-            embed_image = media_links[0]
-
-        elif len(media_links) > 1:
-            # Send images to twitter-image-collage-maker
-            # (e.g https://twitter.lovinator.space/) and get a collage back.
-            response: requests.Response = requests.get(
-                url=settings.collage_maker_url,
-                params={"tweet_id": tweet_id},
-                timeout=5,
-            )
-
-            if response.ok:
-                json_data = json.loads(response.text)
-                embed_image = json_data["url"]
-
-                # Check if image exists
-                if_exists: requests.Response = requests.head(url=embed_image, timeout=5)
-                if not if_exists.ok:
-                    send_error_webhook(
-                        (
-                            f"Image {embed_image} does not exist, but that is the URL we got from "
-                            f"{settings.collage_maker_url}. It looks like the collage maker is broken."
-                        ),
-                    )
-                    embed_image = media_links[0]
-            else:
-                error_msg: str = f"Got {response.status_code} from {settings.collage_maker_url} for tweet {tweet_id}"
-                embed_image = media_links[0]
-                send_error_webhook(error_msg)
-
-    return embed_image
 
 
 def send_normal_webhook(msg: str, webhook: str, files: list[str] | None = None) -> None:

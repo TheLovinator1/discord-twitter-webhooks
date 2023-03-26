@@ -10,8 +10,7 @@ services:
       - BEARER_TOKEN=${BEARER_TOKEN}
       - RULE=${RULE}
       - LOG_LEVEL=${LOG_LEVEL}
-      - TWITTER_IMAGE_COLLAGE_API=${TWITTER_IMAGE_COLLAGE_API}
-
+      
     # The bot will only stop after we get a keep-alive signal from the
     # Twitter API, this can take 20 seconds.
     # By default, stop waits 10 seconds for the container to exit before
