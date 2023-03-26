@@ -19,7 +19,7 @@ from discord_twitter_webhooks.rules import delete_old_rules, new_rule
 from discord_twitter_webhooks.send_webhook import (
     send_embed_webhook,
     send_error_webhook,
-    send_normal_webhook,
+    send_hook_and_files,
 )
 from discord_twitter_webhooks.settings import (
     disable_remove_copyright_symbols,
@@ -32,7 +32,6 @@ from discord_twitter_webhooks.settings import (
     disable_replace_subreddit,
     disable_replace_username,
     disable_unescape_text,
-    no_embed,
 )
 
 # TODO: Add support for Twitter Spaces
@@ -49,109 +48,157 @@ def main(response: StreamResponse) -> None:
     """The main function for the bot. This is where the magic happens."""
     logger.debug("Response: {}", response)
 
-    twitter_card_image: str = ""
-    media_links: list[str] = []
-
-    webhook_url: str = get_webhook_url(response)
-    user_information: UserInformation = get_user_information(response)
-
     text: str = get_text(response)
 
-    data = response.data
+    media_links: list[str] = get_media_links(response)
 
-    if response.includes:
-        includes: dict[str, list[Any]] = response.includes
-        if "media" in includes:
-            media_list: list[dict] = [media.data for media in response.includes["media"]]
-            logger.debug("Media list: {}", media_list)
-
-            # Get the images from the tweet and remove the URLs from the text.
-            media_links = get.media_links(media_list)
-
+    twitter_card_image: str = ""
     if (entities := get_entities(response)) and "urls" in entities:
         text = remove.remove_media_links(entities, text)
         twitter_card_image = get.meta_image(entities)
 
+        # Replace Twitters shortened URLs with the original URL.
         if disable_remove_tco_links:
-            # Replace Twitters shortened URLs with the original URL.
             text = replace.tco_url_link_with_real_link(entities, text)
 
+    # We coverts &gt; and &lt; to > and < to make the text look nicer.
     if disable_unescape_text:
-        # We coverts &gt; and &lt; to > and < to make the text look nicer.
         text = html.unescape(text)
 
+    # Replace the @mentions with URLs.
     if disable_replace_username:
-        # Replace the @mentions with URLs.
         text = replace.username_with_link(text)
 
+    # Replace the hashtags with URLs.
     if disable_replace_hashtag:
-        # Replace the hashtags with URLs.
         text = replace.hashtag_with_link(text)
 
+    # Append < and > to disable Discords link previews.
     if disable_remove_discord_link_previews:
-        # Append < and > to disable Discords link previews.
         text = remove.discord_link_previews(text)
 
+    # Change /r/subreddit to the subreddit URL.
     if disable_replace_subreddit:
-        # Change /r/subreddit to the subreddit URL.
         text = reddit.subreddit_to_link(text)
 
+    # Change /u/username to the user URL.
     if disable_replace_reddit_username:
-        # Change /u/username to the user URL.
         text = reddit.username_to_link(text)
 
+    # Remove UTM parameters, this cleans up the URL.
     if disable_remove_utm_parameters:
-        # Remove UTM parameters, this cleans up the URL.
         text = remove.utm_source(text)
 
+    # Remove trailing whitespace.
     if disable_remove_trailing_whitespace:
-        # Remove trailing whitespace.
         text = text.rstrip()
 
+    # Remove copyright symbols.
     if disable_remove_copyright_symbols:
-        # Remove copyright symbols.
         text = remove.copyright_symbols(text)
 
+    user_info: UserInformation = get_user_information(response)
+    webhook_url: str = get_webhook_url(response)
+    data = response.data
+
+    # If we should only send the link to the tweet.
     if settings.only_link:
         if settings.only_link_preview:
-            msg: str = f"https://twitter.com/{user_information.username}/status/{data.id}"
+            msg: str = f"https://twitter.com/{user_info.username}/status/{data.id}"
         else:
-            msg: str = f"<https://twitter.com/{user_information.username}/status/{data.id}>"
+            msg = f"<https://twitter.com/{user_info.username}/status/{data.id}>"
+        send_hook_and_files(media_links, msg, webhook_url)
 
-        if settings.append_image_links:
-            for media_link in media_links:
-                msg += f"\n{media_link}"
-
-        send_normal_webhook(msg=msg, webhook=webhook_url)
-
-    elif no_embed:
-        if settings.make_text_link:
-            if settings.make_text_link_twitter_embed:
-                url: str = f"https://twitter.com/{user_information.username}/status/{data.id}"
-            else:
-                url: str = f"<https://twitter.com/{user_information.username}/status/{data.id}>"
-            if settings.make_text_link_url:
-                url = settings.make_text_link_url
-            msg = f"[{text}]({url})"
-
-            if settings.append_image_links:
-                for media_link in media_links:
-                    msg += f"\n{media_link}"
-
-            send_normal_webhook(msg=msg, webhook=webhook_url)
-        send_normal_webhook(msg=text, webhook=webhook_url)
-
+    elif settings.no_embed:
+        if msg := no_embed_stuff(
+            media_links,
+            user_info,
+            text,
+            data.id,
+        ):
+            send_hook_and_files(media_links, msg, webhook_url)
     else:
         send_embed_webhook(
             tweet_id=data.id,
             media_links=media_links,
             text=text,
             twitter_card_image=twitter_card_image,
-            avatar_url=user_information.avatar_url,
-            display_name=user_information.display_name,
+            avatar_url=user_info.avatar_url,
+            display_name=user_info.display_name,
             webhook=webhook_url,
-            username=user_information.username,
+            username=user_info.username,
         )
+
+
+def get_media_links(response: StreamResponse) -> list[str]:
+    """Get the media links from the tweet.
+
+    Media links can be images, videos or gifs.
+
+    Args:
+        response: The response from the Twitter API.
+
+    Returns:
+        A list of media links.
+    """
+    # TODO: Add actual .mp4 or add play button overlay so you can see that it's a video
+    media_links: list[str] = []
+    if response.includes:
+        includes: dict[str, list[Any]] = response.includes
+        if "media" in includes:
+            media_list: list[dict] = [media.data for media in response.includes["media"]]
+            logger.debug("Media list: {}", media_list)
+
+            for image in media_list:
+                if image["type"] == "photo":
+                    media_links.append(image["url"])
+                elif image["type"] in ["animated_gif", "video"]:
+                    media_links.append(image["preview_image_url"])
+
+                logger.debug("Image added: {}", image)
+    return media_links
+
+
+def no_embed_stuff(
+    media_links: list[str],
+    user_information: UserInformation,
+    text: str,
+    tweet_id: int,
+) -> str:
+    """Send a webhook with the tweet text or as a link to the tweet.
+
+    You can also append the media links to the message.
+
+    Args:
+        media_links: A list of media links.
+        user_information: The user information.
+        text: The tweet text.
+        tweet_id: The tweet ID.
+
+    Returns:
+        The message to send.
+    """
+    if settings.make_text_link:
+        if settings.make_text_link_twitter_preview:
+            url: str = f"https://twitter.com/{user_information.username}/status/{tweet_id}"
+        else:
+            url: str = f"<https://twitter.com/{user_information.username}/status/{tweet_id}>"
+
+        # If we should use a custom URL instead of the tweet URL.
+        if settings.make_text_link_custom_url:
+            url = settings.make_text_link_custom_url
+
+        # Create the message.
+        msg: str = f"[{text}]({url})"
+
+        # If we should append the media links.
+        if settings.append_image_links:
+            for media_link in media_links:
+                msg += f"\n{media_link}"
+
+        # Send only the link.
+        return msg
+    return text
 
 
 class MyStreamListener(AsyncStreamingClient):

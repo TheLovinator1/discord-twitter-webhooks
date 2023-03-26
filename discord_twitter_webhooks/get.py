@@ -11,30 +11,6 @@ from discord_twitter_webhooks import settings
 from discord_twitter_webhooks.send_webhook import send_error_webhook
 
 
-def media_links(media: list[dict]) -> list[str]:
-    """Get media links from tweet.
-
-    Args:
-        media: The media from the tweet, can be images, videos, gifs, etc.
-
-    Returns:
-        List of media links found in the tweet
-    """
-    link_list: list[str] = []
-    for image in media:
-        # Get the media links from the tweet
-        if image["type"] == "photo":
-            link_list.append(image["url"])
-        elif image["type"] in ["animated_gif", "video"]:
-            link_list.append(image["preview_image_url"])
-            # TODO: Add actual .mp4 or add play button overlay so you can see that it's a video
-        else:
-            return []
-        logger.debug("Image: {}", image)
-
-    return link_list
-
-
 def meta_image(entities) -> str:
     """Get twitter:image meta tag from url.
 

@@ -111,10 +111,10 @@ no_embed: bool = get_settings.get_setting_value(env_var="NO_EMBED", default_valu
 make_text_link: bool = get_settings.get_make_text_link()
 
 # If we should disable the link preview by adding < > around the link.
-make_text_link_twitter_embed: bool = get_settings.get_make_text_link_twitter_embed()
+make_text_link_twitter_preview: bool = get_settings.get_make_text_link_twitter_embed()
 
 # If we should use a custom URL for the link instead of the tweet URL.
-make_text_link_url: str = get_settings.get_make_text_link_url()
+make_text_link_custom_url: str = get_settings.get_make_text_link_url()
 
 # If we should only send the link to the tweet.
 only_link: bool = get_settings.get_setting_value(env_var="ONLY_LINK", default_value=False)
@@ -123,7 +123,10 @@ only_link: bool = get_settings.get_setting_value(env_var="ONLY_LINK", default_va
 only_link_preview: bool = get_settings.get_setting_value(env_var="ONLY_LINK_PREVIEW", default_value=True)
 
 # Append link to the end of the tweet text.
-append_image_links: bool = get_settings.get_append_image_links()
+append_image_links: bool = get_settings.get_setting_value(env_var="APPEND_IMAGE_LINKS", default_value=False)
+
+# If we should upload images to Discord. Alternative to append_image_links.
+upload_images: bool = get_settings.get_setting_value(env_var="UPLOAD_IMAGES", default_value=False)
 
 # Don't convert t.co links to their original links
 disable_remove_tco_links: bool = get_settings.get_setting_value(

@@ -1,4 +1,6 @@
 import json
+import tempfile
+from pathlib import Path
 from random import randint
 
 import requests
@@ -182,23 +184,25 @@ def get_embed_image(media_links, tweet_id) -> str:
     return embed_image
 
 
-def send_normal_webhook(msg: str, webhook: str) -> None:
+def send_normal_webhook(msg: str, webhook: str, files: list[str] | None = None) -> None:
     """Send normal message to Discord webhook.
 
     Args:
         msg: Message to send
         webhook: Webhook URL. Defaults to environment variable WEBHOOK_URL.
+        files: List of files to send.
     """
-    _send_webhook(message=msg, webhook=webhook, func_name="send_normal_webhook()")
+    _send_webhook(message=msg, webhook=webhook, func_name="send_normal_webhook()", files=files)
 
 
-def _send_webhook(message: str, webhook: str, func_name: str) -> None:
+def _send_webhook(message: str, webhook: str, func_name: str, files: list[str] | None = None) -> None:
     """Send the webhook to Discord.
 
     Args:
         message: Message to send
         webhook: Webhook URL.
         func_name: Name of the function that called this function. Used for logging.
+        files: List of files to send.
     """
     logger.debug("{} - Message: {}", func_name, message)
     logger.debug("{} - Webhook URL: {}", func_name, webhook)
@@ -211,6 +215,11 @@ def _send_webhook(message: str, webhook: str, func_name: str) -> None:
     for _webhook in webhook_list:
         logger.debug("Webhook URL: {}", _webhook)
         hook: DiscordWebhook = DiscordWebhook(url=_webhook, content=message, rate_limit_retry=True)
+
+        if files:
+            for file in files:
+                with Path.open(Path(file), "rb") as f:
+                    hook.add_file(file=f.read(), filename=Path(file).name)
 
         response: requests.Response = hook.execute()
         if not response.ok:
@@ -231,3 +240,54 @@ def send_error_webhook(msg: str, webhook: str = settings.error_webhook) -> None:
         _send_webhook(message=msg, webhook=webhook, func_name="send_error_webhook()")
     else:
         logger.debug("Tried to send error webhook but send_errors is not set to True")
+
+
+def send_hook_and_files(media_links: list[str], msg: str, webhook_url: str) -> None:
+    """Send the webhook and check if we should upload images.
+
+    Args:
+        media_links: A list of media links.
+        msg: The message to send.
+        webhook_url: The webhook URL to send the message to.
+    """
+    temp_dir: tempfile.TemporaryDirectory[str] | None = None
+    images: list[str] = []
+    if settings.upload_images:
+        # Download the images from the tweet and upload them to Discord.
+        images, temp_dir = download_images(media_links)
+
+    if settings.append_image_links:
+        for media_link in media_links:
+            msg += f"\n{media_link}"
+
+    send_normal_webhook(msg=msg, webhook=webhook_url, files=images)
+
+    if temp_dir:
+        temp_dir.cleanup()
+
+
+def download_images(media_links: list[str]) -> tuple[list[str], tempfile.TemporaryDirectory[str]]:
+    """Download the images from the tweet.
+
+    The temporary directory is returned so we can delete it after we have uploaded the images to Discord.
+
+    Args:
+        media_links: A list of media links.
+
+    Returns:
+        A tuple of a list of images and a temporary directory.
+    """
+    temp_dir = tempfile.TemporaryDirectory()
+
+    # Add the images to a list so we can upload them to Discord.
+    images: list[str] = []
+    for media_link in media_links:
+        res: requests.Response = requests.get(url=media_link, stream=True, timeout=5)
+        if res.ok:
+            with Path.open(Path(f"{temp_dir.name}/{media_link.split('/')[-1]}"), "wb") as f:
+                for chunk in res.iter_content(1024):
+                    f.write(chunk)
+                images.append(f"{temp_dir.name}/{media_link.split('/')[-1]}")
+        else:
+            logger.error("Failed to download image: {}", media_link)
+    return images, temp_dir
