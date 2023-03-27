@@ -8,19 +8,19 @@ import sys
 import tweepy
 from loguru import logger
 from tweepy import StreamRule
-from tweepy.asynchronous import AsyncStreamingClient
+from tweepy.streaming import StreamingClient
 
 from discord_twitter_webhooks.send_webhook import send_error_webhook
 
 
-async def delete_old_rules(stream: AsyncStreamingClient) -> None:
+def delete_old_rules(stream: StreamingClient) -> None:
     """Check if we have any old rules and delete them if we do.
 
     Args:
         stream: The tweepy stream object
     """
     # Check Twitter app for rules that already have been created.
-    old_rules = await stream.get_rules()
+    old_rules = stream.get_rules()
     logger.debug("Old rules: {}", old_rules)
 
     # Get rules and add to list, so we can delete them later.
@@ -36,12 +36,12 @@ async def delete_old_rules(stream: AsyncStreamingClient) -> None:
     # If the app already has rules, delete them first before adding our own
     if rules_to_delete:
         logger.debug("Deleting rules: {}", rules_to_delete)
-        await stream.delete_rules(rules_to_delete)
+        stream.delete_rules(rules_to_delete)
     else:
         logger.debug("App had no rules to delete")
 
 
-async def new_rule(rule: str, rule_tag: str, stream: AsyncStreamingClient) -> str:
+def new_rule(rule: str, rule_tag: str, stream: StreamingClient) -> str:
     """Add rule to Twitter. If error, exit.
 
     Args:
@@ -52,7 +52,7 @@ async def new_rule(rule: str, rule_tag: str, stream: AsyncStreamingClient) -> st
     logger.info("Adding rule: {} to Twitter", rule)
     if rule:
         rule_to_add: StreamRule = tweepy.StreamRule(value=rule, tag=rule_tag)
-        rule_response = await stream.add_rules(add=rule_to_add)
+        rule_response = stream.add_rules(add=rule_to_add)
 
         if rule_response.errors:  # type: ignore
             for error in rule_response.errors:  # type: ignore

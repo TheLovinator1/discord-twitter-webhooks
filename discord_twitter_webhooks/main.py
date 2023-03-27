@@ -1,11 +1,9 @@
-import asyncio
 import html
 import sys
 from typing import Any
 
 from loguru import logger
-from tweepy.asynchronous import AsyncStreamingClient
-from tweepy.streaming import StreamResponse
+from tweepy.streaming import StreamingClient, StreamResponse
 
 from discord_twitter_webhooks import get, reddit, remove, replace, settings
 from discord_twitter_webhooks.get import (
@@ -205,13 +203,13 @@ def no_embed_stuff(
     return text
 
 
-class MyStreamListener(AsyncStreamingClient):
+class MyStreamListener(StreamingClient):
     """https://docs.tweepy.org/en/latest/streaming.html#using-streamingclient.
 
     Stream tweets in realtime.
     """
 
-    async def on_exception(self, exception: Exception) -> None:  # noqa: ANN101
+    def on_exception(self, exception: Exception) -> None:  # noqa: ANN101
         """An unhandled exception was raised while streaming. Shutting down."""
         error_msg: str = f"discord-twitter-webhooks: An unhandled exception was raised while streaming. Shutting down\nException: {exception}"  # noqa: E501
         send_error_webhook(error_msg)
@@ -219,15 +217,15 @@ class MyStreamListener(AsyncStreamingClient):
         self.disconnect()
         sys.exit(error_msg)
 
-    async def on_response(self, response: StreamResponse) -> None:  # noqa: ANN101
+    def on_response(self, response: StreamResponse) -> None:  # noqa: ANN101
         """This is called when a response is received."""
         if response.data:
             main(response)
 
 
-async def start_bot() -> None:
+def start() -> None:
     """Authenticate to the Twitter API and start the filter."""
-    # TODO: Add proxy support?
+    # TODO: Add proxy support? If we add proxy support we should also add it to the webhook.
     stream: MyStreamListener = MyStreamListener(
         settings.bearer_token,
         wait_on_rate_limit=True,
@@ -235,13 +233,13 @@ async def start_bot() -> None:
 
     # Delete old rules
     # TODO: We should only delete the rules we created and if they are changed.
-    await delete_old_rules(stream=stream)
+    delete_old_rules(stream=stream)
 
     # Create the rules
     rules: dict[int, str] = settings.rules
     for rule_num in rules:
         rule: str = str(rules[rule_num])
-        rule_id: str = await new_rule(stream=stream, rule=rule, rule_tag=f"rule{rule_num}")
+        rule_id: str = new_rule(stream=stream, rule=rule, rule_tag=f"rule{rule_num}")
         rule_ids[rule_num] = {rule_id}
 
     logger.debug("Rule IDs: {}", rule_ids)
@@ -249,7 +247,7 @@ async def start_bot() -> None:
     # TODO: dry_run before to make sure everything works?
     # TODO: We should remove everything that is not needed.
     try:
-        await stream.filter(
+        stream.filter(
             expansions=[
                 "author_id",
                 "referenced_tweets.id",
@@ -278,11 +276,6 @@ async def start_bot() -> None:
         logger.info("Bye!")
         stream.disconnect()
         sys.exit(0)
-
-
-def start() -> None:
-    """Start the bot."""
-    asyncio.run(start_bot())
 
 
 if __name__ == "__main__":
