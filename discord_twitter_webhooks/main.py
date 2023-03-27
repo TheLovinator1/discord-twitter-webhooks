@@ -107,7 +107,7 @@ def main(response: StreamResponse) -> None:
             msg: str = f"https://twitter.com/{user_info.username}/status/{data.id}"
         else:
             msg = f"<https://twitter.com/{user_info.username}/status/{data.id}>"
-        send_hook_and_files(media_links, msg, webhook_url)
+        send_hook_and_files(media_links, msg, webhook_url, user_info)
 
     elif settings.no_embed:
         if msg := no_embed_stuff(
@@ -116,7 +116,7 @@ def main(response: StreamResponse) -> None:
             text,
             data.id,
         ):
-            send_hook_and_files(media_links, msg, webhook_url)
+            send_hook_and_files(media_links, msg, webhook_url, user_info)
     else:
         send_embed_webhook(
             tweet_id=data.id,
@@ -190,6 +190,10 @@ def no_embed_stuff(
 
         # Create the message.
         msg: str = f"[{text}]({url})"
+
+        # If we should append the username to the message.
+        if settings.append_username:
+            msg += f"\n@{user_information.username}"
 
         # If we should append the media links.
         if settings.append_image_links:

@@ -218,13 +218,14 @@ def send_error_webhook(msg: str, webhook: str = settings.error_webhook) -> None:
         logger.debug("Tried to send error webhook but send_errors is not set to True")
 
 
-def send_hook_and_files(media_links: list[str], msg: str, webhook_url: str) -> None:
+def send_hook_and_files(media_links: list[str], msg: str, webhook_url: str, user_info) -> None:
     """Send the webhook and check if we should upload images.
 
     Args:
         media_links: A list of media links.
         msg: The message to send.
         webhook_url: The webhook URL to send the message to.
+        user_info: The user info.
     """
     temp_dir: tempfile.TemporaryDirectory[str] | None = None
     images: list[str] = []
@@ -232,6 +233,11 @@ def send_hook_and_files(media_links: list[str], msg: str, webhook_url: str) -> N
         # Download the images from the tweet and upload them to Discord.
         images, temp_dir = download_images(media_links)
 
+    # If we should append the username to the message.
+    if settings.append_username:
+        msg += f"\n@{user_info.username}"
+
+    # If we should append the image links to the message.
     if settings.append_image_links:
         for media_link in media_links:
             msg += f"\n{media_link}"

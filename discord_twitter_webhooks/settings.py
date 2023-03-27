@@ -122,6 +122,9 @@ only_link: bool = get_settings.get_setting_value(env_var="ONLY_LINK", default_va
 # If we should disable the link preview by adding < > around the link.
 only_link_preview: bool = get_settings.get_setting_value(env_var="ONLY_LINK_PREVIEW", default_value=True)
 
+# Append username to text.
+append_username: bool = get_settings.get_setting_value(env_var="APPEND_USERNAME", default_value=False)
+
 # Append link to the end of the tweet text.
 append_image_links: bool = get_settings.get_setting_value(env_var="APPEND_IMAGE_LINKS", default_value=False)
 
