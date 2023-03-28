@@ -58,6 +58,10 @@ def meta_image(entities) -> str:
 
         logger.debug("image_url: {}", image_url)
 
+    # Some URLs don't have a protocol, so we add it here.
+    if image_url.startswith("//"):
+        image_url = f"https:{image_url}"
+
     return image_url
 
 
