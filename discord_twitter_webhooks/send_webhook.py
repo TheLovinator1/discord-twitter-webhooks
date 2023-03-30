@@ -11,8 +11,8 @@ from discord_twitter_webhooks import settings
 
 def customize_footer(embed: DiscordEmbed) -> DiscordEmbed:
     """Customize the webhook footer."""
-    footer_icon: str = settings.webhook_footer_icon
-    footer_text: str = settings.webhook_footer_text
+    footer_icon: str = settings.embed_footer_icon
+    footer_text: str = settings.embed_footer_text
 
     if footer_icon and footer_text:
         embed.set_footer(icon_url=footer_icon, text=footer_text)
@@ -29,7 +29,7 @@ def send_embed_webhook(
     media_links: list[str],
     text: str,
     twitter_card_image: str,
-    avatar_url: str,
+    author_icon: str,
     display_name: str,
     webhook: str,
     username: str,
@@ -50,49 +50,39 @@ def send_embed_webhook(
     embed: DiscordEmbed = DiscordEmbed(description=text, url=tweet_url)
 
     if not webhook:
-        send_error_webhook(f"No webhook URL found. Tried to send tweet embed for {tweet_id}")
+        send_error_webhook(f"No webhook URL found. Tried to send tweet embed for {tweet_url}")
         return
 
     if twitter_card_image:
-        # TODO: Add support for local images.
-        # TODO: Add support for changing the height and width of the image.
         embed.set_image(url=twitter_card_image)
 
     image_embeds: list[DiscordEmbed] = create_image_embeds(media_links=media_links, tweet_url=tweet_url)
 
-    avatar_url = settings.webhook_author_icon or avatar_url
-    display_name = settings.webhook_author_name or display_name
-    tweet_url = settings.webhook_author_url or tweet_url
-
     # If we should use a custom image.
-    if webhook_image := settings.webhook_image:
+    if webhook_image := settings.embed_image:
         # TODO: Add support for local images.
         embed.set_image(url=webhook_image)
 
     # If we should use a custom thumbnail.
-    if thumbnail := settings.webhook_thumbnail:
-        # TODO: Add support for local images.
-        # TODO: Add support for changing the height and width of the image.
+    if thumbnail := settings.embed_thumbnail:
         embed.set_thumbnail(url=thumbnail)
 
-    # If we should show the timestamp. Defaults to True.
-    if settings.webhook_show_timestamp:
+    if settings.show_timestamp:
         embed.set_timestamp()
 
     # If the user has customized the footer, we will use that instead of the default which is nothing.
     embed = customize_footer(embed)
 
-    if settings.use_title:
-        # TODO: Truncate title if it's too long.
+    if settings.show_title:
         embed.set_title(f"{display_name} (@{username})")
 
-    if settings.use_author:
-        # TODO: Truncate author if it's too long.
-        # TODO: Add support for local images.
-        embed.set_author(f"{display_name} (@{username})", url=tweet_url, icon_url=avatar_url)
+    if settings.show_author:
+        author_icon = settings.embed_author_icon or author_icon
+        embed.set_author(f"{display_name} (@{username})", url=tweet_url, icon_url=author_icon)
 
     # Set the color of the embed.
-    set_color(embed)
+    color: int = get_color()
+    embed.set_color(color)
 
     # Add embed to image_embeds as the first element.
     image_embeds.insert(0, embed)
@@ -137,27 +127,27 @@ def create_image_embeds(
     return embed_list
 
 
-def set_color(embed: DiscordEmbed) -> None:
-    """Set the color of the embed.
+def get_color() -> int:
+    """Get the color of the embed.
 
-    Args:
-        embed: The embed to set the color of.
+    Returns:
+        The color of the embed as an int.
     """
     twitter_blue = "#1DA1F2"
-    if webhook_embed_color := settings.webhook_embed_color:
-        hex_color_length: int = 7  # 6 hex characters + 1 for the #
-        if len(webhook_embed_color) == hex_color_length and webhook_embed_color[0] == "#":
-            embed_color: str = webhook_embed_color
+    embed_color: str = twitter_blue
+    if webhook_embed_color := settings.embed_color:
+        if webhook_embed_color.lower() == "random":
+            embed_color = hex(randint(0, 16777215))[2:]  # noqa: S311
         else:
-            logger.error("Invalid webhook embed color {}. Using default color.", webhook_embed_color)
-            embed_color: str = twitter_blue
-    elif settings.webhook_randomize_embed_color:
-        embed_color = hex(randint(0, 16777215))[2:]  # noqa: S311
-    else:
-        embed_color: str = twitter_blue
+            hex_color_length: int = 7  # 6 hex characters + 1 for the #
+            if len(webhook_embed_color) == hex_color_length and webhook_embed_color[0] == "#":
+                embed_color: str = webhook_embed_color
+            else:
+                logger.error("Invalid webhook embed color {}. Using default color.", webhook_embed_color)
+                embed_color: str = twitter_blue
 
     # Convert hex color to int.
-    embed.set_color(int(embed_color[1:], 16))
+    return int(embed_color[1:], 16)
 
 
 def send_normal_webhook(msg: str, webhook: str, files: list[str] | None = None) -> None:
@@ -212,7 +202,7 @@ def send_error_webhook(msg: str, webhook: str = settings.error_webhook) -> None:
     # TODO: Split webhook into multiple webhooks if it contains multiple webhooks.
     logger.error("Got an error: {}", msg)
 
-    if settings.send_errors == "True":
+    if settings.error_webhook:
         _send_webhook(message=msg, webhook=webhook, func_name="send_error_webhook()")
     else:
         logger.debug("Tried to send error webhook but send_errors is not set to True")

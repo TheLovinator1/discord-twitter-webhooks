@@ -19,25 +19,6 @@ from discord_twitter_webhooks.send_webhook import (
     send_error_webhook,
     send_hook_and_files,
 )
-from discord_twitter_webhooks.settings import (
-    disable_remove_copyright_symbols,
-    disable_remove_discord_link_previews,
-    disable_remove_tco_links,
-    disable_remove_trailing_whitespace,
-    disable_remove_utm_parameters,
-    disable_replace_hashtag,
-    disable_replace_reddit_username,
-    disable_replace_subreddit,
-    disable_replace_username,
-    disable_unescape_text,
-)
-
-# TODO: Add support for Twitter Spaces
-# TODO: Add backfill so we get missed tweets?
-# TODO: Add threading?
-# TODO: Add polls?
-# TODO: If tweet is deleted, remove it from Discord?
-# TODO: If tweet is poll, update it in Discord, so we can see results?
 
 rule_ids = {}
 
@@ -55,44 +36,31 @@ def main(response: StreamResponse) -> None:
         text = remove.remove_media_links(entities, text)
         twitter_card_image = get.meta_image(entities)
 
-        # Replace Twitters shortened URLs with the original URL.
-        if disable_remove_tco_links:
+        if settings.remove_tco_links:
             text = replace.tco_url_link_with_real_link(entities, text)
 
-    # We coverts &gt; and &lt; to > and < to make the text look nicer.
-    if disable_unescape_text:
+    if settings.unescape_text:
         text = html.unescape(text)
 
-    # Replace the @mentions with URLs.
-    if disable_replace_username:
+    if settings.replace_username:
         text = replace.username_with_link(text)
 
-    # Replace the hashtags with URLs.
-    if disable_replace_hashtag:
+    if settings.replace_hashtag:
         text = replace.hashtag_with_link(text)
 
-    # Append < and > to disable Discords link previews.
-    if disable_remove_discord_link_previews:
+    if settings.discord_link_previews:
         text = remove.discord_link_previews(text)
 
-    # Change /r/subreddit to the subreddit URL.
-    if disable_replace_subreddit:
+    if settings.replace_subreddit:
         text = reddit.subreddit_to_link(text)
 
-    # Change /u/username to the user URL.
-    if disable_replace_reddit_username:
+    if settings.replace_reddit_username:
         text = reddit.username_to_link(text)
 
-    # Remove UTM parameters, this cleans up the URL.
-    if disable_remove_utm_parameters:
+    if settings.remove_utm_parameters:
         text = remove.utm_source(text)
 
-    # Remove trailing whitespace.
-    if disable_remove_trailing_whitespace:
-        text = text.rstrip()
-
-    # Remove copyright symbols.
-    if disable_remove_copyright_symbols:
+    if settings.remove_copyright_symbols:
         text = remove.copyright_symbols(text)
 
     user_info: UserInformation = get_user_information(response)
@@ -121,7 +89,7 @@ def main(response: StreamResponse) -> None:
             media_links=media_links,
             text=text,
             twitter_card_image=twitter_card_image,
-            avatar_url=user_info.avatar_url,
+            author_icon=user_info.avatar_url,
             display_name=user_info.display_name,
             webhook=webhook_url,
             username=user_info.username,
@@ -139,7 +107,6 @@ def get_media_links(response: StreamResponse) -> list[str]:
     Returns:
         A list of media links.
     """
-    # TODO: Add actual .mp4 or add play button overlay so you can see that it's a video
     media_links: list[str] = []
     if response.includes:
         includes: dict[str, list[Any]] = response.includes
@@ -225,14 +192,11 @@ class MyStreamListener(StreamingClient):
 
 def start() -> None:
     """Authenticate to the Twitter API and start the filter."""
-    # TODO: Add proxy support? If we add proxy support we should also add it to the webhook.
     stream: MyStreamListener = MyStreamListener(
         settings.bearer_token,
         wait_on_rate_limit=True,
     )
 
-    # Delete old rules
-    # TODO: We should only delete the rules we created and if they are changed.
     delete_old_rules(stream=stream)
 
     # Create the rules
@@ -244,8 +208,6 @@ def start() -> None:
 
     logger.debug("Rule IDs: {}", rule_ids)
 
-    # TODO: dry_run before to make sure everything works?
-    # TODO: We should remove everything that is not needed.
     try:
         stream.filter(
             expansions=[

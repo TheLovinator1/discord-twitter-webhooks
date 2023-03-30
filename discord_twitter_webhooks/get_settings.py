@@ -95,19 +95,40 @@ def get_setting_value(env_var: str, default_value: bool) -> bool:
     if value.lower() in {"y", "yes", "true", "on", "1", "enable", "enabled"}:
         logger.debug("'{}' is set to '{}', enabling.", env_var, value)
         return True
-    logger.debug(
-        "Failed to get a valid value for '{}' which is set to '{}'. Defaulting to '{}'.",
-        env_var,
-        value,
-        default_value,
-    )
+    if value != "":
+        logger.warning(
+            "'{}' is set to '{}', which is not a valid value. Defaulting to {}.",
+            env_var,
+            value,
+            default_value,
+        )
     return default_value
 
 
+def truncate_string(setting_value: str, env_var: str, max_length: int = 256) -> str:
+    result: str = setting_value
+
+    # Truncate the string if it is too long
+    if len(result) > max_length:
+        result: str = f"{result[:max_length - 3]}..."
+        logger.error("{} is longer than max length ({}), truncating to {}", env_var, max_length, result)
+
+    logger.info("{} set to {}", setting_value, result)
+
+    return result
+
+
 def get_bearer_token() -> str:
+    # This was the example bearer token in the .env.example file before it got change to YOUR_BEARER_TOKEN.
+    example_bearer_token = "AAAAAAAAAAAAAAAAAAAAAAMGcQEAAAAA2Xh6%2Bjxw4NM7xetr2C9trBdsNUo%3DIyQF6ddixAnAtuAUq7NRKUVcGJsJ8IlriICvVWqCWFK2SfhRY"  # noqa: S105, E501
     bearer_token: str = os.getenv("BEARER_TOKEN", default="")
+
+    if example_bearer_token == bearer_token:
+        sys.exit("You need to set BEARER_TOKEN to a valid bearer token.")
+
     if not bearer_token:
-        sys.exit("No bearer token found in .env file or environment variables.")
+        sys.exit("You need to set BEARER_TOKEN to a valid bearer token.")
+
     return bearer_token
 
 
@@ -127,8 +148,16 @@ def get_log_level() -> str:
     return log_level
 
 
-def warn_if_http(url: str, hook_name: str) -> None:
-    if urlparse(url).scheme == "http":
+def warn_if_not_https(url: str, hook_name: str) -> None:
+    """Warn if the url is not https.
+
+    Args:
+        url: The url to check.
+        hook_name: The environment variable name.
+    """
+    if not url:
+        return
+    if urlparse(url).scheme != "https":
         logger.warning("{} should probably be a https url do to security reasons.", hook_name)
 
 
@@ -140,161 +169,227 @@ def get_error_webhook() -> str:
     Returns:
         str: The error webhook. Defaults to "".
     """
-    # Only get the error webhook if we should send errors.
+    # Get the error webhook from the environment.
     value: str = os.getenv("ERROR_WEBHOOK", default="")
-    if not get_setting_value(env_var="SEND_ERRORS", default_value=False):
-        logger.warning("SEND_ERRORS is set to False, but ERROR_WEBHOOK is set to '{}'.", value)
+
+    # If error webhook is not set, return an empty string immediately.
+    if not value:
+        return value
+
+    warn_if_not_https(value, "ERROR_WEBHOOK")
+
+    # Remove " and ' from the start and end if they exist
+    value = value.strip("'").strip('"')
+
+    # Discord webhooks start with https://discord.com/api/webhooks/
+    if not value.startswith("https://discord.com/api/webhooks/"):
+        log_msg: str = (
+            "Your ERROR_WEBHOOK does not start with https://discord.com/api/webhooks/, is this correct?"
+            f" It is currently set to '{value}'"
+        )
+        logger.warning(log_msg)
+
     return value
 
 
-def get_webhook_author_name(author_name: str = "", max_author_name_length: int = 236) -> str:
-    """Customize the name of the webhook author.
+def get_embed_author_name() -> str:
+    """Customize the embed author name.
 
-    Embed titles can be up to 256 characters.
-    256 (max title) - 15 (max username) - 2 (spaces) - 1 (@) - 2 (parenthesis) = 236
-
-    Args:
-        author_name: The name of the webhook author.
-        max_author_name_length: The maximum length of the webhook author name.
+    Author name can be up to 256 characters.
 
     Returns:
         str: The webhook author name. Defaults to "".
     """
-    if not author_name:
-        author_name = os.getenv("WEBHOOK_AUTHOR_NAME", default="")
-    if len(author_name) > max_author_name_length:
-        logger.warning("WEBHOOK_AUTHOR_NAME has to be less than 236 characters. It will be truncated.")
-        author_name = author_name[:max_author_name_length]
+    author_name: str = ""
+
+    # Setting was renamed from WEBHOOK_AUTHOR_NAME to EMBED_AUTHOR_NAME
+    new: str = os.getenv("EMBED_AUTHOR_NAME", default="")
+    old: str = os.getenv("WEBHOOK_AUTHOR_NAME", default="")
+
+    # If both are set, use the new one.
+    if new and old:
+        log_msg = "Both EMBED_AUTHOR_NAME and WEBHOOK_AUTHOR_NAME are set. EMBED_AUTHOR_NAME will be used."
+        logger.warning(log_msg)
+    elif new:
+        author_name = truncate_string(new, "EMBED_AUTHOR_NAME")
+    elif old:
+        author_name = truncate_string(old, "WEBHOOK_AUTHOR_NAME")
+
     return author_name
 
 
-def get_webhook_author_url(author_url: str = "") -> str:
-    """Customize the url of the webhook author.
-
-    Args:
-        author_url: Custom url for the webhook author. Otherwise defaults to the env var or "".
+def get_embed_author_url() -> str:
+    """Customize the embed author url.
 
     Returns:
         str: The webhook author url. Defaults to "".
     """
-    if not author_url:
-        author_url = os.getenv("WEBHOOK_AUTHOR_URL", default="")
-    warn_if_http(author_url, "WEBHOOK_AUTHOR_URL")
+    author_url: str = ""
+
+    # Setting was renamed from WEBHOOK_AUTHOR_URL to EMBED_AUTHOR_URL
+    old: str = os.getenv("WEBHOOK_AUTHOR_URL", default="")
+    new: str = os.getenv("EMBED_AUTHOR_URL", default="")
+
+    # If both are set, use the new one.
+    if old and new:
+        log_msg = "Both WEBHOOK_AUTHOR_URL and EMBED_AUTHOR_URL are set. EMBED_AUTHOR_URL will be used."
+        logger.warning(log_msg)
+    elif new:
+        warn_if_not_https(author_url, "EMBED_AUTHOR_URL")
+        author_url = truncate_string(new, "EMBED_AUTHOR_URL")
+    elif old:
+        warn_if_not_https(author_url, "WEBHOOK_AUTHOR_URL")
+        author_url = truncate_string(old, "WEBHOOK_AUTHOR_URL")
+
     return author_url
 
 
-def get_webhook_author_icon(author_icon: str = "") -> str:
-    """Customize the icon of the webhook author.
-
-    Args:
-        author_icon: Custom icon for the webhook author. Otherwise defaults to the env var or "".
+def get_embed_author_icon() -> str:
+    """Customize the embed author icon.
 
     Returns:
         str: The webhook author icon. Defaults to "".
     """
-    if not author_icon:
-        author_icon = os.getenv("WEBHOOK_AUTHOR_ICON", default="")
-    warn_if_http(author_icon, "WEBHOOK_AUTHOR_ICON")
+    author_icon: str = ""
+
+    # Setting was renamed from WEBHOOK_AUTHOR_ICON to EMBED_AUTHOR_ICON
+    old: str = os.getenv("WEBHOOK_AUTHOR_ICON", default="")
+    new: str = os.getenv("EMBED_AUTHOR_ICON", default="")
+
+    # If both are set, use the new one.
+    if old and new:
+        log_msg = "Both WEBHOOK_AUTHOR_ICON and EMBED_AUTHOR_ICON are set. EMBED_AUTHOR_ICON will be used."
+        logger.warning(log_msg)
+    elif new:
+        warn_if_not_https(author_icon, "EMBED_AUTHOR_ICON")
+        author_icon = truncate_string(new, "EMBED_AUTHOR_ICON")
+    elif old:
+        warn_if_not_https(author_icon, "WEBHOOK_AUTHOR_ICON")
+        author_icon = truncate_string(old, "WEBHOOK_AUTHOR_ICON")
+
     return author_icon
 
 
-def get_webhook_image(webhook_image: str = "") -> str:
-    """Customize the image of the webhook.
-
-    Args:
-        webhook_image: Custom image for the webhook. Otherwise defaults to the env var or "".
+def get_embed_image() -> str:
+    """Customize the embed image.
 
     Returns:
         str: The webhook image. Defaults to "".
     """
-    if not webhook_image:
-        os.getenv("WEBHOOK_IMAGE", default="")
-    warn_if_http(webhook_image, "WEBHOOK_IMAGE")
-    return webhook_image
+    embed_image: str = ""
+
+    # Setting was renamed from WEBHOOK_IMAGE to EMBED_IMAGE
+    old: str = os.getenv("WEBHOOK_IMAGE", default="")
+    new: str = os.getenv("EMBED_IMAGE", default="")
+
+    # If both are set, use the new one.
+    if old and new:
+        log_msg = "Both WEBHOOK_IMAGE and EMBED_IMAGE are set. EMBED_IMAGE will be used."
+        logger.warning(log_msg)
+    elif new:
+        warn_if_not_https(embed_image, "EMBED_IMAGE")
+        truncate_string(new, "EMBED_IMAGE")
+    elif old:
+        warn_if_not_https(embed_image, "WEBHOOK_IMAGE")
+        truncate_string(old, "WEBHOOK_IMAGE")
+
+    return embed_image
 
 
-def get_webhook_thumbnail(webhook_thumbnail: str = "") -> str:
-    """Customize the thumbnail of the webhook.
-
-    Args:
-        webhook_thumbnail: Custom thumbnail for the webhook. Otherwise defaults to the env var or "".
+def get_embed_thumbnail() -> str:
+    """Customize the embed thumbnail.
 
     Returns:
         str: The webhook thumbnail. Defaults to "".
     """
-    if not webhook_thumbnail:
-        os.getenv("WEBHOOK_THUMBNAIL", default="")
-    warn_if_http(webhook_thumbnail, "WEBHOOK_THUMBNAIL")
-    return webhook_thumbnail
+    embed_thumbnail: str = ""
+
+    # Setting was renamed from WEBHOOK_IMAGE to EMBED_IMAGE
+    old: str = os.getenv("WEBHOOK_THUMBNAIL", default="")
+    new: str = os.getenv("EMBED_THUMBNAIL", default="")
+
+    # If both are set, use the new one.
+    if old and new:
+        log_msg = "Both WEBHOOK_THUMBNAIL and EMBED_THUMBNAIL are set. EMBED_THUMBNAIL will be used."
+        logger.warning(log_msg)
+    elif new:
+        warn_if_not_https(embed_thumbnail, "EMBED_THUMBNAIL")
+        truncate_string(new, "EMBED_THUMBNAIL")
+    elif old:
+        warn_if_not_https(embed_thumbnail, "WEBHOOK_THUMBNAIL")
+        truncate_string(old, "WEBHOOK_THUMBNAIL")
+
+    return embed_thumbnail
 
 
-def get_webhook_footer_text(footer_text: str = "") -> str:
-    """Customize the footer text of the webhook.
+def get_embed_footer_text() -> str:
+    """Customize the embed footer text.
 
     Returns:
         str: The webhook footer text. Defaults to "".
     """
-    # The footer text is limited to 2048 characters
-    max_footer_length: int = 2047
-    env_name: str = "WEBHOOK_FOOTER_TEXT"
-    if not footer_text:
-        footer_text = os.getenv(env_name, default="")
-    if len(footer_text) > max_footer_length:
-        logger.warning(
-            "{} has to be less than {} characters. It will be truncated.",
-            env_name,
-            max_footer_length,
-        )
-        footer_text = footer_text[:max_footer_length]
+    footer_text: str = ""
+
+    # Setting was renamed from WEBHOOK_IMAGE to EMBED_IMAGE
+    old: str = os.getenv("WEBHOOK_FOOTER_TEXT", default="")
+    new: str = os.getenv("EMBED_FOOTER_TEXT", default="")
+
+    # If both are set, use the new one.
+    if old and new:
+        log_msg = "Both WEBHOOK_FOOTER_TEXT and EMBED_FOOTER_TEXT are set. EMBED_FOOTER_TEXT will be used."
+        logger.warning(log_msg)
+    elif new:
+        warn_if_not_https(footer_text, "EMBED_FOOTER_TEXT")
+        truncate_string(new, "EMBED_FOOTER_TEXT", 2000)
+    elif old:
+        warn_if_not_https(footer_text, "WEBHOOK_FOOTER_TEXT")
+        truncate_string(old, "WEBHOOK_FOOTER_TEXT", 2000)
+
     return footer_text
 
 
-def get_webhook_footer_icon() -> str:
+def get_embed_footer_icon() -> str:
     """Customize the footer icon of the webhook.
 
     Returns:
         str: The webhook footer icon. Defaults to "". If WEBHOOK_FOOTER_TEXT is not set, this will also return "".
     """
-    # TODO: Check if valid url.
-    value: str = os.getenv("WEBHOOK_FOOTER_ICON", default="")
-    if value and not os.getenv("WEBHOOK_FOOTER_TEXT", default=""):
-        logger.warning(
-            (
-                "WEBHOOK_FOOTER_ICON is set, but WEBHOOK_FOOTER_TEXT is not. I think you need to enable this to show"
-                " the icon."
-            ),
-        )
-    return value
+    # TODO: Warn if WEBHOOK_FOOTER_TEXT is not set. Return "" if it is not set.
+    footer_icon: str = ""
+
+    if new := os.getenv("EMBED_FOOTER_ICON", default=""):
+        warn_if_not_https(footer_icon, "EMBED_FOOTER_ICON")
+        return truncate_string(new, "EMBED_FOOTER_ICON")
+
+    if old := os.getenv("WEBHOOK_FOOTER_ICON", default=""):
+        warn_if_not_https(footer_icon, "WEBHOOK_FOOTER_ICON")
+        return truncate_string(old, "WEBHOOK_FOOTER_ICON")
+
+    return ""
 
 
-def get_make_text_link() -> bool:
+def should_make_text_link() -> bool:
     """If we should make the tweet text a link to the tweet.
 
     Returns:
         bool: The value of the setting. Defaults to False.
     """
     value: bool = get_setting_value(env_var="MAKE_TEXT_LINK", default_value=False)
-    if value and not get_setting_value(env_var="NO_EMBED", default_value=False):
-        logger.warning(
-            "You need to set NO_EMBED to True to use MAKE_TEXT_LINK. Defaulting to False.",
-        )
-        return False
+    if value:
+        get_setting_value(env_var="NO_EMBED", default_value=False)
+
     return value
 
 
-def get_make_text_link_twitter_embed() -> bool:
+def get_make_text_link_preview() -> bool:
     """If we should make the tweet text a link to the tweet.
 
     Returns:
         bool: The value of the setting. Defaults to False.
     """
-    value: bool = get_setting_value(env_var="MAKE_TEXT_LINK_TWITTER_EMBED", default_value=False)
-    if value and not get_setting_value(env_var="NO_EMBED", default_value=False):
-        logger.warning(
-            "You need to set NO_EMBED to True to use MAKE_TEXT_LINK_TWITTER_EMBED. Defaulting to False.",
-        )
-        return False
-    return value
+    old: bool = get_setting_value(env_var="MAKE_TEXT_LINK_TWITTER_EMBED", default_value=False)
+    new: bool = get_setting_value(env_var="MAKE_TEXT_LINK_PREVIEW", default_value=False)
+    return False if old else new
 
 
 def get_make_text_link_url() -> str:
@@ -305,7 +400,7 @@ def get_make_text_link_url() -> str:
     """  # noqa: E501
     value: str = os.getenv("MAKE_TEXT_LINK_URL", default="")
     if value:
-        if not get_make_text_link():
+        if not should_make_text_link():
             logger.warning(
                 "You need to set MAKE_TEXT_LINK to True to use MAKE_TEXT_LINK_URL. Defaulting to tweet URL.",
             )
@@ -315,4 +410,159 @@ def get_make_text_link_url() -> str:
                 "You need to set NO_EMBED to True to use MAKE_TEXT_LINK.",
             )
             return ""
+        logger.info("MAKE_TEXT_LINK_URL is set to %s.", value)
     return value
+
+
+def get_remove_copyright_symbols() -> bool:
+    """If we should remove the copyright symbols from the tweet text.
+
+    Returns:
+        bool: The value of the setting. Defaults to True.
+    """
+    old: bool = get_setting_value(env_var="DISABLE_REMOVE_COPYRIGHT_SYMBOLS", default_value=False)
+    new: bool = get_setting_value(env_var="REMOVE_COPYRIGHT_SYMBOLS", default_value=True)
+    return False if old else new
+
+
+def get_remove_utm_parameters() -> bool:
+    """If we should remove the copyright symbols from the tweet text.
+
+    Returns:
+        bool: The value of the setting. Defaults to True.
+    """
+    old: bool = get_setting_value(env_var="DISABLE_REMOVE_UTM", default_value=False)
+    new: bool = get_setting_value(env_var="REMOVE_COPYRIGHT_SYMBOLS", default_value=True)
+    return False if old else new
+
+
+def get_replace_reddit_username() -> bool:
+    """If we should remove the copyright symbols from the tweet text.
+
+    Returns:
+        bool: The value of the setting. Defaults to True.
+    """
+    old: bool = get_setting_value(env_var="DISABLE_REPLACE_REDDIT_USERNAME", default_value=False)
+    new: bool = get_setting_value(env_var="REDDIT_USERNAME_LINK", default_value=True)
+    return False if old else new
+
+
+def get_replace_subreddit() -> bool:
+    """If we should remove the copyright symbols from the tweet text.
+
+    Returns:
+        bool: The value of the setting. Defaults to True.
+    """
+    old: bool = get_setting_value(env_var="DISABLE_REPLACE_SUBREDDIT", default_value=False)
+    new: bool = get_setting_value(env_var="SUBREDDIT_LINK", default_value=True)
+    return False if old else new
+
+
+def get_discord_link_previews() -> bool:
+    old: bool = get_setting_value(env_var="DISABLE_REMOVE_DISCORD_LINK_PREVIEWS", default_value=False)
+    new: bool = get_setting_value(env_var="DISCORD_LINK_PREVIEWS", default_value=True)
+    return False if old else new
+
+
+def get_replace_hashtags() -> bool:
+    """If we should replace hashtags with links to the hashtag.
+
+    Returns:
+        bool: The value of the setting. Defaults to True.
+    """
+    old: bool = get_setting_value(env_var="DISABLE_REPLACE_HASHTAG", default_value=False)
+    new: bool = get_setting_value(env_var="HASHTAG_LINK", default_value=True)
+    return False if old else new
+
+
+def get_replace_username() -> bool:
+    """If we should replace usernames with links to the user.
+
+    Returns:
+        bool: The value of the setting. Defaults to True.
+    """
+    old: bool = get_setting_value(env_var="DISABLE_REPLACE_USERNAME", default_value=False)
+    new: bool = get_setting_value(env_var="USERNAME_LINK", default_value=True)
+    return False if old else new
+
+
+def get_unescape_text() -> bool:
+    """If we should unescape HTML entities in the tweet text.
+
+    For example, "&amp;" becomes "&".
+
+    Returns:
+        bool: The value of the setting. Defaults to True.
+    """
+    old: bool = get_setting_value(env_var="DISABLE_UNESCAPE_TEXT", default_value=False)
+    new: bool = get_setting_value(env_var="UNESCAPE_TEXT", default_value=True)
+    return False if old else new
+
+
+def get_convert_tco_links() -> bool:
+    """If we should convert t.co links to their original links.
+
+    Returns:
+        bool: The value of the setting. Defaults to True.
+    """
+    old: bool = get_setting_value(env_var="DISABLE_REMOVE_TCO_LINKS", default_value=False)
+    new: bool = get_setting_value(env_var="CONVERT_TCO_LINKS", default_value=True)
+    return False if old else new
+
+
+def get_show_title() -> bool:
+    """If we should show the title of the tweet.
+
+    Returns:
+        bool: The value of the setting. Defaults to True.
+    """
+    old: bool = get_setting_value(env_var="USE_TITLE", default_value=False)
+    new: bool = get_setting_value(env_var="SHOW_TITLE", default_value=False)
+    return True if old else new
+
+
+def get_show_author() -> bool:
+    """If we should show the author of the tweet.
+
+    Returns:
+        bool: The value of the setting. Defaults to True.
+    """
+    old: bool = get_setting_value(env_var="USE_AUTHOR", default_value=True)
+    new: bool = get_setting_value(env_var="SHOW_AUTHOR", default_value=True)
+    return True if old else new
+
+
+def get_embed_color() -> str:
+    default_color: str = "#1DA1F2"  # Twitter blue
+    old: str = os.getenv("WEBHOOK_EMBED_COLOR", default=default_color)
+    new: str = os.getenv("EMBED_COLOR", default=default_color)
+
+    random_color: bool = get_setting_value(env_var="RANDOMIZE_EMBED_COLOR", default_value=False)
+    if random_color:
+        logger.info("Embed color is set to random.")
+        return "random"
+
+    if old != default_color:
+        logger.warning("WEBHOOK_EMBED_COLOR is deprecated. Use EMBED_COLOR instead.")
+        logger.info("WEBHOOK_EMBED_COLOR is set to %s.", old)
+        return old
+    if new != default_color:
+        logger.info("EMBED_COLOR is set to %s.", new)
+        return new
+
+    if old.lower() == "random" or new.lower() == "random":
+        logger.info("Embed color is set to random.")
+
+    return default_color
+
+
+def get_no_embed() -> bool:
+    old: bool = get_setting_value(env_var="NO_EMBED", default_value=False)
+    new: bool = get_setting_value(env_var="SEND_TEXT", default_value=False)
+    return True if old else new
+
+
+def get_embed_timestamp() -> bool:
+    old: bool = get_setting_value(env_var="SHOW_TIMESTAMP", default_value=True)
+    new: bool = get_setting_value(env_var="EMBED_TIMESTAMP", default_value=True)
+    return True if old else new
