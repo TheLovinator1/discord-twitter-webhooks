@@ -9,7 +9,6 @@ from discord_twitter_webhooks.logger import setup_logger
 setup_logger()
 
 # Parse the .env file and then load all the variables found as environment variables.
-# TODO: Split .env into multiple files?
 load_dotenv(verbose=True)
 
 # https://developer.twitter.com/en/portal/projects-and-apps

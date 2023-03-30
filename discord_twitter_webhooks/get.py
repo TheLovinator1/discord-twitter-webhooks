@@ -42,7 +42,7 @@ def meta_image(entities) -> str:
         try:
             response: requests.Response = requests.get(url_list[0], timeout=5)
         except requests.exceptions.RequestException:
-            logger.error("RequestException: {}", url_list[0])
+            logger.exception("RequestException: {}", url_list[0])
             return image_url
 
         logger.debug("Response: {}", response)
