@@ -36,8 +36,8 @@ def main(response: StreamResponse) -> None:
         text = remove.remove_media_links(entities, text)
         twitter_card_image = get.meta_image(entities)
 
-        if settings.remove_tco_links:
-            text = replace.tco_url_link_with_real_link(entities, text)
+    if settings.remove_tco_links:
+        text = replace.tco_url_link_with_real_link(entities, text)
 
     if settings.unescape_text:
         text = html.unescape(text)

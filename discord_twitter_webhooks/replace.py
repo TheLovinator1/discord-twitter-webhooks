@@ -42,15 +42,16 @@ def tco_url_link_with_real_link(entities: dict, text: str) -> str:
         Text with the t.co link replaced with the real link.
     """
     replaced_text: str = text
-    for url in entities["urls"]:
-        old_url: str = url["url"]
-        new_url: str = url["expanded_url"]
+    if "urls" in entities:
+        for url in entities["urls"]:
+            old_url: str = url["url"]
+            new_url: str = url["expanded_url"]
 
-        # Remove trailing slash
-        new_url = new_url.rstrip("/")
+            # Remove trailing slash
+            new_url = new_url.rstrip("/")
 
-        # Replace the old URL with the new URL.
-        replaced_text: str = text.replace(old_url, new_url)
+            # Replace the old URL with the new URL.
+            replaced_text: str = text.replace(old_url, new_url)
 
     logger.debug("Replaced text: {}", replaced_text)
     return replaced_text
