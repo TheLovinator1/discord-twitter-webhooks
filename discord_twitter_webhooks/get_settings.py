@@ -34,10 +34,10 @@ def get_hook_and_rule() -> tuple[dict[int, str], dict[int, str]]:
                 # Remove " and ' from the start and end if they exist
                 rules[get_digit] = rule_value.strip("'").strip('"')
 
-                webhooks[get_digit] = os.getenv(f"WEBHOOK_URL{get_digit}")  # type: ignore
-                if webhooks[get_digit] is None:
-                    logger.error("webhook is None for {}", get_digit)
-                    sys.exit("I failed to get WEBHOOK_URL")
+                webhooks[get_digit] = os.getenv(f"WEBHOOK_URL{get_digit}", default="")
+
+                if not webhooks[get_digit]:
+                    sys.exit(f"Failed to get WEBHOOK_URL{get_digit}")
 
                 check_webhook(webhooks[get_digit])
 
@@ -79,7 +79,7 @@ def single_rule(rule_value: str, rules: dict[int, str], webhooks: dict[int, str]
     logger.debug("Rule 0: {} will get sent to {}", rule_value, webhooks[0])
 
 
-def get_setting_value(env_var: str, default_value: bool) -> bool:
+def get_setting_value(env_var: str, default_value: bool) -> bool:  # noqa: FBT001
     """Get the setting value from the environment.
 
     Convert different values that the user might use to a boolean.
@@ -98,13 +98,14 @@ def get_setting_value(env_var: str, default_value: bool) -> bool:
     if value.lower() in {"y", "yes", "true", "on", "1", "enable", "enabled"}:
         logger.debug("'{}' is set to '{}', enabling.", env_var, value)
         return True
-    if value != "":
+    if value != "":  # noqa: PLC1901
         logger.warning(
             "'{}' is set to '{}', which is not a valid value. Defaulting to {}.",
             env_var,
             value,
             default_value,
         )
+
     return default_value
 
 
@@ -126,10 +127,10 @@ def get_bearer_token() -> str:
     example_bearer_token = "AAAAAAAAAAAAAAAAAAAAAAMGcQEAAAAA2Xh6%2Bjxw4NM7xetr2C9trBdsNUo%3DIyQF6ddixAnAtuAUq7NRKUVcGJsJ8IlriICvVWqCWFK2SfhRY"  # noqa: S105, E501
     bearer_token: str = os.getenv("BEARER_TOKEN", default="")
 
-    if example_bearer_token == bearer_token:
+    if not bearer_token:
         sys.exit("You need to set BEARER_TOKEN to a valid bearer token.")
 
-    if not bearer_token:
+    if example_bearer_token == bearer_token:
         sys.exit("You need to set BEARER_TOKEN to a valid bearer token.")
 
     return bearer_token
