@@ -141,13 +141,13 @@ def get_log_level() -> str:
     Returns:
         str: The log level. Defaults to "INFO".
     """
+    # We have to use print here because the logger is not set up yet.
     log_levels: list[str] = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-    log_level: str = os.getenv("LOG_LEVEL", default="INFO")
+    log_level = os.getenv("LOG_LEVEL", default="INFO")
     if log_level not in log_levels:
-        logger.warning(
-            "LOG_LEVEL is set to {}, which is not a valid value. Defaulting to INFO.",
-            log_level,
-        )
+        print(f"LOG_LEVEL is set to '{log_level}', which is not a valid value. Defaulting to INFO.")  # noqa: T201
+        log_level = "INFO"
+
     return log_level
 
 
