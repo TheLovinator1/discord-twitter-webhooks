@@ -56,8 +56,6 @@ def send_embed_webhook(
     if twitter_card_image:
         embed.set_image(url=twitter_card_image)
 
-    image_embeds: list[DiscordEmbed] = create_image_embeds(media_links=media_links, tweet_url=tweet_url)
-
     # If we should use a custom image.
     if webhook_image := settings.embed_image:
         # TODO: Add support for local images.
@@ -84,14 +82,14 @@ def send_embed_webhook(
     color: int = get_color()
     embed.set_color(color)
 
-    # Add embed to image_embeds as the first element.
-    image_embeds.insert(0, embed)
-
-    # TODO: Check if embed is working before adding it to the webhook.
-    if image_embeds:
+    if len(media_links) > 1 and (image_embeds := create_image_embeds(media_links, tweet_url)):
+        image_embeds.insert(0, embed)
         hook: DiscordWebhook = DiscordWebhook(url="", rate_limit_retry=True, embeds=image_embeds)  # type: ignore
     else:
+        if len(media_links) == 1:
+            embed.set_image(url=media_links[0])
         hook: DiscordWebhook = DiscordWebhook(url="", rate_limit_retry=True)
+        hook.add_embed(embed)
 
     # Split the webhook URL into a list if it contains multiple webhooks.
     webhook_list: list[str] = webhook.split(",")
@@ -120,6 +118,9 @@ def create_image_embeds(
         A list of embeds with the images.
     """
     embed_list: list[DiscordEmbed] = []
+    if not media_links:
+        return embed_list
+
     for media_link in media_links:
         embed = DiscordEmbed(url=tweet_url)
         embed.set_image(url=media_link)
