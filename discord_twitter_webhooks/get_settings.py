@@ -1,8 +1,10 @@
+import json
 import os
 import re
 import sys
 from urllib.parse import urlparse
 
+import requests
 from loguru import logger
 
 
@@ -13,6 +15,7 @@ def get_hook_and_rule() -> tuple[dict[int, str], dict[int, str]]:
         WEBHOOK_URL1 goes with RULE1.
         WEBHOOK_URL5 goes with RULE5.
     """
+    # sourcery skip: extract-method
     webhooks: dict[int, str] = {}
     rules: dict[int, str] = {}
     for rule_name, rule_value in os.environ.items():
@@ -26,11 +29,7 @@ def get_hook_and_rule() -> tuple[dict[int, str], dict[int, str]]:
 
             # If we can't get the digit, log an error and continue.
             if get_digit is None:
-                logger.error(
-                    "I couldn't figure out what {} was when parsing {}. Contact TheLovinator if this should work.",
-                    get_digit,
-                    rule_name,
-                )
+                logger.error("I couldn't figure out what {} was when parsing {}.", get_digit, rule_name)
             else:
                 # Remove " and ' from the start and end if they exist
                 rules[get_digit] = rule_value.strip("'").strip('"')
@@ -39,6 +38,8 @@ def get_hook_and_rule() -> tuple[dict[int, str], dict[int, str]]:
                 if webhooks[get_digit] is None:
                     logger.error("webhook is None for {}", get_digit)
                     sys.exit("I failed to get WEBHOOK_URL")
+
+                check_webhook(webhooks[get_digit])
 
                 # Remove " and ' from the start and end if they exist
                 webhooks[get_digit] = webhooks[get_digit].strip("'").strip('"')
@@ -65,6 +66,8 @@ def single_rule(rule_value: str, rules: dict[int, str], webhooks: dict[int, str]
     if webhooks[0] is None:
         logger.error("Webhook is None for Rule 0")
         sys.exit("I failed to get WEBHOOK_URL")
+
+    check_webhook(webhooks[0])
 
     # Remove " and ' from the start and end if they exist
     webhooks[0] = webhooks[0].strip("'").strip('"')
@@ -161,6 +164,45 @@ def warn_if_not_https(url: str, hook_name: str) -> None:
         logger.warning("{} should probably be a https url do to security reasons.", hook_name)
 
 
+def check_webhook(webhook: str) -> None:
+    """Check if the webhook is valid.
+
+    If the webhook is not valid, exit the program with an error message.
+
+    Args:
+        webhook: The webhook to check.
+    """
+    # Connect to the webhook to check if it is a valid webhook
+    response: requests.Response = requests.get(webhook, timeout=5)
+
+    # If we can't connect to the webhook, warn the user.
+    if not response.ok:
+        err_msg: str = ""
+
+        # Discord returns a json with a message if the webhook is invalid
+        if message := response.json().get("message", ""):
+            err_msg += f"{message}\n"
+        elif message := response.json().get("webhook_id", ""):
+            for _value in message:
+                err_msg += f"{_value}\n"
+
+        # Get message from the response if it exists
+        err_msg += (
+            f"{response.status_code} {response.reason} - I can't connect to {webhook}, please check if it is a valid"
+            " webhook."
+        )
+        logger.error(err_msg)
+        sys.exit(1)
+
+    # Check if the webhook has a name in the response to check if it is a valid webhook
+    try:
+        if response.json().get("name"):
+            logger.debug("Webhook {} is a valid webhook", webhook)
+    except json.decoder.JSONDecodeError:
+        logger.exception("Webhook {} is not a valid webhook, got response {}", webhook, response.text)
+        sys.exit(1)
+
+
 def get_error_webhook() -> str:
     """Get the error webhook from the environment.
 
@@ -176,18 +218,11 @@ def get_error_webhook() -> str:
     if not value:
         return value
 
-    warn_if_not_https(value, "ERROR_WEBHOOK")
-
     # Remove " and ' from the start and end if they exist
     value = value.strip("'").strip('"')
 
-    # Discord webhooks start with https://discord.com/api/webhooks/
-    if not value.startswith("https://discord.com/api/webhooks/"):
-        log_msg: str = (
-            "Your ERROR_WEBHOOK does not start with https://discord.com/api/webhooks/, is this correct?"
-            f" It is currently set to '{value}'"
-        )
-        logger.warning(log_msg)
+    warn_if_not_https(value, "ERROR_WEBHOOK")
+    check_webhook(value)
 
     return value
 
