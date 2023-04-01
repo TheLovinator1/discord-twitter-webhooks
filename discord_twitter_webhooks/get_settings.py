@@ -117,8 +117,6 @@ def truncate_string(setting_value: str, env_var: str, max_length: int = 256) -> 
         result: str = f"{result[:max_length - 3]}..."
         logger.error("{} is longer than max length ({}), truncating to {}", env_var, max_length, result)
 
-    logger.info("{} set to {}", setting_value, result)
-
     return result
 
 
