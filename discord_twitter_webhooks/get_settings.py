@@ -39,8 +39,6 @@ def get_hook_and_rule() -> tuple[dict[int, str], dict[int, str]]:
                 if not webhooks[get_digit]:
                     sys.exit(f"Failed to get WEBHOOK_URL{get_digit}")
 
-                check_webhook(webhooks[get_digit])
-
                 # Remove " and ' from the start and end if they exist
                 webhooks[get_digit] = webhooks[get_digit].strip("'").strip('"')
 
@@ -66,8 +64,6 @@ def single_rule(rule_value: str, rules: dict[int, str], webhooks: dict[int, str]
     if webhooks[0] is None:
         logger.error("Failed to get WEBHOOK_URL, webhook is None.")
         sys.exit(1)
-
-    check_webhook(webhooks[0])
 
     # Remove " and ' from the start and end if they exist
     webhooks[0] = webhooks[0].strip("'").strip('"')
@@ -228,7 +224,6 @@ def get_error_webhook() -> str:
     value = value.strip("'").strip('"')
 
     warn_if_not_https(value, "ERROR_WEBHOOK")
-    check_webhook(value)
 
     return value
 
