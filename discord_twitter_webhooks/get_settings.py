@@ -64,8 +64,8 @@ def single_rule(rule_value: str, rules: dict[int, str], webhooks: dict[int, str]
     webhooks[0] = os.getenv("WEBHOOK_URL", default="")
 
     if webhooks[0] is None:
-        logger.error("Webhook is None for Rule 0")
-        sys.exit("I failed to get WEBHOOK_URL")
+        logger.error("Failed to get WEBHOOK_URL, webhook is None.")
+        sys.exit(1)
 
     check_webhook(webhooks[0])
 
@@ -74,7 +74,8 @@ def single_rule(rule_value: str, rules: dict[int, str], webhooks: dict[int, str]
 
     # If we can't get the webhook, exit.
     if not webhooks[0]:
-        sys.exit("I failed to get WEBHOOK_URL")
+        logger.error("I failed to get WEBHOOK_URL when parsing RULE0.")
+        sys.exit(1)
 
     logger.debug("Rule 0: {} will get sent to {}", rule_value, webhooks[0])
 
@@ -109,15 +110,18 @@ def get_setting_value(env_var: str, default_value: bool) -> bool:  # noqa: FBT00
     return default_value
 
 
-def truncate_string(setting_value: str, env_var: str, max_length: int = 256) -> str:
-    result: str = setting_value
+def exit_if_too_long(setting_value: str, env_var: str, max_length: int) -> None:
+    """Exit if the setting value is too long.
 
-    # Truncate the string if it is too long
-    if len(result) > max_length:
-        result: str = f"{result[:max_length - 3]}..."
-        logger.error("{} is longer than max length ({}), truncating to {}", env_var, max_length, result)
-
-    return result
+    Args:
+        setting_value: The value of the setting.
+        env_var: The environment variable that the setting value came from.
+        max_length: The maximum length of the setting value.
+    """
+    if len(setting_value) > max_length:
+        msg: str = f"{env_var} is {len(setting_value)} characters long, but the max length is {max_length}."
+        logger.error(msg)
+        sys.exit(1)
 
 
 def get_bearer_token() -> str:
@@ -125,11 +129,10 @@ def get_bearer_token() -> str:
     example_bearer_token = "AAAAAAAAAAAAAAAAAAAAAAMGcQEAAAAA2Xh6%2Bjxw4NM7xetr2C9trBdsNUo%3DIyQF6ddixAnAtuAUq7NRKUVcGJsJ8IlriICvVWqCWFK2SfhRY"  # noqa: S105, E501
     bearer_token: str = os.getenv("BEARER_TOKEN", default="")
 
-    if not bearer_token:
-        sys.exit("You need to set BEARER_TOKEN to a valid bearer token.")
-
-    if example_bearer_token == bearer_token:
-        sys.exit("You need to set BEARER_TOKEN to a valid bearer token.")
+    if not bearer_token or bearer_token == example_bearer_token:
+        msg = "You need to set BEARER_TOKEN to a valid bearer token."
+        logger.error(msg)
+        sys.exit(1)
 
     return bearer_token
 
@@ -198,7 +201,11 @@ def check_webhook(webhook: str) -> None:
         if response.json().get("name"):
             logger.debug("Webhook {} is a valid webhook", webhook)
     except json.decoder.JSONDecodeError:
-        logger.exception("Webhook {} is not a valid webhook, got response {}", webhook, response.text)
+        logger.exception(
+            "Tried to connect to {}, but it is not a valid webhook. Got response: {}",
+            webhook,
+            response.text,
+        )
         sys.exit(1)
 
 
@@ -240,14 +247,17 @@ def get_embed_author_name() -> str:
     new: str = os.getenv("EMBED_AUTHOR_NAME", default="")
     old: str = os.getenv("WEBHOOK_AUTHOR_NAME", default="")
 
-    # If both are set, use the new one.
+    # If both are set, use the old one.
     if new and old:
-        log_msg = "Both EMBED_AUTHOR_NAME and WEBHOOK_AUTHOR_NAME are set. EMBED_AUTHOR_NAME will be used."
+        log_msg = "Both EMBED_AUTHOR_NAME and WEBHOOK_AUTHOR_NAME are set. WEBHOOK_AUTHOR_NAME will be used."
         logger.warning(log_msg)
-    elif new:
-        author_name = truncate_string(new, "EMBED_AUTHOR_NAME")
+        author_name = old
     elif old:
-        author_name = truncate_string(old, "WEBHOOK_AUTHOR_NAME")
+        exit_if_too_long(old, "WEBHOOK_AUTHOR_NAME", 256)
+        author_name = old
+    elif new:
+        exit_if_too_long(new, "EMBED_AUTHOR_NAME", 256)
+        author_name = new
 
     return author_name
 
@@ -264,16 +274,17 @@ def get_embed_author_url() -> str:
     old: str = os.getenv("WEBHOOK_AUTHOR_URL", default="")
     new: str = os.getenv("EMBED_AUTHOR_URL", default="")
 
-    # If both are set, use the new one.
+    # If both are set, use the old one.
     if old and new:
-        log_msg = "Both WEBHOOK_AUTHOR_URL and EMBED_AUTHOR_URL are set. EMBED_AUTHOR_URL will be used."
+        log_msg = "Both WEBHOOK_AUTHOR_URL and EMBED_AUTHOR_URL are set. WEBHOOK_AUTHOR_URL will be used."
         logger.warning(log_msg)
-    elif new:
-        warn_if_not_https(author_url, "EMBED_AUTHOR_URL")
-        author_url = truncate_string(new, "EMBED_AUTHOR_URL")
+        author_url = old
     elif old:
         warn_if_not_https(author_url, "WEBHOOK_AUTHOR_URL")
-        author_url = truncate_string(old, "WEBHOOK_AUTHOR_URL")
+        author_url = old
+    elif new:
+        warn_if_not_https(author_url, "EMBED_AUTHOR_URL")
+        author_url = new
 
     return author_url
 
@@ -290,16 +301,17 @@ def get_embed_author_icon() -> str:
     old: str = os.getenv("WEBHOOK_AUTHOR_ICON", default="")
     new: str = os.getenv("EMBED_AUTHOR_ICON", default="")
 
-    # If both are set, use the new one.
+    # If both are set, use the old one.
     if old and new:
-        log_msg = "Both WEBHOOK_AUTHOR_ICON and EMBED_AUTHOR_ICON are set. EMBED_AUTHOR_ICON will be used."
+        log_msg = "Both WEBHOOK_AUTHOR_ICON and EMBED_AUTHOR_ICON are set. WEBHOOK_AUTHOR_ICON will be used."
         logger.warning(log_msg)
-    elif new:
-        warn_if_not_https(author_icon, "EMBED_AUTHOR_ICON")
-        author_icon = truncate_string(new, "EMBED_AUTHOR_ICON")
+        author_icon = old
     elif old:
         warn_if_not_https(author_icon, "WEBHOOK_AUTHOR_ICON")
-        author_icon = truncate_string(old, "WEBHOOK_AUTHOR_ICON")
+        author_icon = old
+    elif new:
+        warn_if_not_https(author_icon, "EMBED_AUTHOR_ICON")
+        author_icon = new
 
     return author_icon
 
@@ -316,16 +328,17 @@ def get_embed_image() -> str:
     old: str = os.getenv("WEBHOOK_IMAGE", default="")
     new: str = os.getenv("EMBED_IMAGE", default="")
 
-    # If both are set, use the new one.
+    # If both are set, use the old one.
     if old and new:
-        log_msg = "Both WEBHOOK_IMAGE and EMBED_IMAGE are set. EMBED_IMAGE will be used."
+        log_msg = "Both WEBHOOK_IMAGE and EMBED_IMAGE are set. WEBHOOK_IMAGE will be used."
         logger.warning(log_msg)
-    elif new:
-        warn_if_not_https(embed_image, "EMBED_IMAGE")
-        truncate_string(new, "EMBED_IMAGE")
+        embed_image = old
     elif old:
         warn_if_not_https(embed_image, "WEBHOOK_IMAGE")
-        truncate_string(old, "WEBHOOK_IMAGE")
+        embed_image = old
+    elif new:
+        warn_if_not_https(embed_image, "EMBED_IMAGE")
+        embed_image = new
 
     return embed_image
 
@@ -342,16 +355,17 @@ def get_embed_thumbnail() -> str:
     old: str = os.getenv("WEBHOOK_THUMBNAIL", default="")
     new: str = os.getenv("EMBED_THUMBNAIL", default="")
 
-    # If both are set, use the new one.
+    # If both are set, use the old one.
     if old and new:
-        log_msg = "Both WEBHOOK_THUMBNAIL and EMBED_THUMBNAIL are set. EMBED_THUMBNAIL will be used."
+        log_msg = "Both WEBHOOK_THUMBNAIL and EMBED_THUMBNAIL are set. WEBHOOK_THUMBNAIL will be used."
         logger.warning(log_msg)
-    elif new:
-        warn_if_not_https(embed_thumbnail, "EMBED_THUMBNAIL")
-        truncate_string(new, "EMBED_THUMBNAIL")
+        embed_thumbnail = old
     elif old:
         warn_if_not_https(embed_thumbnail, "WEBHOOK_THUMBNAIL")
-        truncate_string(old, "WEBHOOK_THUMBNAIL")
+        embed_thumbnail = old
+    elif new:
+        warn_if_not_https(embed_thumbnail, "EMBED_THUMBNAIL")
+        embed_thumbnail = new
 
     return embed_thumbnail
 
@@ -366,18 +380,16 @@ def get_embed_footer_text() -> str:
 
     # Setting was renamed from WEBHOOK_IMAGE to EMBED_IMAGE
     old: str = os.getenv("WEBHOOK_FOOTER_TEXT", default="")
-    new: str = os.getenv("EMBED_FOOTER_TEXT", default="")
+    new: str = os.getenv("EMBED_FOOTER_TEXT", default="Twitter")
 
-    # If both are set, use the new one.
-    if old and new:
-        log_msg = "Both WEBHOOK_FOOTER_TEXT and EMBED_FOOTER_TEXT are set. EMBED_FOOTER_TEXT will be used."
-        logger.warning(log_msg)
+    if old:
+        warn_if_not_https(footer_text, "WEBHOOK_FOOTER_TEXT")
+        exit_if_too_long(old, "WEBHOOK_FOOTER_TEXT", 2000)
+        footer_text = old
     elif new:
         warn_if_not_https(footer_text, "EMBED_FOOTER_TEXT")
-        truncate_string(new, "EMBED_FOOTER_TEXT", 2000)
-    elif old:
-        warn_if_not_https(footer_text, "WEBHOOK_FOOTER_TEXT")
-        truncate_string(old, "WEBHOOK_FOOTER_TEXT", 2000)
+        exit_if_too_long(new, "EMBED_FOOTER_TEXT", 2000)
+        footer_text = new
 
     return footer_text
 
@@ -391,15 +403,20 @@ def get_embed_footer_icon() -> str:
     # TODO: Warn if WEBHOOK_FOOTER_TEXT is not set. Return "" if it is not set.
     footer_icon: str = ""
 
-    if new := os.getenv("EMBED_FOOTER_ICON", default=""):
-        warn_if_not_https(footer_icon, "EMBED_FOOTER_ICON")
-        return truncate_string(new, "EMBED_FOOTER_ICON")
+    # Default to the Twitter icon
+    img: str = "https://abs.twimg.com/icons/apple-touch-icon-192x192.png"
 
-    if old := os.getenv("WEBHOOK_FOOTER_ICON", default=""):
+    old: str = os.getenv("WEBHOOK_FOOTER_ICON", default="")
+    new: str = os.getenv("EMBED_FOOTER_ICON", default=img)
+
+    if old:
         warn_if_not_https(footer_icon, "WEBHOOK_FOOTER_ICON")
-        return truncate_string(old, "WEBHOOK_FOOTER_ICON")
+        footer_icon = old
+    elif new:
+        warn_if_not_https(footer_icon, "EMBED_FOOTER_ICON")
+        footer_icon = new
 
-    return ""
+    return footer_icon
 
 
 def should_make_text_link() -> bool:
