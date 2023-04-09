@@ -1,110 +1,89 @@
-import sys
+import os
+from functools import lru_cache
+from pathlib import Path
 
-from dotenv import load_dotenv
+from loguru import logger
+from platformdirs import user_data_dir
+from reader import (
+    InvalidPluginError,
+    PluginError,
+    PluginInitError,
+    Reader,
+    ReaderError,
+    SearchError,
+    StorageError,
+    make_reader,
+)
 
-from discord_twitter_webhooks import get_settings
-from discord_twitter_webhooks.logger import setup_logger
+from discord_twitter_webhooks.webhooks import send_error_webhook
 
-# Setup the logger
-setup_logger()
 
-# Parse the .env file and then load all the variables found as environment variables.
-load_dotenv(verbose=True)
+@lru_cache
+def get_reader(custom_location: Path | None = None) -> Reader:
+    """Get the reader.
 
-# https://developer.twitter.com/en/portal/projects-and-apps
-bearer_token: str = get_settings.get_bearer_token()
+    Args:
+        custom_location: The location of the database file.
 
-# Get webhook and rule from the environment.
-webhooks, rules = get_settings.get_hook_and_rule()
-if len(rules) == 0:
-    sys.exit("No rules found, you should edit the .env or environment variables to add rules.")
+    """
+    data_dir: Path = get_data_location()
+    db_location: Path = custom_location or Path(data_dir) / "discord_twitter_webhooks.sqlite3"
 
-# If we should send errors to Discord.
-error_webhook: str = get_settings.get_error_webhook()
+    return make_reader(url=str(db_location))
 
-# If we should use a custom display name. This is the name that shows up on the left side of the username.
-embed_author_name: str = get_settings.get_embed_author_name()
 
-# If we should use a custom author url. This is the url that the display name and username links to.
-embed_author_url: str = get_settings.get_embed_author_url()
+def get_data_location() -> Path:
+    """Get the data location."""
+    _user_data_dir: str = user_data_dir(appname="discord_twitter-webhooks", appauthor="TheLovinator", roaming=True)
+    data_dir: str = os.getenv("DISCORD_TWITTER_WEBHOOKS_DATA_DIR", default=_user_data_dir)
+    Path.mkdir(Path(data_dir), exist_ok=True)
+    return Path(data_dir)
 
-# If we should use a custom author icon. This is the image on the left side of the display name and username.
-embed_author_icon: str = get_settings.get_embed_author_icon()
 
-# If we should use a custom image. This will the image in the embed.
-embed_image: str = get_settings.get_embed_image()
+def init_reader(
+    db_location: Path | None = None,
+) -> Reader | None:
+    """Create the Reader.
 
-# If we should use a custom thumbnail. This is the image on the right side of the embed.
-embed_thumbnail: str = get_settings.get_embed_thumbnail()
+    This function is used to create the Reader and handle any errors
+    that may occur.
 
-# If we should use a custom footer text.
-embed_footer_text: str = get_settings.get_embed_footer_text()
+    Args:
+        db_location: Where to store the database.
 
-# If we should use a custom footer icon.
-embed_footer_icon: str = get_settings.get_embed_footer_icon()
+    Raises:
+        StorageError: An error occurred while connecting to storage
+        while creating the Reader database.
+        SearchError: An error occurred while enabling/disabling search.
+        InvalidPluginError: An error occurred while loading plugins.
+        PluginInitError: A plugin failed to initialize.
+        PluginError: An ambiguous plugin-related error occurred.
+        ReaderError: An ambiguous exception occurred while creating
+        the reader.
 
-# Show a timestamp on the bottom of the embed. This will show when the tweet was sent/created.
-show_timestamp: bool = get_settings.get_embed_timestamp()
+    Returns:
+        Reader: The Reader if no errors occurred.
+    """
+    db_location = get_data_location() if db_location is None else db_location
+    db_file: Path = db_location / "discord_twitter_webhooks.db"
 
-# Our embed color. This is the color of the left side of the embed. This can be a hex color or "random"
-embed_color: str = get_settings.get_embed_color()
-
-# If we should show a webhook title. This shows the tweet authors display name and username.
-show_title: bool = get_settings.get_show_title()
-
-# If we should show a webhook author. This shows the tweet authors display name, username and profile picture.
-show_author: bool = get_settings.get_show_author()
-
-# If the tweet should be sent as a text instead of an embed.
-no_embed: bool = get_settings.get_no_embed()
-
-# Add [text](tweet_url) to the tweet text. This will make the text a link.
-make_text_link: bool = get_settings.should_make_text_link()
-
-# If we should disable the link preview by adding < > around the link.
-make_text_link_twitter_preview: bool = get_settings.get_make_text_link_preview()
-
-# If we should use a custom URL for the link instead of the tweet URL.
-make_text_link_custom_url: str = get_settings.get_make_text_link_url()
-
-# If we should only send the link to the tweet.
-only_link: bool = get_settings.get_setting_value(env_var="ONLY_LINK", default_value=False)
-
-# If we should disable the link preview by adding < > around the link.
-only_link_preview: bool = get_settings.get_setting_value(env_var="ONLY_LINK_PREVIEW", default_value=True)
-
-# Append username to text.
-append_username: bool = get_settings.get_setting_value(env_var="APPEND_USERNAME", default_value=False)
-
-# Append link to the end of the tweet text.
-append_image_links: bool = get_settings.get_setting_value(env_var="APPEND_IMAGE_LINKS", default_value=False)
-
-# If we should upload images to Discord. Alternative to append_image_links.
-upload_images: bool = get_settings.get_setting_value(env_var="UPLOAD_IMAGES", default_value=False)
-
-# Convert t.co links to their original links
-remove_tco_links: bool = get_settings.get_convert_tco_links()
-
-# Unescape text like &amp; to &
-unescape_text: bool = get_settings.get_unescape_text()
-
-# Replace usernames with a link to the user
-replace_username: bool = get_settings.get_replace_username()
-
-# Replace hashtags with a link to the hashtag
-replace_hashtag: bool = get_settings.get_replace_hashtags()
-
-# Remove Discord link previews
-discord_link_previews: bool = get_settings.get_discord_link_previews()
-
-# Replace subreddits with a link to the subreddit
-replace_subreddit: bool = get_settings.get_replace_subreddit()
-
-# Replace Reddit usernames with a link to the user
-replace_reddit_username: bool = get_settings.get_replace_reddit_username()
-
-# Remove UTM parameters from links (utm_source, utm_medium, utm_campaign, utm_term, utm_content)
-remove_utm_parameters: bool = get_settings.get_remove_utm_parameters()
-
-# Remove copyright symbols (®, ™ and ©)
-remove_copyright_symbols: bool = get_settings.get_remove_copyright_symbols()
+    try:
+        reader: Reader = make_reader(url=str(db_file))
+    except StorageError as e:
+        send_error_webhook(
+            f"An error occurred while connecting to storage while creating the Reader database.\n{e}",
+        )
+    except SearchError as e:
+        send_error_webhook(f"An error occurred while enabling/disabling search.\n{e}")
+    except InvalidPluginError as e:
+        send_error_webhook(f"An error occurred while loading plugins.\n{e}")
+    except PluginInitError as e:
+        send_error_webhook(f"A plugin failed to initialize.\n{e}")
+    except PluginError as e:
+        send_error_webhook(f"An ambiguous plugin-related error occurred.\n{e}")
+    except ReaderError as e:
+        msg: str = f"An ambiguous exception occurred while creating the reader.\n{e}"
+        send_error_webhook(msg)
+    else:
+        logger.info("Successfully created Reader at {}", db_location)
+        return reader

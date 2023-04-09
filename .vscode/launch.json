@@ -5,6 +5,16 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Python: Flask",
+      "type": "python",
+      "request": "launch",
+      "module": "flask",
+      "env": { "FLASK_APP": "discord_twitter_webhooks.app.py", "FLASK_DEBUG": "1" },
+      "args": ["run", "--no-debugger", "--no-reload"],
+      "jinja": true,
+      "justMyCode": true
+    },
+    {
       "name": "Python: Run bot",
       "type": "python",
       "request": "launch",
