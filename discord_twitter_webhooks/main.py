@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from itertools import groupby
 from typing import TYPE_CHECKING
 
-from flask import Flask, request
+from flask import Flask, render_template, request
 
 from discord_twitter_webhooks.settings import init_reader
 
@@ -82,29 +82,7 @@ def index() -> str:
 
 @app.route("/add")
 def add() -> str:
-    html: str = ""
-    html += "<h1>Add a feed</h1>"
-    html += "<style>body { background-color: #111111; color: #DCDDDE; }</style>"
-    html += (
-        "<script> function validateForm() { var x = document.forms['add']['name'].value; if (x == '') { alert('Name"
-        " must be filled out'); return false; } var x = document.forms['add']['usernames'].value; if (x == '') {"
-        " alert('Usernames must be filled out'); return false; } var x = document.forms['add']['url'].value; if (x =="
-        " '') { alert('Webhook URL must be filled out'); return false; } } </script>"
-    )
-    html += "<form name='add' action='/add' onsubmit='return validateForm()' method='post'>"
-    html += "<label for='name'>Name:</label><br>"
-    html += "<input type='text' id='name' name='name' value=''><br>"
-    html += "<label for='usernames'>Usernames: (separate with spaces)</label><br>"
-    html += "<input type='text' id='usernames' name='usernames' value=''><br>"
-    html += "<label for='url'>Webhook URL:</label><br>"
-    html += "<input type='url' id='url' name='url' value=''><br><br>"
-    html += "<input type='checkbox' id='include_retweets' name='include_retweets' value='true'>"
-    html += "<label for='include_retweets'>Include retweets</label><br>"
-    html += "<input type='checkbox' id='include_replies' name='include_replies' value='true'>"
-    html += "<label for='include_replies'>Include replies</label><br>"
-    html += "<input type='submit' value='Submit'>"
-    html += "</form>"
-    return html
+    return render_template("add.html")
 
 
 @app.route("/add", methods=["POST"])

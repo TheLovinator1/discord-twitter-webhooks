@@ -1,0 +1,60 @@
+<h1>Add a feed</h1>
+<style>
+    body {
+        background-color: #111111;
+        color: #DCDDDE;
+    }
+</style>
+<script>
+     function validateForm() {
+         var x = document.forms["add"]["name"].value;
+         if (x == "") {
+             alert("Name must be filled out");
+             return false;
+         }
+
+         var x = document.forms["add"]["usernames"].value;
+         if (x == "") {
+             alert("Usernames must be filled out");
+             return false;
+         }
+
+         var x = document.forms["add"]["url"].value;
+         if (x == "") {
+             alert("Webhook URL must be filled out");
+             return false;
+         }
+         
+     }
+</script>
+<form name="add"
+      action="/add"
+      onsubmit="return validateForm()"
+      method="post">
+    <label for="name">Name:</label>
+</br>
+    <input type="text" id="name" name="name" value=""/>
+</br>
+    <label for="usernames">Usernames: (separate with spaces)</label>
+</br>
+    <input type="text" id="usernames" name="usernames" value=""/>
+</br>
+    <label for="url">Webhook URL:</label>
+</br>
+    <input type="url" id="url" name="url" value=""/>
+</br>
+</br>
+    </input type="checkbox"
+           id="include_retweets"
+           name="include_retweets"
+           value="true"/>
+    <label for="include_retweets">Include retweets</label>
+</br>
+    <input type="checkbox"
+           id="include_replies"
+           name="include_replies"
+           value="true"/>
+    <label for="include_replies">Include replies</label>
+</br>
+    <input type="submit" value="Submit"/>
+</form>
