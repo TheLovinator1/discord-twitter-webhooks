@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block header %}
+    <h1>
+        {% block title %}Feeds{% endblock %}
+    </h1>
+{% endblock %}
+{% block content %}
+    {% for feed in feeds %}
+        <div class="feed">
+            <h2>
+                <a href="{{ feed.link }}">{{ feed.title }}</a>
+            </h2>
+            <p>{{ feed.url }}</p>
+            <form action="/delete/{{ feed.url }}" method="post">
+                <input type="submit" value="Delete"/>
+            </form>
+        </div>
+    {% endfor %}
+{% endblock %}

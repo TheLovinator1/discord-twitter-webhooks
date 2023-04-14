@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from itertools import groupby
 from typing import TYPE_CHECKING
 
 from flask import Flask, render_template, request
@@ -23,8 +22,6 @@ class TwitterGroup:
 
 @app.route("/")
 def index() -> str:
-    html: str = ""
-    html += "<h1>Discord Twitter Webhooks</h1>"
     reader = init_reader()
 
     if reader is None:
@@ -32,52 +29,10 @@ def index() -> str:
 
     reader.update_feeds()
 
-    html_before = html
-    feed_list = []
-    rss_feeds = []
+    # Get all feeds from the generator
+    feeds: list[Feed] = list(reader.get_feeds())
 
-    # Create a list of TwitterGroup objects
-    for feed in reader.get_feeds():
-        tags = reader.get_tags(feed)
-        rss_feeds.append(feed.url)
-        feed_group = TwitterGroup("", "", include_replies=False, include_retweets=False, rss_feeds=rss_feeds)
-
-        for tag in tags:
-            if tag[0] == "name":
-                feed_group.name = str(tag[1]) or "No name"
-            elif tag[0] == "webhook":
-                feed_group.webhook_url = str(tag[1]) or "No webhook"
-            elif tag[0] == "include_retweets":
-                feed_group.include_retweets = bool(tag[1])
-            elif tag[0] == "include_replies":
-                feed_group.include_replies = bool(tag[1])
-        feed_list.append(feed_group)
-
-    # Group by name
-    feed_list.sort(key=lambda x: x.name)
-    feed_list = [list(g) for k, g in groupby(feed_list, lambda x: x.name)]
-
-    # Add the feeds to the html
-    for things in feed_list:
-        html += f"<h2>{things[0].name}</h2>"
-        html += "<p>Feeds:</p>"
-        html += "<ul>"
-        feeds = things[0].rss_feeds
-        for feed in feeds:
-            html += f"<li>{feed}</li>"
-
-        html += "</ul>"
-
-        html += f"<p>Webhook: {things[0].webhook_url}</p>"
-        html += f"<p>Include retweets: {things[0].include_retweets}</p>"
-        html += f"<p>Include replies: {things[0].include_replies}</p>"
-        html += "<hr>"
-
-    # If the html hasn't changed, add the add link
-    if html == html_before:
-        html += "<p>You can add more feeds here: <a href='/add'>/add</a></p>"
-
-    return html
+    return render_template("index.html", feeds=feeds)
 
 
 @app.route("/add")
