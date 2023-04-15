@@ -1,4 +1,7 @@
 body {
-  background-color: #111111;
-  color: #dcddde;
+  background: #111111;
+}
+
+.border {
+  background: #161616;
 }

@@ -5,57 +5,91 @@
     </h1>
 {% endblock %}
 {% block content %}
-    <script>
-        function validateForm() {
-            var x = document.forms["add"]["name"].value;
-            if (x == "") {
-                alert("Name must be filled out");
-                return false;
-            }
+    <div class="p-2 border border-dark">
+        <script>
+            function validateForm() {
+                var x = document.forms["add"]["name"].value;
+                if (x == "") {
+                    alert("Name must be filled out");
+                    return false;
+                }
 
-            var x = document.forms["add"]["usernames"].value;
-            if (x == "") {
-                alert("Usernames must be filled out");
-                return false;
-            }
+                var x = document.forms["add"]["usernames"].value;
+                if (x == "") {
+                    alert("Usernames must be filled out");
+                    return false;
+                }
 
-            var x = document.forms["add"]["url"].value;
-            if (x == "") {
-                alert("Webhook URL must be filled out");
-                return false;
-            }
+                var x = document.forms["add"]["url"].value;
+                if (x == "") {
+                    alert("Webhook URL must be filled out");
+                    return false;
+                }
 
-        }
-    </script>
-    <form name="add"
-          action="/add"
-          onsubmit="return validateForm()"
-          method="post">
-        <label for="name">Name:</label>
-    </br>
-    <input type="text" id="name" name="name" value=""/>
-</br>
-<label for="usernames">Usernames: (separate with spaces)</label>
-</br>
-<input type="text" id="usernames" name="usernames" value=""/>
-</br>
-<label for="url">Webhook URL:</label>
-</br>
-<input type="url" id="url" name="url" value=""/>
-</br>
-</br>
-</input type="checkbox"
-id="include_retweets"
-name="include_retweets"
-value="true"/>
-<label for="include_retweets">Include retweets</label>
-</br>
-<input type="checkbox"
-       id="include_replies"
-       name="include_replies"
-       value="true"/>
-<label for="include_replies">Include replies</label>
-</br>
-<input type="submit" value="Submit"/>
-</form>
+            }
+        </script>
+        <form name="add"
+              action="/add"
+              onsubmit="return validateForm()"
+              method="post">
+            <div class="row pb-2">
+                <label for="feed_url" class="col-sm-2 col-form-label">Name</label>
+                <div class="col-sm-10">
+                    <input name="name"
+                           type="text"
+                           class="form-control bg-dark border-dark text-muted"
+                           id="name"
+                           placeholder=""/>
+                    <div id="feed_url_help" class="form-text">A name to identify this feed. This can be anything you want.</div>
+                </div>
+            </div>
+            <div class="row pb-2">
+                <label for="feed_url" class="col-sm-2 col-form-label">Usernames (space separated)</label>
+                <div class="col-sm-10">
+                    <input name="usernames"
+                           type="text"
+                           class="form-control bg-dark border-dark text-muted"
+                           id="usernames"
+                           placeholder=""/>
+                    <div id="usernames_help" class="form-text">
+                        The usernames of the Twitter accounts you want to monitor. Separate multiple usernames with a space.
+                    </div>
+                </div>
+            </div>
+            <div class="row pb-2">
+                <label for="feed_url" class="col-sm-2 col-form-label">Webhook URL</label>
+                <div class="col-sm-10">
+                    <input name="url"
+                           type="text"
+                           class="form-control bg-dark border-dark text-muted"
+                           id="url"
+                           placeholder=""/>
+                    <div id="url_help" class="form-text">The URL of the Discord webhook you want to send tweets to.</div>
+                </div>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input"
+                       type="checkbox"
+                       role="switch"
+                       id="include_retweets"
+                       name="include_retweets"
+                       value="false"/>
+                <label class="form-check-label" for="include_retweets">Include retweets</label>
+                <div id="url_help" class="form-text">Whether or not you want retweets to be sent to Discord.</div>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input"
+                       type="checkbox"
+                       role="switch"
+                       id="include_replies"
+                       name="include_replies"
+                       value="false"/>
+                <label class="form-check-label" for="include_replies">Include replies</label>
+                <div id="url_help" class="form-text">Whether or not you want replies to be sent to Discord.</div>
+            </div>
+            <div class="d-md-flex">
+                <button class="btn btn-dark btn-sm">Add feed</button>
+            </div>
+        </form>
+    </div>
 {% endblock %}

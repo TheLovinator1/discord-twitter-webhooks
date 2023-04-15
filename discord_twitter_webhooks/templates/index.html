@@ -5,15 +5,16 @@
     </h1>
 {% endblock %}
 {% block content %}
-    {% for feed in feeds %}
-        <div class="feed">
-            <h2>
-                <a href="{{ feed.link }}">{{ feed.title }}</a>
-            </h2>
-            <p>{{ feed.url }}</p>
-            <form action="/delete/{{ feed.url }}" method="post">
-                <input type="submit" value="Delete"/>
-            </form>
-        </div>
-    {% endfor %}
+    <div class="p-2 mb-2 border border-dark">
+        <ul class="list-group">
+            {% for feed in feeds %}
+                <div class="feed">
+                    <h2>
+                        <a class="text-muted"  href="{{ feed.link }}">{{ feed.title }}</a>
+                    </h2>
+                    <p>{{ feed.url }}</p>
+                </div>
+            {% endfor %}
+        </ul>
+    </div>
 {% endblock %}
