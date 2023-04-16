@@ -5,16 +5,28 @@
     </h1>
 {% endblock %}
 {% block content %}
-    <div class="p-2 mb-2 border border-dark">
-        <ul class="list-group">
-            {% for feed in feeds %}
+    {% if feed_list|length == 0 %}
+        <div class="p-2 mb-2 border border-dark">
+            No feeds found. Add one <a class="text-muted" href="/add">here</a>.
+        </div>
+    {% endif %}
+    <ul class="list-group">
+        {% for feed_item in feed_list %}
+            <div class="p-2 mb-2 border border-dark">
                 <div class="feed">
-                    <h2>
-                        <a class="text-muted"  href="{{ feed.link }}">{{ feed.title }}</a>
-                    </h2>
-                    <p>{{ feed.url }}</p>
+                    <h2>{{ feed_item.name }}</h2>
+                    webhook url: {{ feed_item.webhook }}
+                    <br/>
+                    usernames:
+                    <ul>
+                        {% for feed in feed_item.feeds %}
+                            <li>
+                                <a href="{{ feed.link }}">{{ feed.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
-            {% endfor %}
-        </ul>
-    </div>
+            </div>
+        {% endfor %}
+    </ul>
 {% endblock %}

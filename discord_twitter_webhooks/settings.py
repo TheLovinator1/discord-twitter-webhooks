@@ -3,24 +3,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from loguru import logger
-from reader import (
-    Reader,
-    make_reader,
-)
-
-
-@lru_cache
-def get_reader(custom_location: Path | None = None) -> Reader:
-    """Get the reader.
-
-    Args:
-        custom_location: The location of the database file.
-
-    """
-    data_dir: Path = get_data_location()
-    db_location: Path = custom_location or Path(data_dir) / "discord_twitter_webhooks.sqlite3"
-
-    return make_reader(url=str(db_location))
+from reader import Reader, make_reader
 
 
 def get_data_location() -> Path:
@@ -55,7 +38,7 @@ def get_data_location() -> Path:
 
 
 @lru_cache
-def init_reader(db_location: Path | None = None) -> Reader | None:
+def get_reader(db_location: Path | None = None) -> Reader | None:
     """Create the Reader.
 
     This function is used to create the Reader and handle any errors
@@ -77,7 +60,8 @@ def init_reader(db_location: Path | None = None) -> Reader | None:
     Returns:
         Reader: The Reader if no errors occurred.
     """
+    # Check for errors and return them to the user
     db_location = get_data_location() if db_location is None else db_location
     db_file: Path = db_location / "discord_twitter_webhooks.db"
-    reader: Reader = make_reader(url=str(db_file), search_enabled=False)
+    reader: Reader = make_reader(url=str(db_file))
     return reader

@@ -2,37 +2,76 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from flask import Flask, render_template, request
+from loguru import logger
 
-from discord_twitter_webhooks.settings import init_reader
+from discord_twitter_webhooks.get_include_replies import get_include_replies
+from discord_twitter_webhooks.get_include_retweets import get_include_retweets
+from discord_twitter_webhooks.settings import get_reader
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from reader import Feed
 
 app = Flask(__name__)
 
 
 @dataclass
-class TwitterGroup:
+class FeedList:
+    """A feed."""
+
     name: str
-    webhook_url: str
-    rss_feeds: list[str]
-    include_retweets: bool = False
-    include_replies: bool = False
+    feeds: list["Feed"] | None = None
+    webhook: str | None = None
+    include_retweets: bool | None = None
+    include_replies: bool | None = None
 
 
 @app.route("/")
 def index() -> str:
-    reader = init_reader()
+    reader = get_reader()
 
     if reader is None:
-        return "Failed to initialize reader"
+        return (
+            "Failed to initialize reader. You should make an issue on GitHub about this, or contact me on Discord at"
+            " TheLovinator#9276."
+        )
 
+    # Update all feeds before getting them
     reader.update_feeds()
+    feed_list = []
+    for feed in reader.get_feeds():
+        tags = dict(reader.get_tags(feed))
+        if tags["name"]:
+            name = str(tags["name"])
+            logger.debug(f"Name: {name}")
+            list_item = FeedList(name=name)
+            global_tags = reader.get_tags(())
+            for global_tag in global_tags:
+                if global_tag[0] == f"{name}_webhook":
+                    list_item.webhook = str(global_tag[1])
+                    logger.debug(f"Webhook: {list_item.webhook}")
+                elif global_tag[0] == f"{name}_include_retweets":
+                    list_item.include_retweets = bool(global_tag[1])
+                    logger.debug(f"Include retweets: {list_item.include_retweets}")
+                elif global_tag[0] == f"{name}_include_replies":
+                    list_item.include_replies = bool(global_tag[1])
+                    logger.debug(f"Include replies: {list_item.include_replies}")
+                else:
+                    continue
 
-    # Get all feeds from the generator
-    feeds: list[Feed] = list(reader.get_feeds())
+            # Get the feeds with the name
+            all_feeds = reader.get_feeds()
+            for _feed in all_feeds:
+                tags = dict(reader.get_tags(_feed))
+                if tags["name"] == name:
+                    if not list_item.feeds:
+                        list_item.feeds = []
+                    list_item.feeds.append(_feed)
 
-    return render_template("index.html", feeds=feeds)
+            feed_list.append(list_item)
+
+    return render_template("index.html", feed_list=feed_list)
 
 
 @app.route("/add")
@@ -42,45 +81,93 @@ def add() -> str:
 
 @app.route("/add", methods=["POST"])
 def add_post() -> str:
-    reader = init_reader()
+    reader = get_reader()
 
     if reader is None:
-        return "Error"
+        return "Failed to initialize reader."
 
     name: str | None = request.form.get("name")
     webhook_value: str | None = request.form.get("url")
     usernames_value: str | None = request.form.get("usernames")
-    include_retweets_value: str | None = request.form.get("include_retweets")
-    include_replies_value: str | None = request.form.get("include_replies")
+    include_retweets: bool = get_include_retweets(request)
+    include_replies: bool = get_include_replies(request)
+
+    # Check if name contains a semicolon
+    if name is not None and ";" in name:
+        # TODO: Return our previous values
+        return (
+            f"Error, name cannot contain a semicolon.\n\nPlease go back and try again.\nName: '{name}'\n"
+            f"Webhook: '{webhook_value}'\nUsernames: '{usernames_value}'"
+        )
 
     if webhook_value is None or usernames_value is None:
-        return "Error"
+        # TODO: Return our previous values
+        return (
+            "Error: webhook or usernames was None. Please go back and try again.\n\n"
+            f"Webhook: '{webhook_value}'\nUsernames: '{usernames_value}'"
+        )
 
-    username_list: list[str] = usernames_value.split(" ")
+    # Check if the name already exists
+    # Get all global tags
+    global_tags = reader.get_tags(())
+    for global_tag in global_tags:
+        # Check if the name is already in use, each global tag starts with the name, followed by an underscore
+        if global_tag[0].startswith(f"{name}_"):
+            return (
+                f"Error, name already exists.\n\nPlease go back and try again.\nName: '{name}'\n"
+                f"Webhook: '{webhook_value}'\nUsernames: '{usernames_value}'"
+            )
 
-    include_retweets: bool = include_retweets_value == "true"
-    include_replies: bool = include_replies_value == "true"
-
-    for username in username_list:
+    # Get all usernames and add them to the reader if they don't exist, or add the new name to the existing feed.
+    for username in usernames_value.split(" "):
         feed_url: str = f"https://nitter.lovinator.space/{username}/rss"
+
+        # Check if the feed already exists
+        feeds: Iterable[Feed] = reader.get_feeds()
+        for feed in feeds:
+            # Each feed has a name tag, webhooks and include_retweets and include_replies will be added
+            # as global tag named "name_webhook", "name_include_retweets" and "name_include_replies
+            # For example, if the name is "TheLovinator", the webhook will be "TheLovinator_webhook", the
+            # include_retweets will be "TheLovinator_include_retweets" and the include_replies will
+            # be "TheLovinator_include_replies"
+            if feed.url == feed_url:
+                # Get the old name and append the new name to it, this will be used when getting the global tags
+                old_name: str | None = str(reader.get_tag(feed, "name"))
+                if old_name is None:
+                    # TODO: Make this better, we should return a template with a message instead of just a string
+                    return (
+                        f"Error, failed to get old name when adding new name to it.\n\nFeed URL: '{feed_url}'\nOld"
+                        f" name: '{old_name}'\nNew name: '{name}'"
+                    )
+
+                # Add the new name to the old name. For example, if the old name is "TheLovinator" and the new name is
+                # "TheLovinator2", the new name will be "TheLovinator;TheLovinator2"
+                new_name: str = f"{old_name};{name}"
+
+                # Set the names as the tag
+                reader.set_tag(feed, "name", new_name)  # type: ignore  # noqa: PGH003
+
+                # TODO: Make this better, we should return a template with a message instead of just a string
+                return (
+                    f"Added '{name}' to the existing feed for '{username}'. Before it was '{old_name}'. Now it is"
+                    f" '{new_name}'."
+                )
+
+        # If the feed doesn't exist, add it
         reader.add_feed(feed_url, exist_ok=True)
 
         feed: Feed = reader.get_feed(feed_url)
 
-        # Add webhook, include_retweets and include_replies to the feed as tags
-        reader.set_tag(feed, "name", name)  # type: ignore
-        reader.set_tag(feed, "webhook", webhook_value or None)  # type: ignore
-        reader.set_tag(feed, "include_retweets", include_retweets or False)  # type: ignore
-        reader.set_tag(feed, "include_replies", include_replies or False)  # type: ignore
+        # Add the name as a tag
+        reader.set_tag(feed, "name", name)  # type: ignore  # noqa: PGH003
 
-        feed_name: str | None = reader.get_tag(feed, "name")  # type: ignore
-        feed_webhook: str | None = reader.get_tag(feed, "webhook")  # type: ignore
-        feed_include_retweets: bool | None = reader.get_tag(feed, "include_retweets")  # type: ignore
-        feed_include_replies: bool | None = reader.get_tag(feed, "include_replies")  # type: ignore
+        # Add our new global tags
+        reader.set_tag((), f"{name}_webhook", webhook_value)  # type: ignore  # noqa: PGH003
+        reader.set_tag((), f"{name}_include_retweets", include_retweets)  # type: ignore  # noqa: PGH003
+        reader.set_tag((), f"{name}_include_replies", include_replies)  # type: ignore  # noqa: PGH003
 
-        if feed_name is None or feed_webhook is None or feed_include_retweets is None or feed_include_replies is None:
-            return (
-                f"Error - Something was None that shouldn't be it:\nname: {feed_name}\nwebhook: {feed_webhook}\n"
-                f"include_retweets: {feed_include_retweets}\ninclude_replies: {feed_include_replies}"
-            )
-    return f"Added {name} with usernames {usernames_value} and webhook {webhook_value} to the database."
+    # TODO: Make this better, we should return a template with a message instead of just a string
+    return (
+        f"Added new group '{name}' with usernames '{usernames_value}'.\n\nWebhook: '{webhook_value}'\nInclude retweets:"
+        f" '{include_retweets}'\nInclude replies: '{include_replies}'"
+    )
