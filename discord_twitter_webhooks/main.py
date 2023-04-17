@@ -43,33 +43,40 @@ def index() -> str:
     for feed in reader.get_feeds():
         tags = dict(reader.get_tags(feed))
         if tags["name"]:
-            name = str(tags["name"])
-            logger.debug(f"Name: {name}")
-            list_item = FeedList(name=name)
-            global_tags = reader.get_tags(())
-            for global_tag in global_tags:
-                if global_tag[0] == f"{name}_webhook":
-                    list_item.webhook = str(global_tag[1])
-                    logger.debug(f"Webhook: {list_item.webhook}")
-                elif global_tag[0] == f"{name}_include_retweets":
-                    list_item.include_retweets = bool(global_tag[1])
-                    logger.debug(f"Include retweets: {list_item.include_retweets}")
-                elif global_tag[0] == f"{name}_include_replies":
-                    list_item.include_replies = bool(global_tag[1])
-                    logger.debug(f"Include replies: {list_item.include_replies}")
-                else:
-                    continue
+            name: list[str] = str(tags["name"]).split(";")
 
-            # Get the feeds with the name
-            all_feeds = reader.get_feeds()
-            for _feed in all_feeds:
-                tags = dict(reader.get_tags(_feed))
-                if tags["name"] == name:
-                    if not list_item.feeds:
-                        list_item.feeds = []
-                    list_item.feeds.append(_feed)
+            for _name in name:
+                logger.debug(f"Name: {_name}")
+                list_item = FeedList(name=_name)
+                global_tags = reader.get_tags(())
+                for global_tag in global_tags:
+                    if global_tag[0] == f"{_name}_webhook":
+                        list_item.webhook = str(global_tag[1])
+                        logger.debug(f"Webhook: {list_item.webhook}")
+                    elif global_tag[0] == f"{_name}_include_retweets":
+                        list_item.include_retweets = bool(global_tag[1])
+                        logger.debug(f"Include retweets: {list_item.include_retweets}")
+                    elif global_tag[0] == f"{_name}_include_replies":
+                        list_item.include_replies = bool(global_tag[1])
+                        logger.debug(f"Include replies: {list_item.include_replies}")
+                    else:
+                        continue
 
-            feed_list.append(list_item)
+                # Get the feeds with the name
+                all_feeds = reader.get_feeds()
+                feeds_to_add = []
+                for _feed in all_feeds:
+                    tags = dict(reader.get_tags(_feed))
+                    split_name: list[str] = str(tags["name"]).split(";")
+                    for _split_name in split_name:
+                        if _split_name == _name:
+                            feeds_to_add.append(_feed)
+
+                list_item.feeds = feeds_to_add
+
+                # Only add if not already in the list
+                if list_item not in feed_list:
+                    feed_list.append(list_item)
 
     return render_template("index.html", feed_list=feed_list)
 
@@ -146,6 +153,11 @@ def add_post() -> str:
 
                 # Set the names as the tag
                 reader.set_tag(feed, "name", new_name)  # type: ignore  # noqa: PGH003
+
+                # Add our new global tags
+                reader.set_tag((), f"{name}_webhook", webhook_value)  # type: ignore  # noqa: PGH003
+                reader.set_tag((), f"{name}_include_retweets", include_retweets)  # type: ignore  # noqa: PGH003
+                reader.set_tag((), f"{name}_include_replies", include_replies)  # type: ignore  # noqa: PGH003
 
                 # TODO: Make this better, we should return a template with a message instead of just a string
                 return (
