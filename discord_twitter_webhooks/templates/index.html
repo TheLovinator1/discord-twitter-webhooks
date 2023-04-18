@@ -21,7 +21,11 @@
                     <ul>
                         {% for feed in feed_item.feeds %}
                             <li>
-                                <a class="text-muted" href="{{ feed.link }}">{{ feed.title }}</a>
+                                {% if feed.title %}
+                                    <a class="text-muted" href="{{ feed.link }} ">{{ feed.title }}</a>
+                                {% else %}
+                                    {{ feed.url }} <span class="text-danger"><-- broken, please fix</span>
+                                {% endif %}
                             </li>
                         {% endfor %}
                     </ul>
