@@ -32,7 +32,7 @@ def add() -> str:
 
 
 @app.route("/add", methods=["POST"])
-def add_post() -> str:
+def add_post() -> str:  # noqa: PLR0911
     """Add a new feed.
 
     Returns:
