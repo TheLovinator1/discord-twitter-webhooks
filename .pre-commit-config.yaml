@@ -2,6 +2,43 @@ default_language_version:
   python: python3.11
 
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-added-large-files # Prevent large files from being committed. Default limit is 500 kB.
+      - id: check-ast # Simply check whether files parse as valid python.
+      - id: check-builtin-literals # Require literal syntax when initializing empty or zero Python builtin types.
+      - id: check-case-conflict # Check for files that would conflict in case-insensitive filesystems.
+      - id: check-docstring-first # Check that the docstring is the first thing in the file.
+      - id: check-executables-have-shebangs # Check that executables have shebangs.
+      - id: check-json # Check JSON files for syntax errors.
+      - id: check-merge-conflict # Check for files that contain merge conflict strings.
+      - id: check-symlinks # Check for broken symlinks.
+      - id: check-toml # Check TOML files for syntax errors.
+      - id: check-vcs-permalinks # Check for VCS control files that contain permalinks.
+      - id: check-xml # Check XML files for syntax errors.
+      - id: check-yaml # Check YAML files for syntax errors.
+      - id: debug-statements # Check for debugger imports and py37+ `breakpoint()` calls in python source.
+      - id: destroyed-symlinks # Check for broken symlinks.
+      - id: detect-private-key # Check for private keys.
+      - id: double-quote-string-fixer # Use double quotes consistently.
+      - id: end-of-file-fixer # Makes sure files end in a newline and only a newline.
+      - id: fix-byte-order-marker # Remove the BOM from files.
+      - id: fix-encoding-pragma # Remove the encoding pragma.
+        args: [--remove]
+      - id: mixed-line-ending # Check for files with mixed line endings.
+      - id: mixed-line-ending # Replace line endings with the most common one.
+      - id: name-tests-test # Check that test functions are named correctly.
+        args: [--pytest-test-first]
+      - id: requirements-txt-fixer # Sort the requirements.txt file.
+      - id: trailing-whitespace # Trims trailing whitespace.
+      # - id: detect-aws-credentials
+      # - id: file-contents-sorter
+      # - id: forbid-new-submodules
+      # - id: forbid-submodules
+      # - id: no-commit-to-branch
+      # - id: pretty-format-json
+
   # Run Ruff on all Python files. We do this before Black so that Black can
   # format the code that Ruff changes.
   - repo: https://github.com/charliermarsh/ruff-pre-commit
@@ -15,7 +52,7 @@ repos:
     rev: 23.3.0
     hooks:
       - id: black
-  
+
   # Sort Python imports using isort.
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
@@ -31,7 +68,7 @@ repos:
       - id: poetry-lock
       - id: poetry-export
         args: ["-f", "requirements.txt", "-o", "requirements.txt", "--without-hashes"]
-  
+
   # Run Flake8 on all Python files.
   - repo: https://github.com/pycqa/flake8
     rev: 6.0.0
