@@ -33,7 +33,7 @@ def get_data_location() -> Path:
     # Create the data directory if it doesn't exist
     data_dir.mkdir(parents=True, exist_ok=True)
 
-    logger.info(f"Data will be stored in {data_dir}")
+    logger.info("Data will be stored in {}", data_dir)
     return data_dir
 
 

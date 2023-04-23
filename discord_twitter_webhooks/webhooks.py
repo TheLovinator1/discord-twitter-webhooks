@@ -31,4 +31,4 @@ def send_embed_to_discord(entry: Entry) -> None:
 
     response: requests.Response = hook.execute()
     if not response.ok:
-        logger.error(f"Failed to send entry to Discord: {response.text}")
+        logger.error("Failed to send entry to Discord: {}", response.text)

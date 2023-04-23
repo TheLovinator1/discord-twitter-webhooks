@@ -40,7 +40,8 @@ def add_feeds_to_list_item(reader: Reader, list_item: FeedList, feed_list: list[
 def create_list_item(reader: Reader, name: str) -> FeedList:
     """Create a list item. This is used in the feed list in the index page.
 
-    Each group of feeds has settings, these are stored as global tags (https://reader.readthedocs.io/en/latest/guide.html#resource-tags)
+    Each group of feeds has settings, these are stored as global
+    tags (https://reader.readthedocs.io/en/latest/guide.html#resource-tags)
 
     Current settings are:
     - webhook
@@ -95,7 +96,7 @@ def get_feed_list(reader: Reader) -> list[FeedList]:
                 name_list = name.split(";")
 
             if name is None:
-                logger.error(f"Name is None for feed {feed}")
+                logger.error("Name is None for feed {}", feed)
                 continue
 
             if name_list:
