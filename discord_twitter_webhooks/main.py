@@ -22,8 +22,8 @@ def index() -> str:
     if reader is None:
         return "Failed to initialize reader."
 
-    feed_list: list[FeedList] = get_feed_list(reader)
-    return render_template("index.html", feed_list=feed_list) if feed_list else "Failed to initialize reader."
+    feed_list: list[FeedList] = get_feed_list(reader) or []
+    return render_template("index.html", feed_list=feed_list)
 
 
 @app.route("/add")
