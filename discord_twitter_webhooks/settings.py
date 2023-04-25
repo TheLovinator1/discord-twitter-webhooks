@@ -37,7 +37,7 @@ def get_data_location() -> Path:
     return data_dir
 
 
-@lru_cache
+@lru_cache(maxsize=1)
 def get_reader(db_location: Path | None = None) -> Reader | None:
     """Create the Reader.
 

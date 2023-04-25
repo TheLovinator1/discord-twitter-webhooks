@@ -81,9 +81,6 @@ def get_feed_list(reader: Reader) -> list[FeedList]:
     Returns:
             list[FeedList]: The feed list.
     """
-    if reader is None:
-        return []
-
     feed_list: list[FeedList] = []
     for feed in reader.get_feeds():
         tags = dict(reader.get_tags(feed))
