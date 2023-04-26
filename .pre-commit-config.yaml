@@ -21,7 +21,7 @@ repos:
           ]
 
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "0.9.2"
+    rev: "0.10.0"
     hooks:
       - id: pyproject-fmt
         name: Format pyproject.toml with pyproject-fmt
@@ -99,7 +99,7 @@ repos:
   # Run Ruff on all Python files. We do this before Black so that Black can
   # format the code that Ruff changes.
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.0.262"
+    rev: "v0.0.263"
     hooks:
       - id: ruff
         name: Lint Python code with Ruff
@@ -122,7 +122,7 @@ repos:
 
   # Run Pyupgrade on all Python files. This will upgrade the code to Python 3.11.
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
+    rev: v3.3.2
     hooks:
       - id: pyupgrade
         name: Upgrade Python syntax to Python 3.11 with pyupgrade
