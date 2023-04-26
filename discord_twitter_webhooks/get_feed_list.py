@@ -77,31 +77,30 @@ def get_feed_list(reader: Reader) -> list[FeedList]:
     Args:
         reader: The reader to use.
 
-
     Returns:
             list[FeedList]: The feed list.
     """
-    feed_list: list[FeedList] = []
+    feeds: list[FeedList] = []
     for feed in reader.get_feeds():
         tags = dict(reader.get_tags(feed))
         if tags["name"]:
             # Split the name by semicolon, we do this because we can have several groups of feeds with the same RSS feed
             name: str = str(tags["name"])
 
-            name_list: list[str] | None = None
+            names: list[str] | None = None
             if ";" in name:
-                name_list = name.split(";")
+                names = name.split(";")
 
             if name is None:
                 logger.error("Name is None for feed {}", feed)
                 continue
 
-            if name_list:
-                for _name in name_list:
+            if names:
+                for _name in names:
                     list_item: FeedList = create_list_item(reader, _name)
-                    add_feeds_to_list_item(reader=reader, list_item=list_item, feed_list=feed_list, name=_name)
+                    add_feeds_to_list_item(reader=reader, list_item=list_item, feed_list=feeds, name=_name)
             else:
                 list_item: FeedList = create_list_item(reader, name)
-                add_feeds_to_list_item(reader=reader, list_item=list_item, feed_list=feed_list, name=name)
+                add_feeds_to_list_item(reader=reader, list_item=list_item, feed_list=feeds, name=name)
 
-    return feed_list
+    return feeds

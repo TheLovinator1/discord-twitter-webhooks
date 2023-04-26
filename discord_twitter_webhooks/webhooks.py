@@ -11,7 +11,11 @@ DISCORD_WEBHOOK_URL = ""
 
 
 def send_entry_to_discord(entry: Entry) -> None:
-    """Sends an entry to Discord."""
+    """Sends an entry to Discord.
+
+    Args:
+        entry: The entry to send.
+    """
     logger.info(f"Sending entry to Discord: {entry}")
     send_embed_to_discord(entry)
 

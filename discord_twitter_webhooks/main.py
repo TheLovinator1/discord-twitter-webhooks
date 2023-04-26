@@ -1,10 +1,11 @@
+# sourcery skip: avoid-global-variables
 import re
 
 from flask import Flask, render_template, request
 from loguru import logger
 from reader import Reader
 
-from discord_twitter_webhooks.add_new_feed import add_new_feed
+from discord_twitter_webhooks.add_new_feed import create_group
 from discord_twitter_webhooks.get_feed_list import FeedList, get_feed_list
 from discord_twitter_webhooks.include_replies import get_include_replies
 from discord_twitter_webhooks.include_retweets import get_include_retweets
@@ -21,24 +22,38 @@ if not reader:
 
 @app.route("/")
 def index() -> str:
-    feed_list: list[FeedList] = get_feed_list(reader)
-    return render_template("index.html", feed_list=feed_list)
+    """Return the index page.
+
+    Returns:
+        str: The index page.
+    """
+    feeds: list[FeedList] = get_feed_list(reader)
+    return render_template("index.html", feed_list=feeds)
 
 
 @app.route("/add")
 def add() -> str:
+    """Return the add page.
+
+    Returns:
+        str: The add page.
+    """
     return render_template("add.html")
 
 
 @app.route("/add", methods=["POST"])
 def add_post() -> str:
-    """Add a new feed."""
+    """Create a new group.
+
+    Returns:
+        str: The add page.
+    """
     name: str = request.form.get("name", "")
     webhook_value: str = request.form.get("url", "")
     usernames_value: str = request.form.get("usernames", "")
     include_retweets: bool = get_include_retweets(request)
     include_replies: bool = get_include_replies(request)
-    return add_new_feed(
+    return create_group(
         name=name,
         webhook_value=webhook_value,
         usernames_value=usernames_value,
@@ -50,7 +65,11 @@ def add_post() -> str:
 
 @app.route("/remove_group", methods=["POST"])
 def remove_group_post() -> str:
-    """Remove a group."""
+    """Remove a group.
+
+    Returns:
+        str: The index page.
+    """
     name: str = request.form["name"]
     return remove_group(name=name, reader=reader)
 
@@ -64,23 +83,19 @@ def remove_group(name: str, reader: Reader) -> str:
             # Remove the group from the feed
             new_name: str = re.sub(rf";?{name}", "", str(tags["name"]))
 
-            # Remove ; from the start of the name if it exists
-            if new_name.startswith(";"):
-                new_name = new_name[1:]
+            # Remove ; if it is the first or last character
+            clean_name: str = new_name.removeprefix(";").removesuffix(";")
 
-            # Remove ; from the end of the name if it exists
-            if new_name.endswith(";"):
-                new_name = new_name[:-1]
-
-            # If the name is empty, remove the feed
-            if not new_name:
+            # If the name is not empty, set the new name, otherwise delete the feed
+            if clean_name:
+                reader.set_tag(feed, "name", new_name)  # type: ignore  # noqa: PGH003
+                logger.debug(f"Removed group {name} from feed {feed}")
+            else:
                 reader.delete_tag(feed, "name")
                 reader.delete_feed(feed)
                 logger.debug(f"Deleted feed {feed}")
-            else:
-                reader.set_tag(feed, "name", new_name)  # type: ignore  # noqa: PGH003
-                logger.debug(f"Removed group {name} from feed {feed}")
 
+            # Remove the group from the global tags
             global_tags = dict(reader.get_tags(()))
             if f"{name}_include_retweets" in global_tags:
                 reader.delete_tag((), f"{name}_include_retweets")

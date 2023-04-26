@@ -6,7 +6,7 @@ from discord_twitter_webhooks.name_already_exists import name_already_exists
 from discord_twitter_webhooks.webhook_url import set_webhook_url
 
 
-def add_new_feed(  # noqa: PLR0913
+def create_group(  # noqa: PLR0913
     name: str,
     webhook_value: str,
     usernames_value: str,
@@ -14,6 +14,22 @@ def add_new_feed(  # noqa: PLR0913
     include_replies: bool,  # noqa: FBT001
     include_retweets: bool,  # noqa: FBT001
 ) -> str:
+    """Create a new group. A group is a collection of feeds that are sent to the same Discord webhook.
+
+    Each group has a name, a webhook URL, and a list of usernames. The list of usernames is a newline separated list.
+    You can also choose whether or not to include replies and retweets.
+
+    Args:
+        name: The name of the group.
+        webhook_value: What the webhook URL should be set to.
+        usernames_value: What usernames we should be following. This is a newline separated list.
+        reader: What reader we should be using.
+        include_replies: Whether or not we should send replies to Discord.
+        include_retweets: Whether or not we should send retweets to Discord.
+
+    Returns:
+        A string that can be returned to the user.
+    """
     # Check if name contains a semicolon
     if ";" in name:
         # TODO: Return our previous values
