@@ -35,7 +35,11 @@ def add_new_feed(  # noqa: PLR0913
 
     # Get all usernames and add them to the reader if they don't exist, or add the new name to the existing feed.
     # Names can be separated by a space to add multiple feeds at once.
-    for username in usernames_value.split(" "):
+
+    # Check what type of newline is used
+    usernames: list[str] = usernames_value.split("\r\n") if "\r\n" in usernames_value else usernames_value.split("\n")
+
+    for username in usernames:
         # Create the Nitter RSS feed URL
         feed_url: str = f"https://nitter.lovinator.space/{username}/rss"
 

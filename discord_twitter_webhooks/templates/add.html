@@ -9,17 +9,23 @@
         <script>
             function validateForm() {
                 var x = document.forms["add"]["name"].value;
+                // checks if the name field is empty
                 if (x == "") {
                     alert("Name must be filled out");
                     return false;
                 }
-
+                // checks if the name field contains semicolons
+                if (x.includes(";")) {
+                    alert("Name cannot contain semicolons");
+                    return false;
+                }
+                // checks if the usernames field is empty
                 var x = document.forms["add"]["usernames"].value;
                 if (x == "") {
                     alert("Usernames must be filled out");
                     return false;
                 }
-
+                // checks if the url field is empty
                 var x = document.forms["add"]["url"].value;
                 if (x == "") {
                     alert("Webhook URL must be filled out");
@@ -32,37 +38,34 @@
               onsubmit="return validateForm()"
               method="post">
             <div class="row pb-2">
-                <label for="feed_url" class="col-sm-2 col-form-label">Name</label>
-                <div class="col-sm-10">
+                <label for="feed_url" class="col-sm-1 col-form-label">Name</label>
+                <div class="col-sm-11">
                     <input name="name"
                            type="text"
                            class="form-control bg-dark border-dark text-muted"
-                           id="name"
-                           placeholder=""/>
-                    <div id="feed_url_help" class="form-text">A name to identify this group of Twitter accounts.</div>
+                           id="name"/>
+                    <div id="feed_url_help" class="form-text">A name to identify this group. Can be anything you want.</div>
                 </div>
             </div>
             <div class="row pb-2">
-                <label for="feed_url" class="col-sm-2 col-form-label">Usernames (space separated)</label>
-                <div class="col-sm-10">
-                    <input name="usernames"
-                           type="text"
+                <label for="feed_url" class="col-sm-1 col-form-label">Usernames</label>
+                <div class="col-sm-11">
+                    <textarea name="usernames"
                            class="form-control bg-dark border-dark text-muted"
                            id="usernames"
-                           placeholder=""/>
+                           rows="5"></textarea>
                     <div id="usernames_help" class="form-text">
-                        The usernames of the Twitter accounts you want to monitor. Separate multiple usernames with a space.
+                        Twitter usernames to follow, separated by newlines.
                     </div>
                 </div>
             </div>
             <div class="row pb-2">
-                <label for="feed_url" class="col-sm-2 col-form-label">Webhook URL</label>
-                <div class="col-sm-10">
+                <label for="feed_url" class="col-sm-1 col-form-label">Webhook URL</label>
+                <div class="col-sm-11">
                     <input name="url"
                            type="text"
                            class="form-control bg-dark border-dark text-muted"
-                           id="url"
-                           placeholder=""/>
+                           id="url"/>
                     <div id="url_help" class="form-text">The URL of the Discord webhook you want to send tweets to.</div>
                 </div>
             </div>
