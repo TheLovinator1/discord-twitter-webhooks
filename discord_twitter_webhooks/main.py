@@ -6,6 +6,8 @@ from reader import Reader
 
 from discord_twitter_webhooks.add_new_feed import add_new_feed
 from discord_twitter_webhooks.get_feed_list import FeedList, get_feed_list
+from discord_twitter_webhooks.include_replies import get_include_replies
+from discord_twitter_webhooks.include_retweets import get_include_retweets
 from discord_twitter_webhooks.settings import get_reader
 
 app = Flask(__name__)
@@ -31,7 +33,19 @@ def add() -> str:
 @app.route("/add", methods=["POST"])
 def add_post() -> str:
     """Add a new feed."""
-    return add_new_feed(r=request, reader=reader)
+    name: str = request.form.get("name", "")
+    webhook_value: str = request.form.get("url", "")
+    usernames_value: str = request.form.get("usernames", "")
+    include_retweets: bool = get_include_retweets(request)
+    include_replies: bool = get_include_replies(request)
+    return add_new_feed(
+        name=name,
+        webhook_value=webhook_value,
+        usernames_value=usernames_value,
+        include_retweets=include_retweets,
+        include_replies=include_replies,
+        reader=reader,
+    )
 
 
 @app.route("/remove_group", methods=["POST"])

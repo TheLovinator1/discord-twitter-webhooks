@@ -1,24 +1,19 @@
-from flask import Request
 from reader import Feed, Reader
 
-from discord_twitter_webhooks.include_replies import (
-    get_include_replies,
-    set_include_replies,
-)
-from discord_twitter_webhooks.include_retweets import (
-    get_include_retweets,
-    set_include_retweets,
-)
+from discord_twitter_webhooks.include_replies import set_include_replies
+from discord_twitter_webhooks.include_retweets import set_include_retweets
 from discord_twitter_webhooks.name_already_exists import name_already_exists
 from discord_twitter_webhooks.webhook_url import set_webhook_url
 
 
-def add_new_feed(r: Request, reader: Reader) -> str:
-    name: str = r.form.get("name", "")
-    webhook_value: str = r.form.get("url", "")
-    usernames_value: str = r.form.get("usernames", "")
-    include_retweets: bool = get_include_retweets(r)
-    include_replies: bool = get_include_replies(r)
+def add_new_feed(  # noqa: PLR0913
+    name: str,
+    webhook_value: str,
+    usernames_value: str,
+    reader: Reader,
+    include_replies: bool,  # noqa: FBT001
+    include_retweets: bool,  # noqa: FBT001
+) -> str:
     # Check if name contains a semicolon
     if ";" in name:
         # TODO: Return our previous values
