@@ -33,6 +33,7 @@ def add_post() -> str:
     """Add a new feed."""
     return add_new_feed(r=request, reader=reader)
 
+
 @app.route("/remove_group", methods=["POST"])
 def remove_group_post() -> str:
     """Remove a group."""

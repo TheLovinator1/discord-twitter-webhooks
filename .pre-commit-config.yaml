@@ -83,6 +83,8 @@ repos:
       - id: trailing-whitespace
         name: Check for trailing whitespace.
         args: [--markdown-linebreak-ext=md]
+        exclude_types:
+          - "html"
 
       # Not used:
       # - id: detect-aws-credentials
