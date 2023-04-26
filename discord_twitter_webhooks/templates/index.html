@@ -29,6 +29,11 @@
                             </li>
                         {% endfor %}
                     </ul>
+                    <form action="/remove_group" method="post">
+                        <input type="hidden" name="name" value="{{ feed_item.name }}">
+                        <input type="submit" value="Delete">
+                    
+                    </form>
                 </div>
             </div>
         {% endfor %}
