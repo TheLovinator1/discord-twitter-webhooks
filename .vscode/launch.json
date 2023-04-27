@@ -1,33 +1,17 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Python: Flask reload",
-      "type": "python",
-      "request": "launch",
-      "module": "flask",
-      "env": { "FLASK_APP": "discord_twitter_webhooks.main.py", "FLASK_DEBUG": "1" },
-      "args": ["run", "--no-debugger", "--reload"],
-      "jinja": true,
-      "justMyCode": true
-    },
-    {
-      "name": "Python: Flask no reload",
-      "type": "python",
-      "request": "launch",
-      "module": "flask",
-      "env": { "FLASK_APP": "discord_twitter_webhooks.main.py", "FLASK_DEBUG": "1" },
-      "args": ["run", "--no-debugger", "--no-reload"],
-      "jinja": true,
-      "justMyCode": true
-    },
-    {
-      "name": "Python: Run bot",
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/discord_twitter_webhooks/main.py",
-      "console": "integratedTerminal",
-      "justMyCode": true
-    }
-  ]
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Python: FastAPI",
+            "type": "python",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "discord_twitter_webhooks.main:app"
+            ],
+            "jinja": true,
+            "justMyCode": true
+        }
+    ]
 }

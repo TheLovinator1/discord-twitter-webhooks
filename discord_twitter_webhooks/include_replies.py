@@ -1,20 +1,5 @@
-from flask import Request
 from loguru import logger
 from reader import Reader
-
-
-def get_include_replies(request: Request) -> bool:
-    """Return True if the include_replies checkbox is checked.
-
-    Args:
-        request: The request that was sent to the server. This is used to get the
-            include_replies checkbox.
-
-    Returns:
-        bool: True if the include_replies checkbox is checked.
-    """
-    value: str = request.form.get("include_replies", "false")
-    return value == "true"
 
 
 def set_include_replies(reader: Reader, name: str, include_replies: bool) -> None:  # noqa: FBT001

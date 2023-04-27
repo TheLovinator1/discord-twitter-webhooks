@@ -1,31 +1,32 @@
 from typing import TYPE_CHECKING
 
 import pytest
+from fastapi.testclient import TestClient
 
 from discord_twitter_webhooks.main import app
 
 if TYPE_CHECKING:
-    from flask.testing import FlaskClient
-    from werkzeug.test import TestResponse
+    from httpx import Response
+
+
+client = TestClient(app)
 
 
 def test_index() -> None:
     """Test index."""
-    client: FlaskClient = app.test_client()
-    response: TestResponse = client.get("/")
+    response: Response = client.get("/")
 
     # Check that the page loaded successfully.
-    assert response.status == "200 OK"
+    assert response.status_code == 200  # noqa: PLR2004
 
     # Get the page contents.
-    site_contents = response.data.decode("utf-8")
+    site_contents = response.text
 
     # Check that the page is not empty.
     assert site_contents
 
     # Check that the page has something on it.
-    a_good_size = 1000  # The page should be at least 1000 characters long.
-    assert len(site_contents) > a_good_size
+    assert len(site_contents) > 1000  # noqa: PLR2004
 
     # Check that the page contains our HTML and not some other HTML.
     assert "p-2 mb-2 border border-dark" in site_contents
