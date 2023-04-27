@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}
+    | Search
+{% endblock title %}
+{% block content %}
+    <div class="p-2 border border-dark text-muted">
+        Your search for "{{- query -}}" returned {{ search_amount.total }} results.
+    </div>
+    {{- search_html | safe -}}
+{% endblock content %}

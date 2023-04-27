@@ -10,6 +10,7 @@ from reader import Reader
 from discord_twitter_webhooks.add_new_feed import create_group
 from discord_twitter_webhooks.get_feed_list import FeedList, get_feed_list
 from discord_twitter_webhooks.remove_group import remove_group
+from discord_twitter_webhooks.search import create_html_for_search_results
 from discord_twitter_webhooks.settings import get_reader
 
 app = FastAPI()
@@ -75,3 +76,25 @@ def remove_group_post(name: Annotated[str, Form()]) -> str:
         str: The index page.
     """
     return remove_group(name=name, reader=reader)
+
+
+@app.get("/search", response_class=HTMLResponse)
+async def search(request: Request, query: str) -> Response:
+    """Get entries matching a full-text search query.
+
+    Args:
+        query: The query to search for.
+        request: The request object.
+
+    Returns:
+        HTMLResponse: The search page.
+    """
+    reader.update_search()
+
+    context = {
+        "request": request,
+        "search_html": create_html_for_search_results(query),
+        "query": query,
+        "search_amount": reader.search_entry_counts(query),
+    }
+    return templates.TemplateResponse("search.html", context)
