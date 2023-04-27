@@ -123,4 +123,5 @@ convention = "google"
 addopts = "-vvvvvv --exitfirst"
 filterwarnings = [
     "ignore:'imghdr' is deprecated and slated for removal in Python 3.13:DeprecationWarning",
+    "ignore:'cgi' is deprecated and slated for removal in Python 3.13:DeprecationWarning",
 ]
