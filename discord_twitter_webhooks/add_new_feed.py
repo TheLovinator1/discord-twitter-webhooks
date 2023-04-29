@@ -1,18 +1,104 @@
 from reader import Feed, Reader
 
-from discord_twitter_webhooks.include_replies import set_include_replies
-from discord_twitter_webhooks.include_retweets import set_include_retweets
 from discord_twitter_webhooks.name_already_exists import name_already_exists
-from discord_twitter_webhooks.webhook_url import set_webhook_url
+from discord_twitter_webhooks.send_text import set_send_text
+from discord_twitter_webhooks.set_settings.append_usernames import set_append_usernames
+from discord_twitter_webhooks.set_settings.blacklist import (
+    set_blacklist_active,
+    set_blacklist_words,
+)
+from discord_twitter_webhooks.set_settings.embed import (
+    set_embed_author_icon_url,
+    set_embed_author_name,
+    set_embed_author_url,
+    set_embed_color,
+    set_embed_footer_icon_url,
+    set_embed_footer_text,
+    set_embed_image,
+    set_embed_show_author,
+    set_embed_show_title,
+    set_embed_timestamp,
+    set_embed_url,
+    set_send_embed,
+)
+from discord_twitter_webhooks.set_settings.hashtag_link import (
+    set_hashtag_link,
+    set_hashtag_link_destination,
+)
+from discord_twitter_webhooks.set_settings.include_retweets import set_include_retweets
+from discord_twitter_webhooks.set_settings.includes_replies import set_include_replies
+from discord_twitter_webhooks.set_settings.make_text_a_link import (
+    set_make_text_a_link,
+    set_make_text_a_link_preview,
+    set_make_text_a_link_url,
+)
+from discord_twitter_webhooks.set_settings.remove_copyright_symbols import (
+    set_remove_copyright_symbols,
+)
+from discord_twitter_webhooks.set_settings.remove_utm import set_remove_utm
+from discord_twitter_webhooks.set_settings.send_only_link import (
+    set_send_only_link,
+    set_send_only_link_preview,
+)
+from discord_twitter_webhooks.set_settings.set_webhook_url import set_webhook_url
+from discord_twitter_webhooks.set_settings.translate import (
+    set_translate,
+    set_translate_from,
+    set_translate_to,
+)
+from discord_twitter_webhooks.set_settings.unescape_html import set_unescape_html
+from discord_twitter_webhooks.set_settings.upload_media import set_upload_media
+from discord_twitter_webhooks.set_settings.username_link import (
+    set_username_link,
+    set_username_link_destination,
+)
+from discord_twitter_webhooks.set_settings.whitelist import (
+    set_whitelist_active,
+    set_whitelist_words,
+)
 
 
-def create_group(  # noqa: PLR0913
+def create_group(
     name: str,
     webhook_value: str,
     usernames_value: str,
     reader: Reader,
     include_replies: bool,  # noqa: FBT001
     include_retweets: bool,  # noqa: FBT001
+    send_text: bool,  # noqa: FBT001
+    send_embed: bool,  # noqa: FBT001
+    embed_color: str,
+    embed_author_name: str,
+    embed_author_url: str,
+    embed_author_icon_url: str,
+    embed_url: str,
+    embed_timestamp: str,
+    embed_image: str,
+    embed_footer_text: str,
+    embed_footer_icon_url: str,
+    embed_show_title: bool,  # noqa: FBT001
+    embed_show_author: bool,  # noqa: FBT001
+    send_only_link: bool,  # noqa: FBT001
+    send_only_link_preview: bool,  # noqa: FBT001
+    make_text_a_link: bool,  # noqa: FBT001
+    make_text_a_link_preview: bool,  # noqa: FBT001
+    make_text_a_link_url: str,
+    upload_media: bool,  # noqa: FBT001
+    append_usernames: bool,  # noqa: FBT001
+    translate: bool,  # noqa: FBT001
+    translate_to: str,
+    translate_from: str,
+    whitelist_words: str,
+    whitelist_active: bool,  # noqa: FBT001
+    blacklist_words: str,
+    blacklist_active: bool,  # noqa: FBT001
+    unescape_html: bool,  # noqa: FBT001
+    remove_utm: bool,  # noqa: FBT001
+    remove_copyright: bool,  # noqa: FBT001
+    convert_usernames_to_links: bool,  # noqa: FBT001
+    username_link_destination: str,
+    convert_hashtags_to_links: bool,  # noqa: FBT001
+    hashtag_link_destination: str,
 ) -> str:
     """Create a new group. A group is a collection of feeds that are sent to the same Discord webhook.
 
@@ -26,6 +112,7 @@ def create_group(  # noqa: PLR0913
         reader: What reader we should be using.
         include_replies: Whether or not we should send replies to Discord.
         include_retweets: Whether or not we should send retweets to Discord.
+        send_text: Whether or not we should send the text of the tweet to Discord.
 
     Returns:
         A string that can be returned to the user.
@@ -48,6 +135,49 @@ def create_group(  # noqa: PLR0913
     set_webhook_url(reader, name, webhook_value)
     set_include_retweets(reader, name, include_retweets)
     set_include_replies(reader, name, include_replies)
+
+    set_send_text(reader, name, send_text)
+
+    set_send_embed(reader, name, send_embed)
+    set_embed_color(reader, name, embed_color)
+    set_embed_author_name(reader, name, embed_author_name)
+    set_embed_author_url(reader, name, embed_author_url)
+    set_embed_author_icon_url(reader, name, embed_author_icon_url)
+    set_embed_url(reader, name, embed_url)
+    set_embed_timestamp(reader, name, embed_timestamp)
+    set_embed_image(reader, name, embed_image)
+    set_embed_footer_text(reader, name, embed_footer_text)
+    set_embed_footer_icon_url(reader, name, embed_footer_icon_url)
+
+    set_embed_show_title(reader, name, embed_show_title)
+    set_embed_show_author(reader, name, embed_show_author)
+
+    set_send_only_link(reader, name, send_only_link)
+    set_send_only_link_preview(reader, name, send_only_link_preview)
+    set_make_text_a_link(reader, name, make_text_a_link)
+    set_make_text_a_link_preview(reader, name, make_text_a_link_preview)
+    set_make_text_a_link_url(reader, name, make_text_a_link_url)
+
+    set_upload_media(reader, name, upload_media)
+    set_append_usernames(reader, name, append_usernames)
+
+    set_translate(reader, name, translate)
+    set_translate_to(reader, name, translate_to)
+    set_translate_from(reader, name, translate_from)
+
+    set_whitelist_words(reader, name, whitelist_words)
+    set_whitelist_active(reader, name, whitelist_active)
+    set_blacklist_words(reader, name, blacklist_words)
+    set_blacklist_active(reader, name, blacklist_active)
+
+    set_unescape_html(reader, name, unescape_html)
+    set_remove_utm(reader, name, remove_utm)
+    set_remove_copyright_symbols(reader, name, remove_copyright)
+
+    set_username_link(reader, name, convert_usernames_to_links)
+    set_username_link_destination(reader, name, username_link_destination)
+    set_hashtag_link(reader, name, convert_hashtags_to_links)
+    set_hashtag_link_destination(reader, name, hashtag_link_destination)
 
     # Get all usernames and add them to the reader if they don't exist, or add the new name to the existing feed.
     # Names can be separated by a space to add multiple feeds at once.
