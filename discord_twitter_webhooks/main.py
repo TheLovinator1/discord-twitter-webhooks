@@ -55,41 +55,42 @@ def add_post(  # noqa: PLR0913
     name: Annotated[str, Form(title="Group Name")],
     webhooks: Annotated[str, Form(title="Webhook URLs")],
     usernames: Annotated[str, Form(title="Twitter Usernames")],
-    include_retweets: Annotated[bool, Form(title="Include Retweets?")] = False,  # noqa: FBT002
-    include_replies: Annotated[bool, Form(title="Include Replies?")] = False,  # noqa: FBT002
-    send_text: Annotated[bool, Form(title="Send Text?")] = True,  # noqa: FBT002
-    send_embed: Annotated[bool, Form(title="Send Embed?")] = False,  # noqa: FBT002
+    include_retweets: Annotated[bool, Form(title="Include Retweets?")] = False,
+    include_replies: Annotated[bool, Form(title="Include Replies?")] = False,
+    send_text: Annotated[bool, Form(title="Send Text?")] = True,
+    send_embed: Annotated[bool, Form(title="Send Embed?")] = False,
     embed_color: Annotated[str, Form(title="Embed Color")] = "#1DA1F2",
+    embed_color_random: Annotated[bool, Form(title="Randomize Embed Color?")] = False,
     embed_author_name: Annotated[str, Form(title="Embed Author Name")] = "",
     embed_author_url: Annotated[str, Form(title="Embed Author URL")] = "",
     embed_author_icon_url: Annotated[str, Form(title="Embed Author Icon URL")] = "",
     embed_url: Annotated[str, Form(title="Embed URL")] = "",
-    embed_timestamp: Annotated[bool, Form(title="Show Timestamp?")] = True,  # noqa: FBT002
+    embed_timestamp: Annotated[bool, Form(title="Show Timestamp?")] = True,
     embed_image: Annotated[str, Form(title="Embed Image URL")] = "",
     embed_footer_text: Annotated[str, Form(title="Embed Footer Text")] = "",
     embed_footer_icon_url: Annotated[str, Form(title="Embed Footer Icon URL")] = "",
-    embed_show_title: Annotated[bool, Form(title="Show Title?")] = True,  # noqa: FBT002
-    embed_show_author: Annotated[bool, Form(title="Show Author?")] = True,  # noqa: FBT002
-    send_only_link: Annotated[bool, Form(title="Send Only Link?")] = False,  # noqa: FBT002
-    send_only_link_preview: Annotated[bool, Form(title="Should the link make a preview?")] = False,  # noqa: FBT002
-    make_text_a_link: Annotated[bool, Form(title="Make Text a Link?")] = False,  # noqa: FBT002
-    make_text_a_link_preview: Annotated[bool, Form(title="Should the link make a preview?")] = False,  # noqa: FBT002
+    embed_show_title: Annotated[bool, Form(title="Show Title?")] = True,
+    embed_show_author: Annotated[bool, Form(title="Show Author?")] = True,
+    send_only_link: Annotated[bool, Form(title="Send Only Link?")] = False,
+    send_only_link_preview: Annotated[bool, Form(title="Should the link make a preview?")] = True,
+    make_text_a_link: Annotated[bool, Form(title="Make Text a Link?")] = False,
+    make_text_a_link_preview: Annotated[bool, Form(title="Should the link make a preview?")] = False,
     make_text_a_link_url: Annotated[str, Form(title="Link URL")] = "",
-    upload_media: Annotated[bool, Form(title="Upload images to Discord?")] = False,  # noqa: FBT002
-    append_usernames: Annotated[bool, Form(title="Append usernames to text?")] = False,  # noqa: FBT002
-    translate: Annotated[bool, Form(title="Translate the tweet?")] = False,  # noqa: FBT002
+    upload_media: Annotated[bool, Form(title="Upload images to Discord?")] = False,
+    append_usernames: Annotated[bool, Form(title="Append usernames to text?")] = False,
+    translate: Annotated[bool, Form(title="Translate the tweet?")] = False,
     translate_to: Annotated[str, Form(title="Language to translate to")] = "en",
     translate_from: Annotated[str, Form(title="Language to translate from")] = "auto",
     whitelist_words: Annotated[str, Form(title="Whitelisted words")] = "",
-    whitelist_active: Annotated[bool, Form(title="Use whitelist?")] = False,  # noqa: FBT002
+    whitelist_active: Annotated[bool, Form(title="Use whitelist?")] = False,
     blacklist_words: Annotated[str, Form(title="Blacklisted words")] = "",
-    blacklist_active: Annotated[bool, Form(title="Use blacklist?")] = False,  # noqa: FBT002
-    unescape_html: Annotated[bool, Form(title="Unescape HTML?")] = False,  # noqa: FBT002
-    remove_utm: Annotated[bool, Form(title="Remove UTM?")] = False,  # noqa: FBT002
-    remove_copyright: Annotated[bool, Form(title="Remove Copyright?")] = False,  # noqa: FBT002
-    convert_usernames_to_links: Annotated[bool, Form(title="Convert usernames to links?")] = True,  # noqa: FBT002
+    blacklist_active: Annotated[bool, Form(title="Use blacklist?")] = False,
+    unescape_html: Annotated[bool, Form(title="Unescape HTML?")] = False,
+    remove_utm: Annotated[bool, Form(title="Remove UTM?")] = False,
+    remove_copyright: Annotated[bool, Form(title="Remove Copyright?")] = False,
+    convert_usernames_to_links: Annotated[bool, Form(title="Convert usernames to links?")] = True,
     username_link_destination: Annotated[str, Form(title="Username link destination")] = "",
-    convert_hashtags_to_links: Annotated[bool, Form(title="Convert hashtags to links?")] = True,  # noqa: FBT002
+    convert_hashtags_to_links: Annotated[bool, Form(title="Convert hashtags to links?")] = True,
     hashtag_link_destination: Annotated[str, Form(title="Hashtag link destination")] = "",
 ) -> str:
     """Create a new group.
@@ -107,6 +108,7 @@ def add_post(  # noqa: PLR0913
         send_text=send_text,
         send_embed=send_embed,
         embed_color=embed_color,
+        embed_color_random=embed_color_random,
         embed_author_name=embed_author_name,
         embed_author_url=embed_author_url,
         embed_author_icon_url=embed_author_icon_url,

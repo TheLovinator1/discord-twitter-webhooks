@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 import pytest
@@ -10,6 +11,7 @@ if TYPE_CHECKING:
 
 
 client = TestClient(app)
+temp_name: str = f"Test_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
 
 
 def test_index_page() -> None:
@@ -53,10 +55,7 @@ def test_add_page() -> None:
     assert len(response.text) > 1000  # noqa: PLR2004
 
     # Check that the page contains our HTML and not some other HTML.
-    assert "p-2 border border-dark" in response.text
-
-    # Check that our JavaScript is on the page.
-    assert "function validateForm()" in response.text
+    assert "p-2 mb-4 border border-dark" in response.text
 
     # Check that the page contains the add feed button.
     assert '<button class="btn btn-dark btn-sm">Add feed</button>' in response.text
@@ -67,8 +66,8 @@ def test_add_new_group() -> None:
     response: Response = client.post(
         "/add",
         data={
-            "name": "Test Group",
-            "url": "https://twitter.com/elonmusk",
+            "name": temp_name,
+            "webhooks": "https://twitter.com/elonmusk",
             "usernames": "elonmusk",
             "include_retweets": True,
             "include_replies": True,
@@ -84,19 +83,8 @@ def test_add_new_group() -> None:
     # Check that the page has something on it.
     assert len(response.text) > 100  # noqa: PLR2004
 
-    # Check that the page contains our HTML and not some other HTML.
-    try:
-        assert (
-            "\"Added new group 'Test Group' with usernames 'elonmusk'.\\n\\nWebhook:"
-            " 'https://twitter.com/elonmusk'\\nInclude retweets: 'True'\\nInclude replies: 'True'\""
-            in response.text
-        )
-    except AssertionError:
-        assert (
-            "\"Error, name already exists.\\n\\nPlease go back and try again.\\nName: 'Test Group'\\nWebhook:"
-            " 'https://twitter.com/elonmusk'\\nUsernames: 'elonmusk'\""
-            in response.text
-        )
+    # Check that it starts with the correct text.
+    assert response.text.startswith(f"\"Added '{temp_name}' to the existing feed for 'elonmusk'. Before it was")
 
 
 def test_remove_group() -> None:
@@ -105,7 +93,7 @@ def test_remove_group() -> None:
     client.post(
         "/add",
         data={
-            "name": "Test Group",
+            "name": temp_name,
             "url": "https://twitter.com/elonmusk",
             "usernames": "elonmusk",
             "include_retweets": True,
@@ -117,7 +105,7 @@ def test_remove_group() -> None:
     response: Response = client.post(
         "/remove_group",
         data={
-            "name": "Test Group",
+            "name": temp_name,
         },  # type: ignore  # noqa: PGH003
     )
 
@@ -127,5 +115,5 @@ def test_remove_group() -> None:
     # Check that the page is not empty.
     assert response.text
 
-    # Check that the page contains our HTML and not some other HTML.
-    assert "OK" in response.text
+    # Check that it starts with the correct text.
+    assert response.text == '"OK"'
