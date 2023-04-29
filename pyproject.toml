@@ -111,6 +111,7 @@ ignore = [
     "D106", # pydocstyle - missing docstring in public nested class
     "D107", # pydocstyle - missing docstring in __init__
     "PLE1205", # https://github.com/charliermarsh/ruff/issues/3351
+    "FBT003" # Allow positional boolean values in function calls
 ]
 
 [tool.ruff.pydocstyle]
