@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_send_only_link(reader: Reader, name: str, send_only_link: bool) -> None:  # noqa: FBT001
+def set_send_only_link(reader: Reader, name: str, send_only_link: bool) -> None:
     """Set the send_only_link tag for the group.
 
     Args:
@@ -14,7 +14,7 @@ def set_send_only_link(reader: Reader, name: str, send_only_link: bool) -> None:
     reader.set_tag((), f"{name}_send_only_link", send_only_link)  # type: ignore  # noqa: PGH003
 
 
-def set_send_only_link_preview(reader: Reader, name: str, send_only_link_preview: bool) -> None:  # noqa: FBT001
+def set_send_only_link_preview(reader: Reader, name: str, send_only_link_preview: bool) -> None:
     """Set the send_only_link_preview tag for the group.
 
     Args:

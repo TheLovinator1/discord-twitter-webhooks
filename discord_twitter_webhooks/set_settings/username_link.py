@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_username_link(reader: Reader, name: str, username_link: bool) -> None:  # noqa: FBT001
+def set_username_link(reader: Reader, name: str, username_link: bool) -> None:
     """Set the username_link tag for the group.
 
     Args:

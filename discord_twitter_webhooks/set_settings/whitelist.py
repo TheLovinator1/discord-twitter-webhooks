@@ -14,7 +14,7 @@ def set_whitelist_words(reader: Reader, name: str, whitelist_words: str) -> None
     reader.set_tag((), f"{name}_whitelist", whitelist_words)  # type: ignore  # noqa: PGH003
 
 
-def set_whitelist_active(reader: Reader, name: str, whitelist_active: bool) -> None:  # noqa: FBT001
+def set_whitelist_active(reader: Reader, name: str, whitelist_active: bool) -> None:
     """Set the whitelist active tag for the group.
 
     Args:

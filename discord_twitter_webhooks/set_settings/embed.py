@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_send_embed(reader: Reader, name: str, send_embed: bool) -> None:  # noqa: FBT001
+def set_send_embed(reader: Reader, name: str, send_embed: bool) -> None:
     """Set the send_embed tag for the group.
 
     Args:
@@ -24,6 +24,18 @@ def set_embed_color(reader: Reader, name: str, embed_color: str) -> None:
     """
     logger.debug(f"Setting embed_color for {name} to {embed_color}")
     reader.set_tag((), f"{name}_embed_color", embed_color)  # type: ignore  # noqa: PGH003
+
+
+def set_embed_color_random(reader: Reader, name: str, embed_color_random: bool) -> None:
+    """Set the embed_color_random tag for the group.
+
+    Args:
+        reader: The reader to use to set the tag.
+        name: The name of the group.
+        embed_color_random: Whether or not to use a random color.
+    """
+    logger.debug(f"Setting embed_color_random for {name} to {embed_color_random}")
+    reader.set_tag((), f"{name}_embed_color_random", embed_color_random)  # type: ignore  # noqa: PGH003
 
 
 def set_embed_author_name(reader: Reader, name: str, embed_author_name: str) -> None:
@@ -74,7 +86,7 @@ def set_embed_url(reader: Reader, name: str, embed_url: str) -> None:
     reader.set_tag((), f"{name}_embed_url", embed_url)  # type: ignore  # noqa: PGH003
 
 
-def set_embed_timestamp(reader: Reader, name: str, embed_timestamp: str) -> None:
+def set_embed_timestamp(reader: Reader, name: str, embed_timestamp: bool) -> None:
     """Set the embed_timestamp tag for the group.
 
     Args:
@@ -122,7 +134,7 @@ def set_embed_footer_icon_url(reader: Reader, name: str, embed_footer_icon_url: 
     reader.set_tag((), f"{name}_embed_footer_icon_url", embed_footer_icon_url)  # type: ignore  # noqa: PGH003
 
 
-def set_embed_show_title(reader: Reader, name: str, embed_show_title: bool) -> None:  # noqa: FBT001
+def set_embed_show_title(reader: Reader, name: str, embed_show_title: bool) -> None:
     """Set the embed_show_title tag for the group.
 
     Args:
@@ -134,7 +146,7 @@ def set_embed_show_title(reader: Reader, name: str, embed_show_title: bool) -> N
     reader.set_tag((), f"{name}_embed_show_title", embed_show_title)  # type: ignore  # noqa: PGH003
 
 
-def set_embed_show_author(reader: Reader, name: str, embed_show_author: bool) -> None:  # noqa: FBT001
+def set_embed_show_author(reader: Reader, name: str, embed_show_author: bool) -> None:
     """Set the embed_show_author tag for the group.
 
     Args:

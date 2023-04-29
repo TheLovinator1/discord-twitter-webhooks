@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_translate(reader: Reader, name: str, translate: bool) -> None:  # noqa: FBT001
+def set_translate(reader: Reader, name: str, translate: bool) -> None:
     """Set the translate tag for the group.
 
     Args:

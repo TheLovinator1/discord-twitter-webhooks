@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_remove_copyright_symbols(reader: Reader, name: str, remove_copyright: bool) -> None:  # noqa: FBT001
+def set_remove_copyright_symbols(reader: Reader, name: str, remove_copyright: bool) -> None:
     """Set the remove_copyright tag for the group.
 
     Args:

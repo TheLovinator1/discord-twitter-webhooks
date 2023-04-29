@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_include_retweets(reader: Reader, name: str, include_retweets: bool) -> None:  # noqa: FBT001
+def set_include_retweets(reader: Reader, name: str, include_retweets: bool) -> None:
     """Set the include_retweets tag for the group.
 
     Args:

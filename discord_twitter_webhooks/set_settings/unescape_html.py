@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_unescape_html(reader: Reader, name: str, unescape_html: bool) -> None:  # noqa: FBT001
+def set_unescape_html(reader: Reader, name: str, unescape_html: bool) -> None:
     """Set the unescape_html tag for the group.
 
     Args:

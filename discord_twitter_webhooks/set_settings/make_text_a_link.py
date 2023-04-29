@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_make_text_a_link(reader: Reader, name: str, make_text_a_link: bool) -> None:  # noqa: FBT001
+def set_make_text_a_link(reader: Reader, name: str, make_text_a_link: bool) -> None:
     """Set the make_text_a_link tag for the group.
 
     Args:
@@ -14,7 +14,7 @@ def set_make_text_a_link(reader: Reader, name: str, make_text_a_link: bool) -> N
     reader.set_tag((), f"{name}_make_text_a_link", make_text_a_link)  # type: ignore  # noqa: PGH003
 
 
-def set_make_text_a_link_preview(reader: Reader, name: str, make_text_a_link_preview: bool) -> None:  # noqa: FBT001
+def set_make_text_a_link_preview(reader: Reader, name: str, make_text_a_link_preview: bool) -> None:
     """Set the make_text_a_link_preview tag for the group.
 
     Args:

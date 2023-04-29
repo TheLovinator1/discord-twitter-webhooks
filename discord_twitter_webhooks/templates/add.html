@@ -141,7 +141,23 @@
       value="#ff0000"
       class="form-control form-control-color"
     />
-
+    <div id="embed_color_help" class="form-text">The color of the embed.</div>
+    {# Random color #}
+    <div class="form-check form-switch">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        role="switch"
+        id="random_color"
+        name="random_color"
+        value="false"
+      />
+      <label class="form-check-label" for="random_color">Random color</label>
+      <div id="random_color_help" class="form-text">
+        Whether or not you want the embed color to be random. This will override
+        the embed color above.
+      </div>
+    </div>
     {# Author name #}
     <div class="row pb-2">
       <label for="author_name" class="col-sm-1 col-form-label">Author</label>

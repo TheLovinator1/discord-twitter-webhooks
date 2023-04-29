@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_hashtag_link(reader: Reader, name: str, hashtag_link: bool) -> None:  # noqa: FBT001
+def set_hashtag_link(reader: Reader, name: str, hashtag_link: bool) -> None:
     """Set the hashtag_link tag for the group.
 
     Args:

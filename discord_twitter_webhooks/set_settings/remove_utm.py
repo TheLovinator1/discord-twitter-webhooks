@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_remove_utm(reader: Reader, name: str, remove_utm_value: bool) -> None:  # noqa: FBT001
+def set_remove_utm(reader: Reader, name: str, remove_utm_value: bool) -> None:
     """Set the remove_utm tag for the group.
 
     Args:

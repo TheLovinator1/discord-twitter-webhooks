@@ -102,16 +102,17 @@ select = [
     "RUF",
 ]
 ignore = [
-    "D100", # pydocstyle - missing docstring in public module
-    "D101", # pydocstyle - missing docstring in public class
-    "D102", # pydocstyle - missing docstring in public method
-    "D103", # pydocstyle - missing docstring in public function
-    "D104", # pydocstyle - missing docstring in public package
-    "D105", # pydocstyle - missing docstring in magic method
-    "D106", # pydocstyle - missing docstring in public nested class
-    "D107", # pydocstyle - missing docstring in __init__
+    "D100",    # pydocstyle - missing docstring in public module
+    "D101",    # pydocstyle - missing docstring in public class
+    "D102",    # pydocstyle - missing docstring in public method
+    "D103",    # pydocstyle - missing docstring in public function
+    "D104",    # pydocstyle - missing docstring in public package
+    "D105",    # pydocstyle - missing docstring in magic method
+    "D106",    # pydocstyle - missing docstring in public nested class
+    "D107",    # pydocstyle - missing docstring in __init__
     "PLE1205", # https://github.com/charliermarsh/ruff/issues/3351
-    "FBT003" # Allow positional boolean values in function calls
+    "FBT001",  # Boolean positional arg in function definition
+    "FBT003",  # Allow positional boolean values in function calls
 ]
 
 [tool.ruff.pydocstyle]

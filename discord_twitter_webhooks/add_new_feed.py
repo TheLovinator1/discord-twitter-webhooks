@@ -58,46 +58,47 @@ from discord_twitter_webhooks.set_settings.whitelist import (
 )
 
 
-def create_group(
+def create_group(  # noqa: PLR0913, PLR0915
     name: str,
     webhook_value: str,
     usernames_value: str,
     reader: Reader,
-    include_replies: bool,  # noqa: FBT001
-    include_retweets: bool,  # noqa: FBT001
-    send_text: bool,  # noqa: FBT001
-    send_embed: bool,  # noqa: FBT001
+    include_replies: bool,
+    include_retweets: bool,
+    send_text: bool,
+    send_embed: bool,
     embed_color: str,
+    embed_color_random: bool,
     embed_author_name: str,
     embed_author_url: str,
     embed_author_icon_url: str,
     embed_url: str,
-    embed_timestamp: str,
+    embed_timestamp: bool,
     embed_image: str,
     embed_footer_text: str,
     embed_footer_icon_url: str,
-    embed_show_title: bool,  # noqa: FBT001
-    embed_show_author: bool,  # noqa: FBT001
-    send_only_link: bool,  # noqa: FBT001
-    send_only_link_preview: bool,  # noqa: FBT001
-    make_text_a_link: bool,  # noqa: FBT001
-    make_text_a_link_preview: bool,  # noqa: FBT001
+    embed_show_title: bool,
+    embed_show_author: bool,
+    send_only_link: bool,
+    send_only_link_preview: bool,
+    make_text_a_link: bool,
+    make_text_a_link_preview: bool,
     make_text_a_link_url: str,
-    upload_media: bool,  # noqa: FBT001
-    append_usernames: bool,  # noqa: FBT001
-    translate: bool,  # noqa: FBT001
+    upload_media: bool,
+    append_usernames: bool,
+    translate: bool,
     translate_to: str,
     translate_from: str,
     whitelist_words: str,
-    whitelist_active: bool,  # noqa: FBT001
+    whitelist_active: bool,
     blacklist_words: str,
-    blacklist_active: bool,  # noqa: FBT001
-    unescape_html: bool,  # noqa: FBT001
-    remove_utm: bool,  # noqa: FBT001
-    remove_copyright: bool,  # noqa: FBT001
-    convert_usernames_to_links: bool,  # noqa: FBT001
+    blacklist_active: bool,
+    unescape_html: bool,
+    remove_utm: bool,
+    remove_copyright: bool,
+    convert_usernames_to_links: bool,
     username_link_destination: str,
-    convert_hashtags_to_links: bool,  # noqa: FBT001
+    convert_hashtags_to_links: bool,
     hashtag_link_destination: str,
 ) -> str:
     """Create a new group. A group is a collection of feeds that are sent to the same Discord webhook.
@@ -113,6 +114,40 @@ def create_group(
         include_replies: Whether or not we should send replies to Discord.
         include_retweets: Whether or not we should send retweets to Discord.
         send_text: Whether or not we should send the text of the tweet to Discord.
+        send_embed: Whether or not we should send the embed of the tweet to Discord.
+        embed_color: What color the embed should be.
+        embed_color_random: Whether or not the embed color should be random.
+        embed_author_name: What the author name of the embed should be.
+        embed_author_url: What the author URL of the embed should be.
+        embed_author_icon_url: What the author icon URL of the embed should be.
+        embed_url: What the URL of the embed should be.
+        embed_timestamp: Whether or not the embed should have a timestamp.
+        embed_image: What the image of the embed should be.
+        embed_footer_text: What the footer text of the embed should be.
+        embed_footer_icon_url: What the footer icon URL of the embed should be.
+        embed_show_title: Whether or not the embed should show the title.
+        embed_show_author: Whether or not the embed should show the author.
+        send_only_link: Whether or not we should only send a link to Discord.
+        send_only_link_preview: Whether or not we should send a preview of the link to Discord.
+        make_text_a_link: Whether or not we should make text a link.
+        make_text_a_link_preview: Whether or not we should send a preview of the link to Discord.
+        make_text_a_link_url: What the URL of the link should be.
+        upload_media: Whether or not we should upload media to Discord.
+        append_usernames: Whether or not we should append usernames to the end of the tweet.
+        translate: Whether or not we should translate the tweet.
+        translate_to: What language we should translate the tweet to.
+        translate_from: What language we should translate the tweet from.
+        whitelist_words: What words we should whitelist.
+        whitelist_active: Whether or not the whitelist is active.
+        blacklist_words: What words we should blacklist.
+        blacklist_active: Whether or not the blacklist is active.
+        unescape_html: Whether or not we should unescape HTML.
+        remove_utm: Whether or not we should remove UTM parameters.
+        remove_copyright: Whether or not we should remove copyright.
+        convert_usernames_to_links: Whether or not we should convert usernames to links.
+        username_link_destination: What the destination of the username link should be.
+        convert_hashtags_to_links: Whether or not we should convert hashtags to links.
+        hashtag_link_destination: What the destination of the hashtag link should be.
 
     Returns:
         A string that can be returned to the user.
@@ -140,6 +175,7 @@ def create_group(
 
     set_send_embed(reader, name, send_embed)
     set_embed_color(reader, name, embed_color)
+    set_embed_color_random(reader, name, embed_color_random)
     set_embed_author_name(reader, name, embed_author_name)
     set_embed_author_url(reader, name, embed_author_url)
     set_embed_author_icon_url(reader, name, embed_author_icon_url)

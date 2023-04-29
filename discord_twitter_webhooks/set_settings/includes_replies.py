@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_include_replies(reader: Reader, name: str, include_replies: bool) -> None:  # noqa: FBT001
+def set_include_replies(reader: Reader, name: str, include_replies: bool) -> None:
     """Set the include_replies tag for the group.
 
     Args:

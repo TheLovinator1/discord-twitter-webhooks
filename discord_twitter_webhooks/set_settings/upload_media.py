@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_upload_media(reader: Reader, name: str, upload_media: bool) -> None:  # noqa: FBT001
+def set_upload_media(reader: Reader, name: str, upload_media: bool) -> None:
     """Set the upload_media tag for the group.
 
     Args:

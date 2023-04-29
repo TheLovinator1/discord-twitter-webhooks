@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_append_usernames(reader: Reader, name: str, append_usernames: bool) -> None:  # noqa: FBT001
+def set_append_usernames(reader: Reader, name: str, append_usernames: bool) -> None:
     """Set the append_usernames tag for the group.
 
     Args:
