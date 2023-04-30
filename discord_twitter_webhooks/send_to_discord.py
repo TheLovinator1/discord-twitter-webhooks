@@ -1,30 +1,13 @@
-from dataclasses import dataclass
-
 from loguru import logger
 from reader import Entry, Reader
 
-
-@dataclass
-class Settings:
-    """A feed."""
-
-    webhook: str | None = None
-    include_retweets: bool | None = None
-    include_replies: bool | None = None
+from discord_twitter_webhooks.dataclasses import Settings
+from discord_twitter_webhooks.send_embed import send_embed
+from discord_twitter_webhooks.send_link import send_link
+from discord_twitter_webhooks.send_text import send_text
 
 
-def send_text(entry: Entry, settings: Settings, reader: Reader) -> None:
-    """Send text to Discord.
-
-    Args:
-        entry: The entry to send.
-        settings: The settings to use.
-        reader: The reader to use.
-    """
-    logger.debug(f"Sending {entry.title} to {settings.webhook}")
-
-
-def get_settings(reader: Reader, tag_name: str) -> Settings:
+def get_settings(reader: Reader, tag_name: str) -> Settings:  # noqa: C901, PLR0912, PLR0915
     """Get the settings for a tag.
 
     Args:
@@ -34,33 +17,90 @@ def get_settings(reader: Reader, tag_name: str) -> Settings:
     Returns:
         Settings: The settings.
     """
-    include_replies: bool = False
-    include_retweets: bool = False
-    webhook_url: str = ""
+    settings = Settings()
 
-    # Get our settings. These are global tags.
+    # Get our settings, they are stored as global tags.
     global_tags = list(reader.get_tags(()))
     for global_tag in global_tags:
-        # If we should send replies.
-        if global_tag[0] == f"{tag_name}_include_replies":
-            include_replies = bool(global_tag[1])
+        global_tag_name: str = global_tag[0]
+        if global_tag_name == f"{tag_name}_include_replies":
+            settings.include_replies = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_include_retweets":
+            settings.include_retweets = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_webhook":
+            settings.webhooks = str(global_tag[1])
+        if global_tag_name == f"{tag_name}_append_usernames":
+            settings.append_usernames = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_blacklist":
+            settings.blacklist_active = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_blacklist_active":
+            settings.blacklist_active = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_whitelist":
+            settings.whitelist = str(global_tag[1])
+        if global_tag_name == f"{tag_name}_whitelist_active":
+            settings.whitelist_active = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_embed_author_icon_url":
+            settings.embed_author_icon_url = str(global_tag[1])
+        if global_tag_name == f"{tag_name}_embed_author_name":
+            settings.embed_author_name = str(global_tag[1])
+        if global_tag_name == f"{tag_name}_embed_author_url":
+            settings.embed_author_url = str(global_tag[1])
+        if global_tag_name == f"{tag_name}_embed_color":
+            settings.embed_color = str(global_tag[1])
+        if global_tag_name == f"{tag_name}_embed_color_random":
+            settings.embed_color_random = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_embed_footer_icon_url":
+            settings.embed_footer_icon_url = str(global_tag[1])
+        if global_tag_name == f"{tag_name}_embed_footer_text":
+            settings.embed_footer_text = str(global_tag[1])
+        if global_tag_name == f"{tag_name}_embed_image":
+            settings.embed_image = str(global_tag[1])
+        if global_tag_name == f"{tag_name}_embed_show_author":
+            settings.embed_show_author = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_embed_show_title":
+            settings.embed_show_title = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_embed_timestamp":
+            settings.embed_timestamp = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_embed_url":
+            settings.embed_url = str(global_tag[1])
+        if global_tag_name == f"{tag_name}_hashtag_link":
+            settings.hashtag_link = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_hashtag_link_destination":
+            settings.hashtag_link_destination = str(global_tag[1])
+        if global_tag_name == f"{tag_name}_make_text_a_link":
+            settings.make_text_a_link = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_make_text_a_link_preview":
+            settings.make_text_a_link_preview = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_make_text_a_link_url":
+            settings.make_text_a_link_url = str(global_tag[1])
+        if global_tag_name == f"{tag_name}_remove_copyright":
+            settings.remove_copyright = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_remove_utm":
+            settings.remove_utm = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_send_embed":
+            settings.send_embed = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_send_only_link":
+            settings.send_only_link = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_send_only_link_preview":
+            settings.send_only_link_preview = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_send_text":
+            settings.send_text = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_translate":
+            settings.translate = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_translate_from":
+            settings.translate_from = str(global_tag[1])
+        if global_tag_name == f"{tag_name}_translate_to":
+            settings.translate_to = str(global_tag[1])
+        if global_tag_name == f"{tag_name}_unescape_html":
+            settings.unescape_html = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_upload_media":
+            settings.upload_media = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_username_link":
+            settings.username_link = bool(global_tag[1])
+        if global_tag_name == f"{tag_name}_username_link_destination":
+            settings.username_link_destination = str(global_tag[1])
 
-        # If we should send retweets.
-        if global_tag[0] == f"{tag_name}_include_retweets":
-            include_retweets = bool(global_tag[1])
-
-        # Get the webhook URL.
-        if global_tag[0] == f"{tag_name}_webhook":
-            webhook_url = str(global_tag[1])
-
-    logger.info(f"Webhook URL: {webhook_url}")
-    logger.info(f"Include Retweets: {include_retweets}")
-    logger.info(f"Include Replies: {include_replies}")
-
-    if not include_replies or not include_retweets or not webhook_url:
-        return Settings()
-
-    return Settings(webhook=webhook_url, include_replies=include_replies, include_retweets=include_retweets)
+    return settings
 
 
 def send_tag(entry: Entry, tag_name: str, reader: Reader) -> None:
@@ -73,7 +113,15 @@ def send_tag(entry: Entry, tag_name: str, reader: Reader) -> None:
     """
     # Get the settings for the tag.
     settings: Settings = get_settings(reader=reader, tag_name=tag_name)
-    send_text(entry=entry, settings=settings, reader=reader)
+
+    if settings.send_only_link:
+        send_link(entry=entry, settings=settings)
+    elif settings.send_text:
+        send_text(entry=entry, settings=settings)
+    elif settings.send_embed:
+        send_embed(entry=entry, settings=settings, reader=reader)
+    else:
+        logger.warning(f"Unknown settings for tag {tag_name}.")
 
 
 def send_to_discord(reader: Reader) -> None:
@@ -109,9 +157,11 @@ def send_to_discord(reader: Reader) -> None:
             # For example: ('name', 'Games')
             global_tag_name: str = global_tag[0]
             if global_tag_name == "name":
+                tag_names: str = str(global_tag[1])
                 # Group names can be separated by a semicolon.
-                for tag in global_tag_name.split(";"):
-                    tag_name: str = tag[1]
-
+                for tag in tag_names.split(";"):
                     # Send the tag and entry to another function where we will decide what to do with it.
-                    send_tag(entry, tag_name, reader)
+                    send_tag(entry, tag, reader)
+                    # Send the tag and entry to another function where we will decide what to do with it.
+                    send_tag(entry, tag, reader)
+                    send_tag(entry, tag, reader)

@@ -13,6 +13,7 @@ from reader import Reader
 from discord_twitter_webhooks.add_missing_tags import add_missing_tags
 from discord_twitter_webhooks.add_new_feed import create_group
 from discord_twitter_webhooks.get_feed_list import FeedList, get_feed_list
+from discord_twitter_webhooks.logger import setup_logger
 from discord_twitter_webhooks.remove_group import remove_group
 from discord_twitter_webhooks.search import create_html_for_search_results
 from discord_twitter_webhooks.send_to_discord import send_to_discord
@@ -202,6 +203,7 @@ def startup() -> None:
 
     It adds missing tags and starts the scheduler.
     """
+    setup_logger()
     add_missing_tags(reader=reader)
 
     scheduler: BackgroundScheduler = BackgroundScheduler()

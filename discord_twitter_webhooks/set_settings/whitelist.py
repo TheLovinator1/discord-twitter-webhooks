@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_whitelist_words(reader: Reader, name: str, whitelist_words: str) -> None:
+def set_whitelist(reader: Reader, name: str, whitelist_words: str) -> None:
     """Set the whitelist words tag for the group.
 
     Args:

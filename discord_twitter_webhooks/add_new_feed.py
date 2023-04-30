@@ -1,11 +1,10 @@
 from reader import Feed, Reader
 
 from discord_twitter_webhooks.name_already_exists import name_already_exists
-from discord_twitter_webhooks.send_text import set_send_text
 from discord_twitter_webhooks.set_settings.append_usernames import set_append_usernames
 from discord_twitter_webhooks.set_settings.blacklist import (
+    set_blacklist,
     set_blacklist_active,
-    set_blacklist_words,
 )
 from discord_twitter_webhooks.set_settings.embed import (
     set_embed_author_icon_url,
@@ -41,6 +40,7 @@ from discord_twitter_webhooks.set_settings.send_only_link import (
     set_send_only_link,
     set_send_only_link_preview,
 )
+from discord_twitter_webhooks.set_settings.send_text import set_send_text
 from discord_twitter_webhooks.set_settings.set_webhook_url import set_webhook_url
 from discord_twitter_webhooks.set_settings.translate import (
     set_translate,
@@ -54,8 +54,8 @@ from discord_twitter_webhooks.set_settings.username_link import (
     set_username_link_destination,
 )
 from discord_twitter_webhooks.set_settings.whitelist import (
+    set_whitelist,
     set_whitelist_active,
-    set_whitelist_words,
 )
 
 
@@ -202,9 +202,9 @@ def create_group(  # noqa: PLR0913, PLR0915
     set_translate_to(reader, name, translate_to)
     set_translate_from(reader, name, translate_from)
 
-    set_whitelist_words(reader, name, whitelist_words)
+    set_whitelist(reader, name, whitelist_words)
     set_whitelist_active(reader, name, whitelist_active)
-    set_blacklist_words(reader, name, blacklist_words)
+    set_blacklist(reader, name, blacklist_words)
     set_blacklist_active(reader, name, blacklist_active)
 
     set_unescape_html(reader, name, unescape_html)

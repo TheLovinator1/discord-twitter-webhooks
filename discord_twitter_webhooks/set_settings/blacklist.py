@@ -2,7 +2,7 @@ from loguru import logger
 from reader import Reader
 
 
-def set_blacklist_words(reader: Reader, name: str, blacklist_words: str) -> None:
+def set_blacklist(reader: Reader, name: str, blacklist_words: str) -> None:
     """Set the blacklist words tag for the group.
 
     Args:
