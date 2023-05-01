@@ -63,6 +63,9 @@ def test_add_page() -> None:
 
 def test_add_new_group() -> None:
     """Test if we can add a new group."""
+    # Get the old index page.
+    old_index_page: Response = client.get("/")
+
     response: Response = client.post(
         "/add",
         data={
@@ -83,12 +86,17 @@ def test_add_new_group() -> None:
     # Check that the page has something on it.
     assert len(response.text) > 100  # noqa: PLR2004
 
-    # Check that it starts with the correct text.
-    assert response.text.startswith(f"\"Added '{temp_name}' to the existing feed for 'elonmusk'. Before it was")
+    # Check that the index page is smaller than the old index page.
+    assert len(response.text) > len(old_index_page.text)
+
+    assert temp_name in response.text
 
 
 def test_remove_group() -> None:
     """Test if we can remove a group."""
+    # Get the old index page.
+    old_index_page: Response = client.get("/")
+
     # Add a group to remove.
     client.post(
         "/add",
@@ -115,5 +123,7 @@ def test_remove_group() -> None:
     # Check that the page is not empty.
     assert response.text
 
-    # Check that it starts with the correct text.
-    assert response.text == '"OK"'
+    # Check that the index page is smaller than the old index page.
+    assert len(response.text) < len(old_index_page.text)
+
+    assert temp_name not in response.text

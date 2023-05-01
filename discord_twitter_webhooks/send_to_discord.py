@@ -115,7 +115,7 @@ def send_tag(entry: Entry, tag_name: str, reader: Reader) -> None:
     elif settings.send_text:
         send_text(entry=entry, settings=settings)
     elif settings.send_embed:
-        send_embed(entry=entry, settings=settings, reader=reader)
+        send_embed(entry=entry, settings=settings)
     else:
         logger.warning(f"Unknown settings for tag {tag_name}.")
 

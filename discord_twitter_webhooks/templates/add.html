@@ -586,25 +586,6 @@
         Whether or not you want to remove &copy;, &reg;, and &trade; symbols.
       </div>
     </div>
-    {# Convert usernames to links #}
-    <div class="form-check form-switch">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        role="switch"
-        id="convert_usernames_to_links"
-        name="convert_usernames_to_links"
-        value="True"
-      />
-      <label class="form-check-label" for="convert_usernames_to_links"
-        >Convert usernames to links</label
-      >
-      <div id="convert_usernames_to_links_help" class="form-text">
-        Whether or not you want to convert usernames to links. For example,
-        @username becomes
-        <a class="text-muted" href="https://twitter.com/username">@username</a>.
-      </div>
-    </div>
     {# Username destination #}
     <div class="row pb-2">
       <label for="username_destination" class="col-sm-1 col-form-label"
@@ -622,27 +603,6 @@
         <div id="username_destination_help" class="form-text">
           The destination of the username links.
         </div>
-      </div>
-    </div>
-    {# Convert hashtags to links #}
-    <div class="form-check form-switch">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        role="switch"
-        id="convert_hashtags_to_links"
-        name="convert_hashtags_to_links"
-        value="True"
-      />
-      <label class="form-check-label" for="convert_hashtags_to_links"
-        >Convert hashtags to links</label
-      >
-      <div id="convert_hashtags_to_links_help" class="form-text">
-        Whether or not you want to convert hashtags to links. For example,
-        #hashtag becomes
-        <a class="text-muted" href="https://twitter.com/hashtag/hashtag"
-          >#hashtag</a
-        >.
       </div>
     </div>
     {# Hashtag destination #}

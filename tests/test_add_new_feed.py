@@ -113,8 +113,6 @@ def test_add_new_feed(tmp_path: str) -> None:  # noqa: C901, PLR0915, PLR0912
             assert tags[1] is True
         elif tags[0] == f"{group_name}_username_link_destination":
             assert tags[1] == "Nitter"
-        elif tags[0] == f"{group_name}_webhook":
-            assert tags[1] == "https://twitter.com/elonmusk"
         else:
             tag_without_group_name: str = tags[0].replace(f"{group_name}", "")
             pytest.fail(f"Unexpected tag: {tag_without_group_name}")

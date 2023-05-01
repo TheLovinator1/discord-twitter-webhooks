@@ -4,7 +4,7 @@ from typing import Annotated
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, Form, Request, Response
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
@@ -91,13 +91,13 @@ def add_post(  # noqa: PLR0913
     remove_copyright: Annotated[bool, Form(title="Remove Copyright?")] = False,
     username_link_destination: Annotated[str, Form(title="Username link destination")] = "",
     hashtag_link_destination: Annotated[str, Form(title="Hashtag link destination")] = "",
-) -> str:
+) -> RedirectResponse:
     """Create a new group.
 
     Returns:
         str: The add page.
     """
-    return create_group(
+    create_group(
         reader=reader,
         name=name,
         webhook_value=webhooks,
@@ -139,15 +139,21 @@ def add_post(  # noqa: PLR0913
         hashtag_link_destination=hashtag_link_destination,
     )
 
+    # Redirect to the index page.
+    return RedirectResponse(url="/", status_code=303)
+
 
 @app.post("/remove_group")
-def remove_group_post(name: Annotated[str, Form()]) -> str:
+def remove_group_post(name: Annotated[str, Form()]) -> RedirectResponse:
     """Remove a group.
 
     Returns:
         str: The index page.
     """
-    return remove_group(name=name, reader=reader)
+    remove_group(name=name, reader=reader)
+
+    # Redirect to the index page.
+    return RedirectResponse(url="/", status_code=303)
 
 
 @app.get("/search", response_class=HTMLResponse)
@@ -173,7 +179,7 @@ async def search(request: Request, query: str) -> Response:
 
 
 @app.get("/mark_as_unread/{group_name}")
-def mark_as_unread(group_name: str) -> str:
+def mark_as_unread(group_name: str) -> RedirectResponse:
     """Mark a feed as unread.
 
     Returns:
@@ -190,7 +196,9 @@ def mark_as_unread(group_name: str) -> str:
                 for entry in reader.get_entries(feed=feed):
                     reader.set_entry_read(entry, False)
                     logger.info(f"Marked {entry.title} as unread.")
-    return "OK"
+
+    # Redirect to the index page.
+    return RedirectResponse(url="/", status_code=303)
 
 
 @app.on_event("startup")

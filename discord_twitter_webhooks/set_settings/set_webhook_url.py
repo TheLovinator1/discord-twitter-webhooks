@@ -11,4 +11,4 @@ def set_webhook_url(reader: Reader, name: str, webhook_value: str) -> None:
         webhook_value: The webhook_url value.
     """
     logger.debug(f"Setting webhook for {name} to {webhook_value}")
-    reader.set_tag((), f"{name}_webhook", webhook_value)  # type: ignore  # noqa: PGH003
+    reader.set_tag((), f"{name}_webhooks", webhook_value)  # type: ignore  # noqa: PGH003

@@ -51,6 +51,7 @@ from discord_twitter_webhooks.set_settings.upload_media import set_upload_media
 from discord_twitter_webhooks.set_settings.username_link import (
     set_username_link_destination,
 )
+from discord_twitter_webhooks.set_settings.usernames import set_usernames
 from discord_twitter_webhooks.set_settings.whitelist import (
     set_whitelist,
     set_whitelist_active,
@@ -103,49 +104,6 @@ def create_group(  # noqa: PLR0913, PLR0915
     Each group has a name, a webhook URL, and a list of usernames. The list of usernames is a newline separated list.
     You can also choose whether or not to include replies and retweets.
 
-    Args:
-        name: The name of the group.
-        webhook_value: What the webhook URL should be set to.
-        usernames_value: What usernames we should be following. This is a newline separated list.
-        reader: What reader we should be using.
-        include_replies: Whether or not we should send replies to Discord.
-        include_retweets: Whether or not we should send retweets to Discord.
-        send_text: Whether or not we should send the text of the tweet to Discord.
-        send_embed: Whether or not we should send the embed of the tweet to Discord.
-        embed_color: What color the embed should be.
-        embed_color_random: Whether or not the embed color should be random.
-        embed_author_name: What the author name of the embed should be.
-        embed_author_url: What the author URL of the embed should be.
-        embed_author_icon_url: What the author icon URL of the embed should be.
-        embed_url: What the URL of the embed should be.
-        embed_timestamp: Whether or not the embed should have a timestamp.
-        embed_image: What the image of the embed should be.
-        embed_footer_text: What the footer text of the embed should be.
-        embed_footer_icon_url: What the footer icon URL of the embed should be.
-        embed_show_title: Whether or not the embed should show the title.
-        embed_show_author: Whether or not the embed should show the author.
-        send_only_link: Whether or not we should only send a link to Discord.
-        send_only_link_preview: Whether or not we should send a preview of the link to Discord.
-        make_text_a_link: Whether or not we should make text a link.
-        make_text_a_link_preview: Whether or not we should send a preview of the link to Discord.
-        make_text_a_link_url: What the URL of the link should be.
-        upload_media: Whether or not we should upload media to Discord.
-        append_usernames: Whether or not we should append usernames to the end of the tweet.
-        translate: Whether or not we should translate the tweet.
-        translate_to: What language we should translate the tweet to.
-        translate_from: What language we should translate the tweet from.
-        whitelist_words: What words we should whitelist.
-        whitelist_active: Whether or not the whitelist is active.
-        blacklist_words: What words we should blacklist.
-        blacklist_active: Whether or not the blacklist is active.
-        unescape_html: Whether or not we should unescape HTML.
-        remove_utm: Whether or not we should remove UTM parameters.
-        remove_copyright: Whether or not we should remove copyright.
-        convert_usernames_to_links: Whether or not we should convert usernames to links.
-        username_link_destination: What the destination of the username link should be.
-        convert_hashtags_to_links: Whether or not we should convert hashtags to links.
-        hashtag_link_destination: What the destination of the hashtag link should be.
-
     Returns:
         A string that can be returned to the user.
     """
@@ -164,6 +122,7 @@ def create_group(  # noqa: PLR0913, PLR0915
         )
 
     # Add our new global tags
+    set_usernames(reader, name, usernames_value)
     set_webhook_url(reader, name, webhook_value)
     set_include_retweets(reader, name, include_retweets)
     set_include_replies(reader, name, include_replies)
