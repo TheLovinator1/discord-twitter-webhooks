@@ -1,4 +1,4 @@
-def remove_copyright() -> None:
+def remove_copyright(tweet_text: str) -> str:
     """Remove the copyright.
 
     Args:
@@ -8,3 +8,11 @@ def remove_copyright() -> None:
     Returns:
         The tweet text with the copyright removed.
     """
+    # Remove the "©" symbol.
+    tweet_text = tweet_text.replace("©", "")
+
+    # Remove the trademark symbol.
+    tweet_text = tweet_text.replace("™", "")
+
+    # Remove the registered trademark symbol.
+    return tweet_text.replace("®", "")

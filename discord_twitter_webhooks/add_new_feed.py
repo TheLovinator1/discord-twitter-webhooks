@@ -22,7 +22,6 @@ from discord_twitter_webhooks.set_settings.embed import (
     set_send_embed,
 )
 from discord_twitter_webhooks.set_settings.hashtag_link import (
-    set_hashtag_link,
     set_hashtag_link_destination,
 )
 from discord_twitter_webhooks.set_settings.include_retweets import set_include_retweets
@@ -50,7 +49,6 @@ from discord_twitter_webhooks.set_settings.translate import (
 from discord_twitter_webhooks.set_settings.unescape_html import set_unescape_html
 from discord_twitter_webhooks.set_settings.upload_media import set_upload_media
 from discord_twitter_webhooks.set_settings.username_link import (
-    set_username_link,
     set_username_link_destination,
 )
 from discord_twitter_webhooks.set_settings.whitelist import (
@@ -97,9 +95,7 @@ def create_group(  # noqa: PLR0913, PLR0915
     unescape_html: bool = True,
     remove_utm: bool = True,
     remove_copyright: bool = True,
-    convert_usernames_to_links: bool = True,
     username_link_destination: str = "Nitter",  # Can be "Nitter" or "Twitter"
-    convert_hashtags_to_links: bool = True,
     hashtag_link_destination: str = "Nitter",  # Can be "Nitter" or "Twitter"
 ) -> str:
     """Create a new group. A group is a collection of feeds that are sent to the same Discord webhook.
@@ -211,9 +207,7 @@ def create_group(  # noqa: PLR0913, PLR0915
     set_remove_utm(reader, name, remove_utm)
     set_remove_copyright_symbols(reader, name, remove_copyright)
 
-    set_username_link(reader, name, convert_usernames_to_links)
     set_username_link_destination(reader, name, username_link_destination)
-    set_hashtag_link(reader, name, convert_hashtags_to_links)
     set_hashtag_link_destination(reader, name, hashtag_link_destination)
 
     # Get all usernames and add them to the reader if they don't exist, or add the new name to the existing feed.

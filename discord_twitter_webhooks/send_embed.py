@@ -4,13 +4,12 @@ from typing import TYPE_CHECKING
 
 from discord_webhook import DiscordEmbed, DiscordWebhook
 from loguru import logger
-from reader import Entry, Reader
+from reader import Entry
 
 from discord_twitter_webhooks.dataclasses import Settings
 from discord_twitter_webhooks.remove_copyright import remove_copyright
 from discord_twitter_webhooks.remove_utm import remove_utm
-from discord_twitter_webhooks.replace_hashtags import replace_hashtags
-from discord_twitter_webhooks.replace_usernames import replace_usernames
+from discord_twitter_webhooks.set_settings.markdown import convert_html_to_md
 
 if TYPE_CHECKING:
     from requests import Response
@@ -37,7 +36,7 @@ def get_color(settings: Settings) -> int:
     return int(embed_color[1:], 16)
 
 
-def get_tweet_text(entry: Entry, settings: Settings, reader: Reader) -> str:
+def get_tweet_text(entry: Entry, settings: Settings) -> str:
     """Get the text to send in the embed.
 
     Args:
@@ -49,22 +48,19 @@ def get_tweet_text(entry: Entry, settings: Settings, reader: Reader) -> str:
         The text to send in the embed.
     """
     tweet_text: str = entry.summary or "Failed to get tweet text"
+    tweet_text = convert_html_to_md(tweet_text)
 
-    if settings.hashtag_link:
-        tweet_text = replace_hashtags(tweet_text, settings)
     if settings.remove_copyright:
-        tweet_text = remove_copyright(tweet_text, reader)
+        tweet_text = remove_copyright(tweet_text)
     if settings.remove_utm:
         tweet_text = remove_utm(tweet_text)
     if settings.unescape_html:
         tweet_text = unescape(tweet_text)
-    if settings.username_link:
-        tweet_text = replace_usernames(tweet_text, reader)
 
     return tweet_text
 
 
-def send_embed(entry: Entry, settings: Settings, reader: Reader) -> None:
+def send_embed(entry: Entry, settings: Settings) -> None:
     """Send an embed to Discord.
 
     Args:
@@ -81,7 +77,7 @@ def send_embed(entry: Entry, settings: Settings, reader: Reader) -> None:
     # We will add the URL later, so we can send embeds to multiple webhooks.
     webhook = DiscordWebhook(url="")
 
-    tweet_text: str = get_tweet_text(entry, settings, reader)
+    tweet_text: str = get_tweet_text(entry, settings)
     embed = DiscordEmbed(description=tweet_text)
 
     if settings.embed_show_title:
@@ -102,5 +98,4 @@ def send_embed(entry: Entry, settings: Settings, reader: Reader) -> None:
         if response.ok:
             logger.info("Webhook posted for tweet https://twitter.com/i/status/{}", entry.link)
         else:
-            logger.error(f"Got {response.status_code} from {webhook}. Response: {response.text}")
             logger.error(f"Got {response.status_code} from {webhook}. Response: {response.text}")

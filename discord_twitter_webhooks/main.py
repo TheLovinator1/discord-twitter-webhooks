@@ -89,9 +89,7 @@ def add_post(  # noqa: PLR0913
     unescape_html: Annotated[bool, Form(title="Unescape HTML?")] = False,
     remove_utm: Annotated[bool, Form(title="Remove UTM?")] = False,
     remove_copyright: Annotated[bool, Form(title="Remove Copyright?")] = False,
-    convert_usernames_to_links: Annotated[bool, Form(title="Convert usernames to links?")] = True,
     username_link_destination: Annotated[str, Form(title="Username link destination")] = "",
-    convert_hashtags_to_links: Annotated[bool, Form(title="Convert hashtags to links?")] = True,
     hashtag_link_destination: Annotated[str, Form(title="Hashtag link destination")] = "",
 ) -> str:
     """Create a new group.
@@ -137,9 +135,7 @@ def add_post(  # noqa: PLR0913
         unescape_html=unescape_html,
         remove_utm=remove_utm,
         remove_copyright=remove_copyright,
-        convert_usernames_to_links=convert_usernames_to_links,
         username_link_destination=username_link_destination,
-        convert_hashtags_to_links=convert_hashtags_to_links,
         hashtag_link_destination=hashtag_link_destination,
     )
 

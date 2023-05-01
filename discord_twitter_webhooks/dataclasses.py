@@ -37,9 +37,7 @@ class Settings:
     unescape_html: bool = True
     remove_utm: bool = True
     remove_copyright: bool = True
-    username_link: bool = True
     username_link_destination: str = "Nitter"  # Can be "Nitter" or "Twitter"
-    hashtag_link: bool = True
     hashtag_link_destination: str = "Nitter"  # Can be "Nitter" or "Twitter"
 
 

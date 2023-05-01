@@ -63,8 +63,6 @@ def get_settings(reader: Reader, tag_name: str) -> Settings:  # noqa: C901, PLR0
             settings.embed_timestamp = bool(global_tag[1])
         if global_tag_name == f"{tag_name}_embed_url":
             settings.embed_url = str(global_tag[1])
-        if global_tag_name == f"{tag_name}_hashtag_link":
-            settings.hashtag_link = bool(global_tag[1])
         if global_tag_name == f"{tag_name}_hashtag_link_destination":
             settings.hashtag_link_destination = str(global_tag[1])
         if global_tag_name == f"{tag_name}_make_text_a_link":
@@ -95,8 +93,6 @@ def get_settings(reader: Reader, tag_name: str) -> Settings:  # noqa: C901, PLR0
             settings.unescape_html = bool(global_tag[1])
         if global_tag_name == f"{tag_name}_upload_media":
             settings.upload_media = bool(global_tag[1])
-        if global_tag_name == f"{tag_name}_username_link":
-            settings.username_link = bool(global_tag[1])
         if global_tag_name == f"{tag_name}_username_link_destination":
             settings.username_link_destination = str(global_tag[1])
 
