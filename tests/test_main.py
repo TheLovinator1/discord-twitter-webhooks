@@ -55,7 +55,7 @@ def test_add_page() -> None:
     assert len(response.text) > 1000  # noqa: PLR2004
 
     # Check that the page contains our HTML and not some other HTML.
-    assert "p-2 mb-4 border border-dark" in response.text
+    assert "p-2 border border-dark" in response.text
 
     # Check that the page contains the add feed button.
     assert '<button class="btn btn-dark btn-sm">Add feed</button>' in response.text

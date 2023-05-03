@@ -22,5 +22,5 @@ def get_global_settings(reader: Reader) -> GlobalSettings:
         elif global_tag[0] == "global_send_errors_to_discord":
             global_settings.send_errors_to_discord = bool(global_tag[1])
         elif global_tag[0] == "global_send_errors_to_discord_webhook":
-            global_settings.send_errors_to_discord_webhook = str(global_tag[1])
+            global_settings.error_webhook = str(global_tag[1])
     return global_settings

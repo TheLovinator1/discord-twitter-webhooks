@@ -20,7 +20,7 @@ def test_get_global_settings(tmp_path: Path) -> None:
         "https://translate.lovinator.space",
         False,
     )
-    assert not global_settings_empty.send_errors_to_discord_webhook
+    assert not global_settings_empty.error_webhook
 
     our_reader.set_tag((), "global_nitter_instance", "https://nitter.net")  # type: ignore  # noqa: PGH003
     our_reader.set_tag((), "global_translator_instance", "https://translate.example.com")  # type: ignore  # noqa: PGH003, E501
@@ -33,7 +33,7 @@ def test_get_global_settings(tmp_path: Path) -> None:
         "https://translate.example.com",
         True,
     )
-    assert global_settings.send_errors_to_discord_webhook == "https://discord.com"
+    assert global_settings.error_webhook == "https://discord.com"
 
     # Check that there are no other tags.
     assert len(list(our_reader.get_tags(()))) == 4  # noqa: PLR2004

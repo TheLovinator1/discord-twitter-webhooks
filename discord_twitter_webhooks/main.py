@@ -12,6 +12,7 @@ from reader import Reader
 
 from discord_twitter_webhooks.add_missing_tags import add_missing_tags
 from discord_twitter_webhooks.add_new_feed import create_group
+from discord_twitter_webhooks.dataclasses import GlobalSettings, save_global_settings
 from discord_twitter_webhooks.get_feed_list import FeedList, get_feed_list
 from discord_twitter_webhooks.logger import setup_logger
 from discord_twitter_webhooks.remove_group import remove_group
@@ -31,7 +32,7 @@ if not reader:
 
 
 @app.get("/", response_class=HTMLResponse)
-def index(request: Request) -> Response:
+async def index(request: Request) -> Response:
     """Return the index page.
 
     Returns:
@@ -42,7 +43,7 @@ def index(request: Request) -> Response:
 
 
 @app.get("/add", response_class=HTMLResponse)
-def add(request: Request) -> Response:
+async def add(request: Request) -> Response:
     """Return the add page.
 
     Returns:
@@ -52,7 +53,7 @@ def add(request: Request) -> Response:
 
 
 @app.post("/add")
-def add_post(  # noqa: PLR0913
+async def add_post(  # noqa: PLR0913
     name: Annotated[str, Form(title="Group Name")],
     webhooks: Annotated[str, Form(title="Webhook URLs")],
     usernames: Annotated[str, Form(title="Twitter Usernames")],
@@ -144,7 +145,7 @@ def add_post(  # noqa: PLR0913
 
 
 @app.post("/remove_group")
-def remove_group_post(name: Annotated[str, Form()]) -> RedirectResponse:
+async def remove_group_post(name: Annotated[str, Form()]) -> RedirectResponse:
     """Remove a group.
 
     Returns:
@@ -179,7 +180,7 @@ async def search(request: Request, query: str) -> Response:
 
 
 @app.get("/mark_as_unread/{group_name}")
-def mark_as_unread(group_name: str) -> RedirectResponse:
+async def mark_as_unread(group_name: str) -> RedirectResponse:
     """Mark a feed as unread.
 
     Returns:
@@ -199,6 +200,57 @@ def mark_as_unread(group_name: str) -> RedirectResponse:
 
     # Redirect to the index page.
     return RedirectResponse(url="/", status_code=303)
+
+
+@app.get("/settings")
+async def settings(request: Request) -> Response:
+    """Get the settings page.
+
+    Args:
+        request: The request object.
+
+    Returns:
+        Response: The settings page.
+    """
+    return templates.TemplateResponse("settings.html", {"request": request})
+
+
+@app.post("/settings")
+async def settings_post(
+    nitter_instance: Annotated[str, Form(title="Nitter instance")],
+    translator_instance: Annotated[str, Form(title="Translator instance")],
+    send_errors_to_discord: Annotated[bool, Form(title="Send errors to Discord?")] = False,
+    error_webhook: Annotated[str, Form(title="Error webhook")] = "",
+) -> None:
+    """Save the settings.
+
+    Args:
+        nitter_instance: The Nitter instance to use.
+        translator_instance: The translator instance to use.
+        send_errors_to_discord: Whether to send errors to Discord.
+        error_webhook: The webhook to send errors to.
+    """
+    save_settings(
+        nitter_instance=nitter_instance,
+        translator_instance=translator_instance,
+        send_errors_to_discord=send_errors_to_discord,
+        error_webhook=error_webhook,
+    )
+
+
+def save_settings(
+    nitter_instance: str,
+    translator_instance: str,
+    send_errors_to_discord: bool,
+    error_webhook: str,
+) -> None:
+    """Save the settings."""
+    global_settings = GlobalSettings()
+    global_settings.nitter_instance = nitter_instance
+    global_settings.translator_instance = translator_instance
+    global_settings.send_errors_to_discord = send_errors_to_discord
+    global_settings.error_webhook = error_webhook
+    save_global_settings(reader=reader, global_settings=global_settings)
 
 
 @app.on_event("startup")
