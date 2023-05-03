@@ -1,0 +1,70 @@
+<div class="p-2 border border-dark">
+  <h3>Send link settings</h3>
+  {# Send link preview #}
+  <div class="form-check form-switch">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      role="switch"
+      id="send_link_preview"
+      name="send_link_preview"
+      value="False"
+    />
+    <label class="form-check-label" for="send_link_preview"
+      >Send link preview</label
+    >
+    <div id="send_link_preview_help" class="form-text">
+      Whether or not you want the link to have a preview.
+    </div>
+  </div>
+
+  {# Make text a link #}
+  <div class="form-check form-switch">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      role="switch"
+      id="make_text_a_link"
+      name="make_text_a_link"
+      value="False"
+    />
+    <label class="form-check-label" for="make_text_a_link"
+      >Make text a link</label
+    >
+    <div id="make_text_a_link_help" class="form-text">
+      Whether or not you want the text to be a link.
+    </div>
+  </div>
+  {# Make text a link preview #}
+  <div class="form-check form-switch">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      role="switch"
+      id="make_text_a_link_preview"
+      name="make_text_a_link_preview"
+      value="False"
+    />
+    <label class="form-check-label" for="make_text_a_link_preview"
+      >Should the link make a preview in Discord?</label
+    >
+    <div id="make_text_a_link_preview_help" class="form-text">
+      Should the link make a preview in Discord?
+    </div>
+  </div>
+  {# Custom URL #}
+  <div class="row pb-2">
+    <label for="custom_url" class="col-sm-1 col-form-label">URL</label>
+    <div class="col-sm-11">
+      <input
+        name="custom_url"
+        type="text"
+        class="form-control bg-dark border-dark text-muted"
+        id="custom_url"
+      />
+      <div id="custom_url_help" class="form-text">
+        The URL to link the text to.
+      </div>
+    </div>
+  </div>
+</div>

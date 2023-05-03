@@ -1,0 +1,131 @@
+<div class="p-2 border border-dark">
+  <h3>Other</h3>
+  {# Upload media to Discord #}
+  <div class="form-check form-switch">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      role="switch"
+      id="upload_media_to_discord"
+      name="upload_media_to_discord"
+      value="False"
+    />
+    <label class="form-check-label" for="upload_media_to_discord"
+      >Upload media to Discord</label
+    >
+    <div id="upload_media_to_discord_help" class="form-text">
+      Whether or not you want to upload the media to Discord.
+    </div>
+  </div>
+  {# Append usernames to message #}
+  <div class="form-check form-switch">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      role="switch"
+      id="append_usernames_to_message"
+      name="append_usernames_to_message"
+      value="False"
+    />
+    <label class="form-check-label" for="append_usernames_to_message"
+      >Append usernames to message</label
+    >
+    <div id="append_usernames_to_message_help" class="form-text">
+      Whether or not you want to append the usernames to the message.
+    </div>
+  </div>
+  {# Unescape HTML #}
+  <div class="form-check form-switch">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      role="switch"
+      id="unescape_html"
+      name="unescape_html"
+      value="True"
+    />
+    <label class="form-check-label" for="unescape_html">Unescape HTML</label>
+    <div id="unescape_html_help" class="form-text">
+      Whether or not you want to unescape HTML. For example, &amp;amp; becomes
+      &.
+    </div>
+  </div>
+  {# Remove UTM #}
+  <div class="form-check form-switch">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      role="switch"
+      id="remove_utm"
+      name="remove_utm"
+      value="True"
+    />
+    <label class="form-check-label" for="remove_utm">Remove UTM params</label>
+    <div id="remove_utm_help" class="form-text">
+      Whether or not you want to remove UTM parameters from URLs. Read more here
+      <a class="text-muted" href="https://en.wikipedia.org/wiki/UTM_parameters"
+        >https://en.wikipedia.org/wiki/UTM_parameters</a
+      >.
+    </div>
+  </div>
+  {# Remove copyright symbols #}
+  <div class="form-check form-switch">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      role="switch"
+      id="remove_copyright"
+      name="remove_copyright"
+      value="True"
+    />
+    <label class="form-check-label" for="remove_utm"
+      >Remove &copy;, &reg;, and &trade;</label
+    >
+    <div id="remove_utm_help" class="form-text">
+      Whether or not you want to remove &copy;, &reg;, and &trade; symbols.
+    </div>
+  </div>
+  {# Username destination #}
+  <div class="row pb-2">
+    <label for="username_destination" class="col-sm-1 col-form-label"
+      >Username destination</label
+    >
+    <div class="col-sm-11">
+      <select
+        name="username_destination"
+        class="form-select bg-dark border-dark text-muted"
+        id="username_destination"
+      >
+        <option value="nitter" selected>Nitter</option>
+        <option value="twitter">Twitter</option>
+      </select>
+      <div id="username_destination_help" class="form-text">
+        The destination of the username links.
+      </div>
+    </div>
+  </div>
+  {# Hashtag destination #}
+  <div class="row pb-2">
+    <label for="hashtag_destination" class="col-sm-1 col-form-label"
+      >Hashtag destination</label
+    >
+    <div class="col-sm-11">
+      <select
+        name="hashtag_destination"
+        class="form-select bg-dark border-dark text-muted"
+        id="hashtag_destination"
+      >
+        <option value="nitter" selected>Nitter</option>
+        <option value="twitter">Twitter</option>
+      </select>
+      <div id="hashtag_destination_help" class="form-text">
+        The URL to use for hashtags.
+        <br />
+        Nitter: https://nitter.lovinator.space/hashtag/Test (Or your own
+        instance)
+        <br />
+        Twitter: https://twitter.com/hashtag/test
+      </div>
+    </div>
+  </div>
+</div>

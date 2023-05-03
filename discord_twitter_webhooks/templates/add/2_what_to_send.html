@@ -1,0 +1,38 @@
+<div class="p-2 border border-dark">
+  <h3>What to send</h3>
+  {# Include retweets? #}
+  <div class="form-check form-switch">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      role="switch"
+      id="include_retweets"
+      name="include_retweets"
+      value="False"
+    />
+    <label class="form-check-label" for="include_retweets"
+      >Include retweets</label
+    >
+    <div id="url_help" class="form-text">
+      Whether or not you want retweets to be sent to Discord.
+    </div>
+  </div>
+
+  {# Include replies? #}
+  <div class="form-check form-switch">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      role="switch"
+      id="include_replies"
+      name="include_replies"
+      value="False"
+    />
+    <label class="form-check-label" for="include_replies"
+      >Include replies</label
+    >
+    <div id="url_help" class="form-text">
+      Whether or not you want replies to be sent to Discord.
+    </div>
+  </div>
+</div>

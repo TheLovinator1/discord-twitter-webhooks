@@ -1,0 +1,77 @@
+<div class="p-2 border border-dark">
+  <h3>Whitelist</h3>
+  {# Whitelist active #}
+  <div class="form-check form-switch">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      role="switch"
+      id="whitelist_active"
+      name="whitelist_active"
+      value="False"
+    />
+    <label class="form-check-label" for="whitelist_active"
+      >Whitelist active</label
+    >
+    <div id="whitelist_active_help" class="form-text">
+      Whether or not you want to use the whitelist.
+    </div>
+  </div>
+  {# Whitelist words #}
+  <div class="row pb-2">
+    <label for="whitelist_words" class="col-sm-1 col-form-label"
+      >Whitelist</label
+    >
+    <div class="col-sm-11">
+      <input
+        name="whitelist_words"
+        type="text"
+        class="form-control bg-dark border-dark text-muted"
+        id="whitelist_words"
+      />
+      <div id="whitelist_words_help" class="form-text">
+        The words to whitelist. Only tweets containing these words will be shown
+        if the whitelist is active. This is useful when you only want to see
+        tweets about a specific topic.
+      </div>
+    </div>
+  </div>
+
+  <h3>Blacklist</h3>
+  {# Blacklist active #}
+  <div class="form-check form-switch">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      role="switch"
+      id="blacklist_active"
+      name="blacklist_active"
+      value="False"
+    />
+    <label class="form-check-label" for="blacklist_active"
+      >Blacklist active</label
+    >
+    <div id="blacklist_active_help" class="form-text">
+      Whether or not you want to use the blacklist.
+    </div>
+  </div>
+  {# Blacklist words #}
+  <div class="row pb-2">
+    <label for="blacklist_words" class="col-sm-1 col-form-label"
+      >Blacklist</label
+    >
+    <div class="col-sm-11">
+      <input
+        name="blacklist_words"
+        type="text"
+        class="form-control bg-dark border-dark text-muted"
+        id="blacklist_words"
+      />
+      <div id="blacklist_words_help" class="form-text">
+        The words to blacklist. Words in tweets containing these words will not
+        be shown if the blacklist is active. This is useful for filtering out
+        tweets that you don't want to see.
+      </div>
+    </div>
+  </div>
+</div>
