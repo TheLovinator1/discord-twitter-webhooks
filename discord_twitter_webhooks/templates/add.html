@@ -1,7 +1,13 @@
-{% extends 'base.html' %} {% block header %}
-<h1>{% block title %}Add a feed{% endblock title %}</h1>
-{% endblock header %} {% block content %}
-<script>
+{% extends "base.html" %}
+{% block header %}
+  <h1>
+    {% block title %}
+      Add a feed
+    {% endblock title %}
+  </h1>
+{% endblock header %}
+{% block content %}
+  <script>
   // JavaScript
   const toggleInput = document.getElementById("toggle-input");
   const divToHide = document.getElementById("div-to-hide");
@@ -12,28 +18,26 @@
     } else {
       divToHide.style.display = "block";
     }
-  });
-</script>
-
-<form name="add" action="/add" method="post">
-  {% include 'add/1_feed_details.html' %}
-  <br />
-  {% include 'add/2_what_to_send.html' %}
-  <br />
-  {% include 'add/3_how_to_send.html' %}
-  <br />
-  {% include 'add/4_embed_settings.html' %}
-  <br />
-  {% include 'add/5_send_link.html' %}
-  <br />
-  {% include 'add/6_translate.html' %}
-  <br />
-  {% include 'add/7_blackwhitelist.html' %}
-  <br />
-  {% include 'add/8_other.html' %}
-
-  <div class="d-md-flex">
-    <button class="btn btn-dark btn-sm">Add feed</button>
-  </div>
-</form>
+  })
+  </script>
+  <form name="add" action="{{ url_for('add_post') }}" method="post">
+    {% include "add/1_feed_details.html" %}
+    <br />
+    {% include "add/2_what_to_send.html" %}
+    <br />
+    {% include "add/3_how_to_send.html" %}
+    <br />
+    {% include "add/4_embed_settings.html" %}
+    <br />
+    {% include "add/5_send_link.html" %}
+    <br />
+    {% include "add/6_translate.html" %}
+    <br />
+    {% include "add/7_blackwhitelist.html" %}
+    <br />
+    {% include "add/8_other.html" %}
+    <div class="d-md-flex">
+      <button class="btn btn-dark btn-sm">Add feed</button>
+    </div>
+  </form>
 {% endblock content %}

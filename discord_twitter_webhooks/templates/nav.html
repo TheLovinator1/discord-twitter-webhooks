@@ -1,51 +1,41 @@
-<nav
-  class="navbar navbar-expand-md navbar-dark p-2 mb-3 border-bottom border-warning"
->
+<nav class="navbar navbar-expand-md navbar-dark p-2 mb-3 border-bottom border-warning">
   <div class="container-fluid">
-    <button
-      class="navbar-toggler ms-auto"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#collapseNavbar"
-    >
+    <button class="navbar-toggler ms-auto"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseNavbar">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="navbar-collapse collapse" id="collapseNavbar">
       <ul class="navbar-nav">
         {# Feeds #}
         <li class="nav-item">
-          <a class="nav-link" href="/">Feeds</a>
+          <a class="nav-link" href="{{ url_for('index') }}">Feeds</a>
         </li>
-
         <li class="nav-item nav-link d-none d-md-block">|</li>
-
         {# Add #}
         <li class="nav-item">
-          <a class="nav-link" href="/add">Add</a>
+          <a class="nav-link" href="{{ url_for('add') }}">Add</a>
         </li>
-
         <li class="nav-item nav-link d-none d-md-block">|</li>
-
         {# Settings #}
         <li class="nav-item">
-          <a class="nav-link" href="/settings">Settings</a>
+          <a class="nav-link" href="{{ url_for('settings') }}">Settings</a>
         </li>
       </ul>
       {# Search #}
-      <form action="/search" method="get" class="ms-auto w-50 input-group">
-        <input
-          name="query"
-          class="form-control bg-dark border-dark text-muted"
-          type="search"
-          placeholder="Search"
-        />
+      <form action="{{ url_for('search') }}"
+            method="get"
+            class="ms-auto w-50 input-group">
+        <input name="query"
+               class="form-control bg-dark border-dark text-muted"
+               type="search"
+               placeholder="Search" />
       </form>
       {# Donate button #}
       <ul class="navbar-nav ms-auto">
         <li class="nav-item d-none d-md-block">
-          <a class="nav-link" href="https://github.com/sponsors/TheLovinator1"
-            >Donate ❤️</a
-          >
+          <a class="nav-link" href="https://github.com/sponsors/TheLovinator1">Donate ❤️</a>
         </li>
       </ul>
     </div>

@@ -1,4 +1,3 @@
-import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -10,42 +9,46 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
 
-def test_create_html_for_search_results() -> None:
-    """Test create_html_for_search_results."""
+def test_create_html_for_search_results(tmp_path: Path) -> None:
+    """Test create_html_for_search_results.
+
+    Args:
+        tmp_path: The temporary directory.
+    """
     # Create a reader.
-    with tempfile.TemporaryDirectory() as temp_dir:
-        # Create the temp directory.
-        Path.mkdir(Path(temp_dir), exist_ok=True)
-        assert Path.exists(Path(temp_dir))
 
-        # Create a temporary reader.
-        reader: Reader = make_reader(url=str(Path(temp_dir, "test_db.sqlite")))
-        assert reader is not None
+    # Create the temp directory.
+    Path.mkdir(Path(tmp_path), exist_ok=True)
+    assert Path.exists(Path(tmp_path))
 
-        # Add a feed to the reader.
-        reader.add_feed("https://lovinator.space/rss_test.xml", exist_ok=True)
+    # Create a temporary reader.
+    reader: Reader = make_reader(url=str(Path(tmp_path, "test_db.sqlite")))
+    assert reader is not None
 
-        # Check that the feed was added.
-        feeds: Iterable[Feed] = reader.get_feeds()
-        assert feeds is not None
-        assert len(list(feeds)) == 1
+    # Add a feed to the reader.
+    reader.add_feed("https://lovinator.space/rss_test.xml", exist_ok=True)
 
-        # Update the feed to get the entries.
-        reader.update_feeds()
+    # Check that the feed was added.
+    feeds: Iterable[Feed] = reader.get_feeds()
+    assert feeds is not None
+    assert len(list(feeds)) == 1
 
-        # Get the feed.
-        feed: Feed = reader.get_feed("https://lovinator.space/rss_test.xml")
-        assert feed is not None
+    # Update the feed to get the entries.
+    reader.update_feeds()
 
-        # Update the search index.
-        reader.enable_search()
-        reader.update_search()
+    # Get the feed.
+    feed: Feed = reader.get_feed("https://lovinator.space/rss_test.xml")
+    assert feed is not None
 
-        # Create the HTML and check if it is not empty.
-        search_html: str = create_html_for_search_results("a", reader)
-        assert search_html is not None
-        assert len(search_html) > 10  # noqa: PLR2004
+    # Update the search index.
+    reader.enable_search()
+    reader.update_search()
 
-        # Close the reader, so we can delete the directory.
-        reader.close()
-        reader.close()
+    # Create the HTML and check if it is not empty.
+    search_html: str = create_html_for_search_results("a", reader)
+    assert search_html is not None
+    assert len(search_html) > 10  # noqa: PLR2004
+
+    # Close the reader, so we can delete the directory.
+    reader.close()
+    reader.close()

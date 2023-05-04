@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 
-from reader import Reader
-
 
 @dataclass
 class Settings:
@@ -49,16 +47,3 @@ class GlobalSettings:
     translator_instance: str = "https://translate.lovinator.space"
     send_errors_to_discord: bool = False
     error_webhook: str = ""
-
-
-def save_global_settings(reader: Reader, global_settings: GlobalSettings) -> None:
-    """Save the global settings to the reader.
-
-    Args:
-        reader: The reader to use to save the settings to.
-        global_settings: The global settings to save.
-    """
-    reader.set_tag("global_nitter_instance", global_settings.nitter_instance)
-    reader.set_tag("global_translator_instance", global_settings.translator_instance)
-    reader.set_tag("global_send_errors_to_discord", global_settings.send_errors_to_discord)  # type: ignore  # noqa: PGH003, E501
-    reader.set_tag("global_error_webhook", global_settings.error_webhook)

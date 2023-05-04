@@ -12,8 +12,12 @@ from reader import Reader
 
 from discord_twitter_webhooks.add_missing_tags import add_missing_tags
 from discord_twitter_webhooks.add_new_feed import create_group
-from discord_twitter_webhooks.dataclasses import GlobalSettings, save_global_settings
+from discord_twitter_webhooks.dataclasses import GlobalSettings
 from discord_twitter_webhooks.get_feed_list import FeedList, get_feed_list
+from discord_twitter_webhooks.global_settings import (
+    get_global_settings,
+    save_global_settings,
+)
 from discord_twitter_webhooks.logger import setup_logger
 from discord_twitter_webhooks.remove_group import remove_group
 from discord_twitter_webhooks.search import create_html_for_search_results
@@ -212,30 +216,36 @@ async def settings(request: Request) -> Response:
     Returns:
         Response: The settings page.
     """
-    return templates.TemplateResponse("settings.html", {"request": request})
+    global_settings: GlobalSettings = get_global_settings(reader=reader)
+    return templates.TemplateResponse("settings.html", {"request": request, "settings": global_settings})
 
 
 @app.post("/settings")
 async def settings_post(
-    nitter_instance: Annotated[str, Form(title="Nitter instance")],
-    translator_instance: Annotated[str, Form(title="Translator instance")],
-    send_errors_to_discord: Annotated[bool, Form(title="Send errors to Discord?")] = False,
+    request: Request,
+    nitter_instance: Annotated[str, Form(title="Nitter instance")] = "",
+    translator_instance: Annotated[str, Form(title="Translator instance")] = "",
     error_webhook: Annotated[str, Form(title="Error webhook")] = "",
-) -> None:
+    send_errors_to_discord: Annotated[bool, Form(title="Send errors to Discord?")] = False,
+) -> Response:
     """Save the settings.
 
     Args:
+        request: The request object.
         nitter_instance: The Nitter instance to use.
         translator_instance: The translator instance to use.
         send_errors_to_discord: Whether to send errors to Discord.
         error_webhook: The webhook to send errors to.
     """
+    logger.info(send_errors_to_discord)
     save_settings(
         nitter_instance=nitter_instance,
         translator_instance=translator_instance,
         send_errors_to_discord=send_errors_to_discord,
         error_webhook=error_webhook,
     )
+    global_settings: GlobalSettings = get_global_settings(reader=reader)
+    return templates.TemplateResponse("settings.html", {"request": request, "settings": global_settings})
 
 
 def save_settings(

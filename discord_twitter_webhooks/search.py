@@ -1,6 +1,8 @@
 from typing import TYPE_CHECKING
 
+from loguru import logger
 from reader import EntrySearchResult, Feed, HighlightedString, Reader
+from reader.exceptions import FeedNotFoundError
 
 from discord_twitter_webhooks.settings import get_reader
 
@@ -29,7 +31,11 @@ def create_html_for_search_results(query: str, custom_reader: Reader | None = No
     html: str = ""
     for result in search_results:
         if ".summary" in result.content:
-            feed: Feed = reader.get_feed(result.feed_url)
+            try:
+                feed: Feed = reader.get_feed(result.feed_url)
+            except FeedNotFoundError:
+                logger.error(f"Feed not found for {result.feed_url} when creating HTML for search results.")
+                continue
             result_summary: str = add_span_with_slice(result.content[".summary"])
 
             html += f"""

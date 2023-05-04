@@ -2,32 +2,24 @@
   <h3>Translate</h3>
   {# Should we translate the message? #}
   <div class="form-check form-switch">
-    <input
-      class="form-check-input"
-      type="checkbox"
-      role="switch"
-      id="translate"
-      name="translate"
-      value="False"
-    />
+    <input class="form-check-input"
+           type="checkbox"
+           role="switch"
+           id="translate"
+           name="translate"
+           value="False" />
     <label class="form-check-label" for="translate">Translate</label>
-    <div id="translate_help" class="form-text">
-      Whether or not you want to translate the message.
-    </div>
+    <div id="translate_help" class="form-text">Whether or not you want to translate the message.</div>
   </div>
   {# Translate to #}
   <div class="row pb-2">
     <label for="translate_to" class="col-sm-1 col-form-label">Language</label>
     <div class="col-sm-11">
-      <input
-        name="translate_to"
-        type="text"
-        class="form-control bg-dark border-dark text-muted"
-        id="translate_to"
-      />
-      <div id="translate_to_help" class="form-text">
-        The language to translate the message to.
-      </div>
+      <input name="translate_to"
+             type="text"
+             class="form-control bg-dark border-dark text-muted"
+             id="translate_to" />
+      <div id="translate_to_help" class="form-text">The language to translate the message to.</div>
     </div>
   </div>
 </div>

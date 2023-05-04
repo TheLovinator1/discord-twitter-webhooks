@@ -1,106 +1,98 @@
-{% extends 'base.html' %} {% block header %}
-<h1>{% block title %}Settings{% endblock title %}</h1>
-{% endblock header %} {% block content %}
-
-<form name="add" action="/add" method="post">
-  <div class="p-2 border border-dark">
-    <h3>Feed Details</h3>
-    {# Nitter instance #}
-    <div class="row pb-2">
-      <label for="nitter" class="col-sm-1 col-form-label"
-        >Nitter instance</label
-      >
-      <div class="col-sm-11">
-        <input
-          name="nitter"
-          type="text"
-          class="form-control bg-dark border-dark text-muted"
-          id="nitter"
-        />
-        <div id="nitter_help" class="form-text">
-          The URL of the Nitter instance you want to use.
-          <br />
-          You can find a list of instances
-          <a
-            class="text-muted"
-            href="https://github.com/zedeus/nitter/wiki/Instances"
-            >here</a
-          >.
-          <br />
-          <br />
-          I highly recommend using your own instance, it is very easy to set up
-          and you can find instructions <a class="text-muted" href="">here</a>.
-
-          <br />
-          It will be faster, more private and you won't clog down the public
-          instance.
+{% extends "base.html" %}
+{% block header %}
+  <h1>
+    {% block title %}
+      Settings
+    {% endblock title %}
+  </h1>
+{% endblock header %}
+{% block content %}
+  <form name="add" action="{{ url_for('settings_post') }}" method="post">
+    <div class="p-2 border border-dark">
+      <h3>Feed Details</h3>
+      {# Nitter instance #}
+      <div class="row pb-2">
+        <label for="nitter_instance" class="col-sm-1 col-form-label">Nitter instance</label>
+        <div class="col-sm-11">
+          <input name="nitter_instance"
+                 type="text"
+                 value="{%- if settings.nitter_instance -%}{{ settings.nitter_instance }}{%- endif -%}"
+                 class="form-control bg-dark border-dark text-muted"
+                 id="nitter_instance" />
+          <div id="nitter_help" class="form-text">
+            The URL of the Nitter instance you want to use.
+            <br />
+            You can find a list of instances
+            <a class="text-muted"
+               href="https://github.com/zedeus/nitter/wiki/Instances">here</a>.
+            <br />
+            <br />
+            I highly recommend using your own instance, it is very easy to set up
+            and you can find instructions <a class="text-muted" href="">here</a>.
+            <br />
+            It will be faster, more private and you won't clog down the public
+            instance.
+          </div>
         </div>
       </div>
-    </div>
-
-    {# Translator instance #}
-    <div class="row pb-2">
-      <label for="translator" class="col-sm-1 col-form-label"
-        >Translator instance</label
-      >
-      <div class="col-sm-11">
-        <input
-          name="translator"
-          type="text"
-          class="form-control bg-dark border-dark text-muted"
-          id="translator"
-        />
-        <div id="translator_help" class="form-text">
-          The URL of the translator instance you want to use.
-          <br />
-          You can use
-          <code>https://translator.lovinator.space</code>
-          or run your <a class="text-muted" href="">own</a>.
+      {# Translator instance #}
+      <div class="row pb-2">
+        <label for="translator_instance" class="col-sm-1 col-form-label">Translator instance</label>
+        <div class="col-sm-11">
+          <input name="translator_instance"
+                 type="text"
+                 value="{%- if settings.translator_instance -%}{{ settings.translator_instance }}{%- endif -%}"
+                 class="form-control bg-dark border-dark text-muted"
+                 id="translator_instance" />
+          <div id="translator_help" class="form-text">
+            The URL of the translator instance you want to use.
+            <br />
+            You can use
+            <code>https://translator.lovinator.space</code>
+            or run your <a class="text-muted" href="">own</a>.
+          </div>
         </div>
       </div>
-    </div>
-
-    {# Error webhook #}
-    <div class="row pb-2">
-      <label for="name" class="col-sm-1 col-form-label">Error webhook</label>
-      <div class="col-sm-11">
-        <input
-          name="name"
-          type="text"
-          class="form-control bg-dark border-dark text-muted"
-          id="name"
-        />
-        <div id="name_help" class="form-text">
-          The URL of the translator instance you want to use.
-          <br />
-          You can use
-          <code>https://translator.lovinator.space</code>
-          or run your <a class="text-muted" href="">own</a>.
+      {# Error webhook #}
+      <div class="row pb-2">
+        <label for="error_webhook" class="col-sm-1 col-form-label">Error webhook</label>
+        <div class="col-sm-11">
+          <input name="error_webhook"
+                 type="text"
+                 value="{%- if settings.error_webhook -%}{{ settings.error_webhook }}{%- endif -%}"
+                 class="form-control bg-dark border-dark text-muted"
+                 id="error_webhook" />
+          <div id="error_webhook_help" class="form-text">
+            Discord webhook URLs to send errors to, you can add several by separating
+            them with a new line with <code>Shift+Enter</code>.
+            <br />
+            Read more about webhooks
+            <a class="text-muted"
+               href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks">here</a>.
+            <br />
+            Right click channel in Discord -> Integrations -> Webhooks -> Create
+            Webhook
+          </div>
         </div>
       </div>
-    </div>
-
-    {# Send error webhooks? #}
-    <div class="form-check form-switch">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        role="switch"
-        id="send_error_webhooks"
-        name="send_error_webhooks"
-        value="False"
-      />
-      <label class="form-check-label" for="send_error_webhooks"
-        >Send error webhooks?</label
-      >
-      <div id="send_error_webhooks_help" class="form-text">
-        If enabled, the bot will send a webhook to the URL specified above when
-        an error occurs.
+      {# Send error webhooks? #}
+      <div class="form-check form-switch">
+        <input class="form-check-input"
+               type="checkbox"
+               role="switch"
+               id="send_errors_to_discord"
+               name="send_errors_to_discord"
+                {% if settings.send_errors_to_discord %}checked{% endif %}
+               />
+        <label class="form-check-label" for="send_errors_to_discord">Send error webhooks?</label>
+        <div id="send_errors_to_discord_help" class="form-text">
+          If enabled, the bot will send a webhook to the URL specified above when
+          an error occurs.
+        </div>
+      </div>
+      <div class="d-md-flex">
+        <button class="btn btn-dark btn-sm">Update settings</button>
       </div>
     </div>
-    <div class="d-md-flex">
-      <button class="btn btn-dark btn-sm">Update settings</button>
-    </div>
-  </div>
-</form>
+  </form>
 {% endblock content %}

@@ -1,39 +1,46 @@
-{% extends 'base.html' %} {% block header %}
-<h1>{% block title %}Feeds{% endblock %}</h1>
-{% endblock %} {% block content %} {% if feed_list|length == 0 %}
-<div class="p-2 mb-2 border border-dark">
-  No feeds found. Add one <a class="text-muted" href="/add">here</a>.
-</div>
-{% endif %}
-<ul class="list-group">
-  {% for feed_item in feed_list %}
-  <div class="p-2 mb-2 border border-dark">
-    <div class="feed">
-      <h2>{{ feed_item.name }}</h2>
-      <a class="text-muted" href="/mark_as_unread/{{ feed_item.name }}"
-        >Mark as unread</a
-      >
-      <br />
-      webhook url: {{ feed_item.webhook }}
-      <br />
-      usernames:
-      <ul>
-        {% for feed in feed_item.feeds %}
-        <li>
-          {% if feed.title %}
-          <a class="text-muted" href="{{ feed.link }} ">{{ feed.title }}</a>
-          {% else %} {{ feed.url }}
-          <span class="text-danger"><-- broken, please fix</span>
-          {% endif %}
-        </li>
-        {% endfor %}
-      </ul>
-      <form action="/remove_group" method="post">
-        <input type="hidden" name="name" value="{{ feed_item.name }}" />
-        <input type="submit" value="Delete" />
-      </form>
+{% extends "base.html" %}
+{% block header %}
+  <h1>
+    {% block title %}
+      Feeds
+    {% endblock title %}
+  </h1>
+{% endblock header %}
+{% block content %}
+  {% if feed_list|length == 0 %}
+    <div class="p-2 mb-2 border border-dark">
+      No feeds found. Add one <a class="text-muted" href="{{ url_for('add') }}">here</a>.
     </div>
-  </div>
-  {% endfor %}
-</ul>
-{% endblock %}
+  {% endif %}
+  <ul class="list-group">
+    {% for feed_item in feed_list %}
+      <div class="p-2 mb-2 border border-dark">
+        <div class="feed">
+          <h2>{{ feed_item.name }}</h2>
+          <a class="text-muted"
+             href="{{ url_for('mark_as_unread', group_name=feed_item.name ) }}">Mark as unread</a>
+          <br />
+          webhook url: {{ feed_item.webhook }}
+          <br />
+          usernames:
+          <ul>
+            {% for feed in feed_item.feeds %}
+              <li>
+                {% if feed.title %}
+                  <a class="text-muted" href="{{ feed.link }} ">{{ feed.title }}</a>
+                {% else %}
+                  {{ feed.url }}
+                  <span class="text-danger"><-- broken, please fix</span>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+          <form action="{{ url_for('remove_group_post') }}" method="post">
+            <input type="hidden" name="name" value="{{ feed_item.name }}" />
+            <input type="submit" value="Delete" />
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </ul>
+{% endblock content %}

@@ -131,3 +131,7 @@ filterwarnings = [
     "ignore: No parser was explicitly specified, so I'm using the best available HTML parser for this system",
     "ignore: pkg_resources is deprecated as an API:DeprecationWarning",
 ]
+
+[tool.djlint]
+profile = "jinja"
+ignore = "H023"   # Firefox makes emojis if we use the unicode version(©️ vs &copy;)
