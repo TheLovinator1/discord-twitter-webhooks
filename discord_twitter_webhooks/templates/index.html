@@ -20,7 +20,7 @@
           <a class="text-muted"
              href="{{ url_for('mark_as_unread', group_name=feed_item.name ) }}">Mark as unread</a>
           <br />
-          webhook url: {{ feed_item.webhook }}
+          webhook url: <a class="text-muted" href="{{ feed_item.webhook }}">{{ feed_item.webhook }}</a>
           <br />
           usernames:
           <ul>

@@ -60,7 +60,7 @@ def create_list_item(reader: Reader, name: str) -> FeedList:
     list_item = FeedList(name=name)
     global_tags = list(reader.get_tags(()))
     for global_tag in global_tags:
-        if global_tag[0] == f"{name}_webhook":
+        if global_tag[0] == f"{name}_webhooks":
             list_item.webhook = str(global_tag[1])
         elif global_tag[0] == f"{name}_include_retweets":
             list_item.include_retweets = bool(global_tag[1])
