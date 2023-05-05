@@ -7,19 +7,7 @@
   </h1>
 {% endblock header %}
 {% block content %}
-  <script>
-  // JavaScript
-  const toggleInput = document.getElementById("toggle-input");
-  const divToHide = document.getElementById("div-to-hide");
-
-  toggleInput.addEventListener("change", function () {
-    if (toggleInput.checked) {
-      divToHide.style.display = "none";
-    } else {
-      divToHide.style.display = "block";
-    }
-  })
-  </script>
+<script src="{{ url_for('static', path='/add.js') }}"></script>
   <form name="add" action="{{ url_for('add_post') }}" method="post">
     {% include "add/1_feed_details.html" %}
     <br />

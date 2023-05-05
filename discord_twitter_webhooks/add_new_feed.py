@@ -58,7 +58,7 @@ from discord_twitter_webhooks.set_settings.whitelist import (
 )
 
 
-def create_group(  # noqa: PLR0913, PLR0915
+def create_group(  # noqa: PLR0913, PLR0915, C901
     name: str,
     webhook_value: str,
     usernames_value: str,
@@ -176,6 +176,10 @@ def create_group(  # noqa: PLR0913, PLR0915
     usernames: list[str] = usernames_value.split("\r\n") if "\r\n" in usernames_value else usernames_value.split("\n")
 
     for username in usernames:
+        # Check if the username is empty
+        if not username:
+            continue
+
         # Create the Nitter RSS feed URL
         feed_url: str = f"https://nitter.lovinator.space/{username}/rss"
 

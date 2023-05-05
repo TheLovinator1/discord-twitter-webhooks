@@ -300,9 +300,9 @@ pytz==2023.3 ; python_version >= "3.11" and python_version < "4.0" \
 reader==3.5 ; python_version >= "3.11" and python_version < "4.0" \
     --hash=sha256:4f7089e9d7e3039a0ba58ba1e590853f9e6d87f110a98e2e7a399e41c63ca9ea \
     --hash=sha256:ea1818c1f6a70eaaf84167d8dc43a43020efee3d05a82684d879b69434824a26
-requests==2.29.0 ; python_version >= "3.11" and python_version < "4.0" \
-    --hash=sha256:e8f3c9be120d3333921d213eef078af392fba3933ab7ed2d1cba3b56f2568c3b \
-    --hash=sha256:f2e34a75f4749019bb0e3effb66683630e4ffeaf75819fb51bebef1bf5aef059
+requests==2.30.0 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:10e94cc4f3121ee6da529d358cdaeaff2f1c409cd377dbc72b825852f2f7e294 \
+    --hash=sha256:239d7d4458afcb28a692cdd298d87542235f4ca8d36d03a15bfc128a6559a2f4
 setuptools==67.7.2 ; python_version >= "3.11" and python_version < "4.0" \
     --hash=sha256:23aaf86b85ca52ceb801d32703f12d77517b2556af839621c641fca11287952b \
     --hash=sha256:f104fa03692a2602fa0fec6c6a9e63b6c8a968de13e17c026957dd1f53d80990
@@ -329,9 +329,9 @@ tzdata==2023.3 ; python_version >= "3.11" and python_version < "4.0" \
 tzlocal==4.3 ; python_version >= "3.11" and python_version < "4.0" \
     --hash=sha256:3f21d09e1b2aa9f2dacca12da240ca37de3ba5237a93addfd6d593afe9073355 \
     --hash=sha256:b44c4388f3d34f25862cfbb387578a4d70fec417649da694a132f628a23367e2
-urllib3==1.26.15 ; python_version >= "3.11" and python_version < "4.0" \
-    --hash=sha256:8a388717b9476f934a21484e8c8e61875ab60644d29b9b39e11e4b9dc1c6b305 \
-    --hash=sha256:aa751d169e23c7479ce47a0cb0da579e3ede798f994f5816a74e4f4500dcea42
+urllib3==2.0.2 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:61717a1095d7e155cdb737ac7bb2f4324a858a1e2e6466f6d03ff630ca68d3cc \
+    --hash=sha256:d055c2f9d38dc53c808f6fdc8eab7360b6fdbbde02340ed25cfbcd817c62469e
 uvicorn==0.21.1 ; python_version >= "3.11" and python_version < "4.0" \
     --hash=sha256:0fac9cb342ba099e0d582966005f3fdba5b0290579fed4a6266dc702ca7bb032 \
     --hash=sha256:e47cac98a6da10cd41e6fd036d472c6f58ede6c5dbee3dbee3ef7a100ed97742
