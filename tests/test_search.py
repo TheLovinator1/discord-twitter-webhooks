@@ -51,4 +51,3 @@ def test_create_html_for_search_results(tmp_path: Path) -> None:
 
     # Close the reader, so we can delete the directory.
     reader.close()
-    reader.close()

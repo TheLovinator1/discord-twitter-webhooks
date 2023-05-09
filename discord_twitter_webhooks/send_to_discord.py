@@ -71,6 +71,3 @@ def send_to_discord(reader: Reader) -> None:
                 for tag in tag_names.split(";"):
                     # Send the tag and entry to another function where we will decide what to do with it.
                     send_tag(entry, tag, reader)
-                    # Send the tag and entry to another function where we will decide what to do with it.
-                    send_tag(entry, tag, reader)
-                    send_tag(entry, tag, reader)
