@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 {% block header %}
     {% block title %}
-Add a feed
+Modify {{ group_name }}
     {% endblock title %}
 {% endblock header %}
 {% block content %}
 <script src="{{ url_for('static', path='/add.js') }}"></script>
-<form name="add" action="{{ url_for('add_post') }}" method="post">
+  <form name="modify" action="{{ url_for('modify_post') }}" method="post">
+    <input type="hidden" name="name" value="{{ group_name }}" />
     {% include "add/1_feed_details.html" %}
     <br />
     {% include "add/2_what_to_send.html" %}
@@ -23,7 +24,7 @@ Add a feed
     <br />
     {% include "add/8_other.html" %}
     <div class="d-md-flex">
-      <button class="btn btn-dark btn-sm">Add feed</button>
+      <button class="btn btn-dark btn-sm">Modify {{ group_name }}</button>
     </div>
   </form>
 {% endblock content %}

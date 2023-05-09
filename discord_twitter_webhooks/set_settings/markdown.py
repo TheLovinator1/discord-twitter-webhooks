@@ -10,9 +10,6 @@ def convert_html_to_md(html: str) -> str:  # noqa: C901
     Returns:
         Our markdown.
     """
-    if not html:
-        return html
-
     soup: BeautifulSoup = BeautifulSoup(html, features="lxml")
 
     for bold in soup.find_all("b") + soup.find_all("strong"):

@@ -8,7 +8,7 @@
       role="switch"
       id="send_link_preview"
       name="send_link_preview"
-      value="False"
+      {% if settings.send_only_link_preview %}checked{% endif %}
     />
     <label class="form-check-label" for="send_link_preview"
       >Send link preview</label
@@ -26,7 +26,7 @@
       role="switch"
       id="make_text_a_link"
       name="make_text_a_link"
-      value="False"
+      {% if settings.make_text_a_link %}checked{% endif %}
     />
     <label class="form-check-label" for="make_text_a_link"
       >Make text a link</label
@@ -35,6 +35,7 @@
       Whether or not you want the text to be a link.
     </div>
   </div>
+  
   {# Make text a link preview #}
   <div class="form-check form-switch">
     <input
@@ -43,7 +44,7 @@
       role="switch"
       id="make_text_a_link_preview"
       name="make_text_a_link_preview"
-      value="False"
+      {% if settings.make_text_a_link_preview %}checked{% endif %}
     />
     <label class="form-check-label" for="make_text_a_link_preview"
       >Should the link make a preview in Discord?</label
@@ -52,6 +53,7 @@
       Should the link make a preview in Discord?
     </div>
   </div>
+
   {# Custom URL #}
   <div class="row pb-2">
     <label for="custom_url" class="col-sm-1 col-form-label">URL</label>
@@ -61,6 +63,7 @@
         type="text"
         class="form-control bg-dark border-dark text-muted"
         id="custom_url"
+        value="{{ settings.make_text_a_link_url }}"
       />
       <div id="custom_url_help" class="form-text">
         The URL to link the text to.

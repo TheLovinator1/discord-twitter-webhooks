@@ -10,5 +10,9 @@ def set_include_replies(reader: Reader, name: str, include_replies: bool) -> Non
         name: The name of the group.
         include_replies: Whether or not to include replies.
     """
+    if include_replies is None:
+        logger.error("Include replies is None when setting include replies.")
+        return
+
     logger.debug(f"Setting include_replies for {name} to {include_replies}")
     reader.set_tag((), f"{name}_include_replies", include_replies)  # type: ignore  # noqa: PGH003

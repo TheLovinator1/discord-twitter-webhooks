@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 {% block header %}
   <h1>
-    {% block title %}
-      Feeds
-    {% endblock title %}
+    {% block title %}Feeds{% endblock title %}
   </h1>
 {% endblock header %}
 {% block content %}
@@ -37,8 +35,12 @@
           </ul>
           <form action="{{ url_for('remove_group_post') }}" method="post">
             <input type="hidden" name="name" value="{{ feed_item.name }}" />
-            <input type="submit" value="Delete" />
+            <input type="submit" value="Delete" class="btn btn-danger btn-sm" />
           </form>
+
+          {# Button to edit group #}
+          <a class="btn btn-primary btn-sm" href="{{ url_for('modify', group_name=feed_item.name) }}">Edit</a>
+
         </div>
       </div>
     {% endfor %}

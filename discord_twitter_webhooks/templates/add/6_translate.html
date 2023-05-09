@@ -7,10 +7,13 @@
            role="switch"
            id="translate"
            name="translate"
-           value="False" />
+           value="True"
+           {% if settings.translate %}checked{% endif %}
+           />
     <label class="form-check-label" for="translate">Translate</label>
     <div id="translate_help" class="form-text">Whether or not you want to translate the message.</div>
   </div>
+  
   {# Translate to #}
   <div class="row pb-2">
     <label for="translate_to" class="col-sm-1 col-form-label">Language</label>
@@ -18,7 +21,9 @@
       <input name="translate_to"
              type="text"
              class="form-control bg-dark border-dark text-muted"
-             id="translate_to" />
+             id="translate_to" 
+             {% if settings.translate_to %}value="{{ settings.translate_to }}"{% endif %}
+             />
       <div id="translate_to_help" class="form-text">The language to translate the message to.</div>
     </div>
   </div>

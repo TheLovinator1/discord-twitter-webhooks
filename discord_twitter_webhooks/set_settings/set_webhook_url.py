@@ -10,5 +10,9 @@ def set_webhook_url(reader: Reader, name: str, webhook_value: str) -> None:
         name: The name of the group.
         webhook_value: The webhook_url value.
     """
+    if webhook_value is None or not webhook_value:
+        logger.error("Webhook value is None when setting webhook value.")
+        return
+
     logger.debug(f"Setting webhook for {name} to {webhook_value}")
     reader.set_tag((), f"{name}_webhooks", webhook_value)  # type: ignore  # noqa: PGH003

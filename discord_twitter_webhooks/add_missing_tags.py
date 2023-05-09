@@ -16,11 +16,11 @@ def add_tag(name: str, reader: Reader) -> None:
     """
     global_tags = dict(reader.get_tags(()))
     if f"{name}_include_retweets" not in global_tags:
-        logger.warning(f"Adding missing tag {name}_include_retweets")
+        logger.warning(f"You are missing the {name}_include_retweets")
     if f"{name}_include_replies" not in global_tags:
-        logger.warning(f"Adding missing tag {name}_include_replies")
-    if f"{name}_webhook" not in global_tags:
-        logger.warning(f"Adding missing tag {name}_webhook")
+        logger.warning(f"You are missing the {name}_include_replies")
+    if f"{name}_webhooks" not in global_tags:
+        logger.warning(f"You are missing the tag {name}_webhooks")
 
 
 def add_missing_tags(reader: Reader) -> None:

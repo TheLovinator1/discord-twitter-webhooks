@@ -12,17 +12,19 @@ from reader import Reader
 
 from discord_twitter_webhooks.add_missing_tags import add_missing_tags
 from discord_twitter_webhooks.add_new_feed import create_group
-from discord_twitter_webhooks.dataclasses import GlobalSettings
+from discord_twitter_webhooks.dataclasses import GlobalSettings, Settings
 from discord_twitter_webhooks.get_feed_list import FeedList, get_feed_list
+from discord_twitter_webhooks.get_settings import get_settings
 from discord_twitter_webhooks.global_settings import (
     get_global_settings,
     save_global_settings,
 )
 from discord_twitter_webhooks.logger import setup_logger
+from discord_twitter_webhooks.modify_feed import modify_feed
+from discord_twitter_webhooks.reader_settings import get_reader
 from discord_twitter_webhooks.remove_group import remove_group
 from discord_twitter_webhooks.search import create_html_for_search_results
 from discord_twitter_webhooks.send_to_discord import send_to_discord
-from discord_twitter_webhooks.settings import get_reader
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
@@ -53,7 +55,40 @@ async def add(request: Request) -> Response:
     Returns:
         The add page.
     """
-    return templates.TemplateResponse("add.html", {"request": request})
+    return templates.TemplateResponse(
+        "add.html",
+        {
+            "request": request,
+            "settings": None,
+            "modifying": False,
+            "group_name": None,
+        },
+    )
+
+
+@app.get("/modify/{group_name}", response_class=HTMLResponse)
+async def modify(request: Request, group_name: str) -> Response:
+    """Return the add page.
+
+    Returns:
+        The add page.
+    """
+    # Get the old settings
+    settings: Settings = get_settings(reader, group_name)
+
+    if not settings:
+        msg: str = f"Failed to get settings for {group_name}"
+        raise RuntimeError(msg)
+
+    return templates.TemplateResponse(
+        "modify.html",
+        {
+            "request": request,
+            "settings": settings,
+            "modifying": True,
+            "group_name": group_name,
+        },
+    )
 
 
 @app.post("/add")
@@ -87,15 +122,15 @@ async def add_post(  # noqa: PLR0913
     translate: Annotated[bool, Form(title="Translate the tweet?")] = False,
     translate_to: Annotated[str, Form(title="Language to translate to")] = "en",
     translate_from: Annotated[str, Form(title="Language to translate from")] = "auto",
-    whitelist_words: Annotated[str, Form(title="Whitelisted words")] = "",
+    whitelist: Annotated[str, Form(title="Whitelisted words")] = "",
     whitelist_active: Annotated[bool, Form(title="Use whitelist?")] = False,
-    blacklist_words: Annotated[str, Form(title="Blacklisted words")] = "",
+    blacklist: Annotated[str, Form(title="Blacklisted words")] = "",
     blacklist_active: Annotated[bool, Form(title="Use blacklist?")] = False,
     unescape_html: Annotated[bool, Form(title="Unescape HTML?")] = False,
     remove_utm: Annotated[bool, Form(title="Remove UTM?")] = False,
     remove_copyright: Annotated[bool, Form(title="Remove Copyright?")] = False,
-    username_link_destination: Annotated[str, Form(title="Username link destination")] = "",
-    hashtag_link_destination: Annotated[str, Form(title="Hashtag link destination")] = "",
+    username_destination: Annotated[str, Form(title="Username link destination")] = "",
+    hashtag_destination: Annotated[str, Form(title="Hashtag link destination")] = "",
 ) -> RedirectResponse:
     """Create a new group.
 
@@ -133,15 +168,111 @@ async def add_post(  # noqa: PLR0913
         translate=translate,
         translate_to=translate_to,
         translate_from=translate_from,
-        whitelist_words=whitelist_words,
+        whitelist=whitelist,
         whitelist_active=whitelist_active,
-        blacklist_words=blacklist_words,
+        blacklist=blacklist,
         blacklist_active=blacklist_active,
         unescape_html=unescape_html,
         remove_utm=remove_utm,
         remove_copyright=remove_copyright,
-        username_link_destination=username_link_destination,
-        hashtag_link_destination=hashtag_link_destination,
+        username_destination=username_destination,
+        hashtag_destination=hashtag_destination,
+    )
+
+    # Redirect to the index page.
+    return RedirectResponse(url="/", status_code=303)
+
+
+@app.post("/modify")
+async def modify_post(  # noqa: PLR0913
+    name: Annotated[str, Form(title="Group Name")] = "",
+    webhooks: Annotated[str, Form(title="Webhook URLs")] = "",
+    usernames: Annotated[str, Form(title="Twitter Usernames")] = "",
+    include_retweets: Annotated[bool, Form(title="Include Retweets?")] = False,
+    include_replies: Annotated[bool, Form(title="Include Replies?")] = False,
+    send_text: Annotated[bool, Form(title="Send Text?")] = True,
+    send_embed: Annotated[bool, Form(title="Send Embed?")] = False,
+    embed_color: Annotated[str, Form(title="Embed Color")] = "#1DA1F2",
+    embed_color_random: Annotated[bool, Form(title="Randomize Embed Color?")] = False,
+    embed_author_name: Annotated[str, Form(title="Embed Author Name")] = "",
+    embed_author_url: Annotated[str, Form(title="Embed Author URL")] = "",
+    embed_author_icon_url: Annotated[str, Form(title="Embed Author Icon URL")] = "",
+    embed_url: Annotated[str, Form(title="Embed URL")] = "",
+    embed_timestamp: Annotated[bool, Form(title="Show Timestamp?")] = True,
+    embed_image: Annotated[str, Form(title="Embed Image URL")] = "",
+    embed_footer_text: Annotated[str, Form(title="Embed Footer Text")] = "",
+    embed_footer_icon_url: Annotated[str, Form(title="Embed Footer Icon URL")] = "",
+    embed_show_title: Annotated[bool, Form(title="Show Title?")] = True,
+    embed_show_author: Annotated[bool, Form(title="Show Author?")] = True,
+    send_only_link: Annotated[bool, Form(title="Send Only Link?")] = False,
+    send_only_link_preview: Annotated[bool, Form(title="Should the link make a preview?")] = True,
+    make_text_a_link: Annotated[bool, Form(title="Make Text a Link?")] = False,
+    make_text_a_link_preview: Annotated[bool, Form(title="Should the link make a preview?")] = False,
+    make_text_a_link_url: Annotated[str, Form(title="Link URL")] = "",
+    upload_media: Annotated[bool, Form(title="Upload images to Discord?")] = False,
+    append_usernames: Annotated[bool, Form(title="Append usernames to text?")] = False,
+    translate: Annotated[bool, Form(title="Translate the tweet?")] = False,
+    translate_to: Annotated[str, Form(title="Language to translate to")] = "en",
+    translate_from: Annotated[str, Form(title="Language to translate from")] = "auto",
+    whitelist: Annotated[str, Form(title="Whitelisted words")] = "",
+    whitelist_active: Annotated[bool, Form(title="Use whitelist?")] = False,
+    blacklist: Annotated[str, Form(title="Blacklisted words")] = "",
+    blacklist_active: Annotated[bool, Form(title="Use blacklist?")] = False,
+    unescape_html: Annotated[bool, Form(title="Unescape HTML?")] = False,
+    remove_utm: Annotated[bool, Form(title="Remove UTM?")] = False,
+    remove_copyright: Annotated[bool, Form(title="Remove Copyright?")] = False,
+    username_destination: Annotated[str, Form(title="Username link destination")] = "",
+    hashtag_destination: Annotated[str, Form(title="Hashtag link destination")] = "",
+) -> RedirectResponse:
+    """Create a new group.
+
+    Returns:
+        str: The add page.
+    """
+    if not name:
+        # TODO: Add a flash message.
+        return "Name cannot be empty."  # type: ignore  # noqa: PGH003
+
+    modify_feed(
+        reader=reader,
+        name=name,
+        webhooks=webhooks,
+        usernames=usernames,
+        include_retweets=include_retweets,
+        include_replies=include_replies,
+        send_text=send_text,
+        send_embed=send_embed,
+        embed_color=embed_color,
+        embed_color_random=embed_color_random,
+        embed_author_name=embed_author_name,
+        embed_author_url=embed_author_url,
+        embed_author_icon_url=embed_author_icon_url,
+        embed_url=embed_url,
+        embed_timestamp=embed_timestamp,
+        embed_image=embed_image,
+        embed_footer_text=embed_footer_text,
+        embed_footer_icon_url=embed_footer_icon_url,
+        embed_show_title=embed_show_title,
+        embed_show_author=embed_show_author,
+        send_only_link=send_only_link,
+        send_only_link_preview=send_only_link_preview,
+        make_text_a_link=make_text_a_link,
+        make_text_a_link_preview=make_text_a_link_preview,
+        make_text_a_link_url=make_text_a_link_url,
+        upload_media=upload_media,
+        append_usernames=append_usernames,
+        translate=translate,
+        translate_to=translate_to,
+        translate_from=translate_from,
+        whitelist=whitelist,
+        whitelist_active=whitelist_active,
+        blacklist=blacklist,
+        blacklist_active=blacklist_active,
+        unescape_html=unescape_html,
+        remove_utm=remove_utm,
+        remove_copyright=remove_copyright,
+        username_destination=username_destination,
+        hashtag_destination=hashtag_destination,
     )
 
     # Redirect to the index page.

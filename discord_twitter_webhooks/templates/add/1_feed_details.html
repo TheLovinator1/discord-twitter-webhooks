@@ -2,6 +2,7 @@
   <h3>Feed Details</h3>
   {# Group name #}
   <div class="row pb-2">
+    {% if not modifying %} {# We can't change the name of a group #}
     <label for="name" class="col-sm-1 col-form-label">Name</label>
     <div class="col-sm-11">
       <input
@@ -14,6 +15,7 @@
         A name to identify this group. Can be anything you want.
       </div>
     </div>
+    {% endif %}
   </div>
 
   {# Twitter usernames #}
@@ -25,7 +27,7 @@
         class="form-control bg-dark border-dark text-muted"
         id="usernames"
         rows="3"
-      ></textarea>
+      >{{ settings.usernames }}</textarea>
       <div id="usernames_help" class="form-text">
         Twitter usernames to follow, separate each webhook with a new line. You
         can add new line with <code>Shift+Enter</code>.
@@ -42,7 +44,7 @@
         class="form-control bg-dark border-dark text-muted"
         id="url"
         rows="3"
-      ></textarea>
+      >{{ settings.webhooks }}</textarea>
       <div id="webhooks_help" class="form-text">
         Discord webhook URLs to send tweets to, separated by newlines. Add new
         line with <code>Shift+Enter</code>.

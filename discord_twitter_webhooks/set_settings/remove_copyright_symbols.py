@@ -10,5 +10,9 @@ def set_remove_copyright_symbols(reader: Reader, name: str, remove_copyright: bo
         name: The name of the group.
         remove_copyright: The remove_utm value.
     """
+    if remove_copyright is None:
+        logger.error("Remove utm value is None when setting remove utm value.")
+        return
+
     logger.debug(f"Setting remove_copyright for {name}")
     reader.set_tag((), f"{name}_remove_copyright", remove_copyright)  # type: ignore  # noqa: PGH003

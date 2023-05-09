@@ -10,5 +10,9 @@ def set_append_usernames(reader: Reader, name: str, append_usernames: bool) -> N
         name: The name of the group.
         append_usernames: Whether or not to append usernames.
     """
+    if append_usernames is None:
+        logger.error("Append usernames is None when setting append usernames.")
+        return
+
     logger.debug(f"Setting append_usernames for {name} to {append_usernames}")
     reader.set_tag((), f"{name}_append_usernames", append_usernames)  # type: ignore  # noqa: PGH003

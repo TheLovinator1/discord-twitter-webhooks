@@ -10,5 +10,9 @@ def set_unescape_html(reader: Reader, name: str, unescape_html: bool) -> None:
         name: The name of the group.
         unescape_html: Whether or not to unescape HTML.
     """
+    if unescape_html is None:
+        logger.error("Unescape HTML is None when setting unescape HTML.")
+        return
+
     logger.debug(f"Setting unescape_html for {name} to {unescape_html}")
     reader.set_tag((), f"{name}_unescape_html", unescape_html)  # type: ignore  # noqa: PGH003

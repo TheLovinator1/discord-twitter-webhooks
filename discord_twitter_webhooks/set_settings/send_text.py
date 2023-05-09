@@ -10,5 +10,9 @@ def set_send_text(reader: Reader, name: str, send_text: bool) -> None:
         name: The name of the group.
         send_text: Whether or not to send text.
     """
+    if send_text is None:
+        logger.error("Send text is None when setting send text.")
+        return
+
     logger.debug(f"Setting send_text for {name} to {send_text}")
     reader.set_tag((), f"{name}_send_text", send_text)  # type: ignore  # noqa: PGH003

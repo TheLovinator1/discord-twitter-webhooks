@@ -79,7 +79,7 @@ def test_add_new_feed(tmp_path: str) -> None:  # noqa: C901, PLR0915, PLR0912
             assert not tags[1]
         elif tags[0] == f"{group_name}_hashtag_link":
             assert tags[1] is True
-        elif tags[0] == f"{group_name}_hashtag_link_destination":
+        elif tags[0] == f"{group_name}_hashtag_destination":
             assert tags[1] == "Nitter"
         elif tags[0] == f"{group_name}_make_text_a_link":
             assert tags[1] is False
@@ -111,7 +111,7 @@ def test_add_new_feed(tmp_path: str) -> None:  # noqa: C901, PLR0915, PLR0912
             assert tags[1] is False
         elif tags[0] == f"{group_name}_username_link":
             assert tags[1] is True
-        elif tags[0] == f"{group_name}_username_link_destination":
+        elif tags[0] == f"{group_name}_username_destination":
             assert tags[1] == "Nitter"
         else:
             tag_without_group_name: str = tags[0].replace(f"{group_name}", "")

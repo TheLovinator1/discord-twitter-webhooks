@@ -120,14 +120,14 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "certifi"
-version = "2022.12.7"
+version = "2023.5.7"
 description = "Python package for providing Mozilla's CA Bundle."
 category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "certifi-2022.12.7-py3-none-any.whl", hash = "sha256:4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18"},
-    {file = "certifi-2022.12.7.tar.gz", hash = "sha256:35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3"},
+    {file = "certifi-2023.5.7-py3-none-any.whl", hash = "sha256:c6c2e98f5c7869efca1f8916fed228dd91539f9f1b444c314c06eef02980c716"},
+    {file = "certifi-2023.5.7.tar.gz", hash = "sha256:0f0d56dc5a6ad56fd4ba36484d6cc34451e1c6548c61daad8c320169f91eddc7"},
 ]
 
 [[package]]
@@ -302,14 +302,14 @@ files = [
 
 [[package]]
 name = "djlint"
-version = "1.25.0"
+version = "1.26.0"
 description = "HTML Template Linter and Formatter"
 category = "dev"
 optional = false
 python-versions = ">=3.8.0,<4.0.0"
 files = [
-    {file = "djlint-1.25.0-py3-none-any.whl", hash = "sha256:5d4ca41b40e8986773043eb7b857654154da91337df7c6c9aeeca256d5f0459a"},
-    {file = "djlint-1.25.0.tar.gz", hash = "sha256:1b9e5265e51c224ef5c6b8d434151293943ddae8602fb544063f33039738d17c"},
+    {file = "djlint-1.26.0-py3-none-any.whl", hash = "sha256:70433268642bb034452a6b5b1c127fbaedf8d1a11deb5f10d858668085c9671a"},
+    {file = "djlint-1.26.0.tar.gz", hash = "sha256:becdb7fd37950c65cbb01813ed12faee1feb5ec7bce8be6062411dde621f8ec7"},
 ]
 
 [package.dependencies]
@@ -319,6 +319,7 @@ cssbeautifier = ">=1.14.4,<2.0.0"
 html-tag-names = ">=0.1.2,<0.2.0"
 html-void-elements = ">=0.1.0,<0.2.0"
 jsbeautifier = ">=1.14.4,<2.0.0"
+json5 = ">=0.9.11,<0.10.0"
 pathspec = ">=0.11.0,<0.12.0"
 PyYAML = ">=6.0,<7.0"
 regex = ">=2023.0.0,<2024.0.0"
@@ -572,6 +573,21 @@ files = [
 [package.dependencies]
 editorconfig = ">=0.12.2"
 six = ">=1.13.0"
+
+[[package]]
+name = "json5"
+version = "0.9.11"
+description = "A Python implementation of the JSON5 data format."
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "json5-0.9.11-py2.py3-none-any.whl", hash = "sha256:1aa54b80b5e507dfe31d12b7743a642e2ffa6f70bf73b8e3d7d1d5fba83d99bd"},
+    {file = "json5-0.9.11.tar.gz", hash = "sha256:4f1e196acc55b83985a51318489f345963c7ba84aa37607e49073066c562e99b"},
+]
+
+[package.extras]
+dev = ["hypothesis"]
 
 [[package]]
 name = "loguru"
@@ -965,14 +981,14 @@ tzdata = {version = "*", markers = "python_version >= \"3.6\""}
 
 [[package]]
 name = "pyupgrade"
-version = "3.3.2"
+version = "3.4.0"
 description = "A tool to automatically upgrade syntax for newer versions."
 category = "dev"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "pyupgrade-3.3.2-py2.py3-none-any.whl", hash = "sha256:c05b82c911934b3a638b29f48f48dc6e0ef6c57c55ec36f2b41ae9dbf6711b4b"},
-    {file = "pyupgrade-3.3.2.tar.gz", hash = "sha256:bcfed63d38811809f179fd269dec246680b0aaa5bbe662b535826e5fa2275219"},
+    {file = "pyupgrade-3.4.0-py2.py3-none-any.whl", hash = "sha256:98b6bee32149f662da1aa038cb9baf93d592ae696059acd613db6ff583583048"},
+    {file = "pyupgrade-3.4.0.tar.gz", hash = "sha256:f6bcf0d5e59170d178a2630e981d0e7b04d9b13f3c0e7e62f3e6bab582f841e4"},
 ]
 
 [package.dependencies]

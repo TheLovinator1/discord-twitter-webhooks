@@ -6,9 +6,10 @@
     type="color"
     id="embed_color"
     name="embed_color"
-    value="#ff0000"
+    {% if settings.embed_color %}value="{{ settings.embed_color }}"{% endif %}
     class="form-control form-control-color"
   />
+
   {# Random color #}
   <div class="form-check form-switch">
     <input
@@ -17,7 +18,8 @@
       role="switch"
       id="random_color"
       name="random_color"
-      value="False"
+      value="True"
+      {% if settings.random_color %}checked{% endif %}
     />
     <label class="form-check-label" for="random_color">Random color</label>
     <div id="random_color_help" class="form-text">
@@ -35,13 +37,15 @@
       role="switch"
       id="embed_show_author"
       name="embed_show_author"
-      value="False"
+      value="True"
+      {% if settings.embed_show_author %}checked{% endif %}
     />
     <label class="form-check-label" for="embed_show_author">Embed author</label>
     <div id="embed_show_author_help" class="form-text">
       Whether or not you want the embed to have an author.
     </div>
   </div>
+
   {# Author name #}
   <div class="row pb-2">
     <label for="author_name" class="col-sm-1 col-form-label">Author</label>
@@ -51,6 +55,7 @@
         type="text"
         class="form-control bg-dark border-dark text-muted"
         id="author_name"
+        {% if settings.author_name %}value="{{ settings.author_name }}"{% endif %}
       />
       <div id="author_name_help" class="form-text">
         The name of the author of the embed.
@@ -60,15 +65,14 @@
 
   {# Author URL #}
   <div class="row pb-2">
-    <label for="embed_author_url" class="col-sm-1 col-form-label"
-      >Author URL</label
-    >
+    <label for="embed_author_url" class="col-sm-1 col-form-label">Author URL</label>
     <div class="col-sm-11">
       <input
         name="embed_author_url"
         type="text"
         class="form-control bg-dark border-dark text-muted"
         id="embed_author_url"
+        value="{{ settings.embed_author_url }}"
       />
       <div id="embed_author_url_help" class="form-text">
         The URL to link the author name to.
@@ -78,15 +82,14 @@
 
   {# Author icon URL #}
   <div class="row pb-2">
-    <label for="embed_author_icon_url" class="col-sm-1 col-form-label"
-      >Author Icon URL</label
-    >
+    <label for="embed_author_icon_url" class="col-sm-1 col-form-label">Author Icon URL</label>
     <div class="col-sm-11">
       <input
         name="embed_author_icon_url"
         type="text"
         class="form-control bg-dark border-dark text-muted"
         id="embed_author_icon_url"
+        {% if settings.embed_author_icon_url %}value="{{ settings.embed_author_icon_url }}"{% endif %}
       />
       <div id="embed_author_icon_url_help" class="form-text">
         The URL of the author's icon.
@@ -94,6 +97,7 @@
     </div>
   </div>
   <hr />
+
   {# Embed URL #}
   <div class="row pb-2">
     <label for="embed_url" class="col-sm-1 col-form-label">URL</label>
@@ -103,6 +107,7 @@
         type="text"
         class="form-control bg-dark border-dark text-muted"
         id="embed_url"
+        {% if settings.embed_url %}value="{{ settings.embed_url }}"{% endif %}
       />
       <div id="embed_url_help" class="form-text">
         The URL to link the embed title to.
@@ -118,7 +123,8 @@
       role="switch"
       id="embed_timestamp"
       name="embed_timestamp"
-      value="False"
+      {% if settings.embed_timestamp %}value="{{ settings.embed_timestamp }}"{% endif %}
+      {% if settings.embed_timestamp %}checked{% endif %}
     />
     <label class="form-check-label" for="embed_timestamp">Timestamp</label>
     <div id="embed_timestamp_help" class="form-text">
@@ -128,15 +134,14 @@
 
   {# Footer text #}
   <div class="row pb-2">
-    <label for="embed_footer_text" class="col-sm-1 col-form-label"
-      >Footer</label
-    >
+    <label for="embed_footer_text" class="col-sm-1 col-form-label">Footer</label>
     <div class="col-sm-11">
       <input
         name="embed_footer_text"
         type="text"
         class="form-control bg-dark border-dark text-muted"
         id="embed_footer_text"
+        {% if settings.embed_footer_text %}value="{{ settings.embed_footer_text }}"{% endif %}
       />
       <div id="embed_footer_text_help" class="form-text">The footer text.</div>
     </div>
@@ -153,12 +158,14 @@
         type="text"
         class="form-control bg-dark border-dark text-muted"
         id="embed_footer_icon_url"
+        {% if settings.embed_footer_icon_url %}value="{{ settings.embed_footer_icon_url }}"{% endif %}
       />
       <div id="embed_footer_icon_url_help" class="form-text">
         The URL of the footer icon.
       </div>
     </div>
   </div>
+  
   {# Show title #}
   <div class="form-check form-switch">
     <input
@@ -167,7 +174,8 @@
       role="switch"
       id="embed_show_title"
       name="embed_show_title"
-      value="False"
+      value="True"
+      {% if settings.embed_show_title %}checked{% endif %}
     />
     <label class="form-check-label" for="embed_show_title">Embed title</label>
     <div id="url_help" class="form-text">

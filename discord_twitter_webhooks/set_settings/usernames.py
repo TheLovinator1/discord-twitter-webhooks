@@ -10,5 +10,9 @@ def set_usernames(reader: Reader, name: str, usernames: str) -> None:
         name: The name of the group.
         usernames: The usernames to set.
     """
+    if usernames is None or not usernames:
+        logger.error("Usernames is None when setting usernames.")
+        return
+
     logger.debug(f"Setting usernames for {name} to {usernames}")
     reader.set_tag((), f"{name}_usernames", usernames)  # type: ignore  # noqa: PGH003

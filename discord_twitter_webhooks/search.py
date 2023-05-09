@@ -4,7 +4,7 @@ from loguru import logger
 from reader import EntrySearchResult, Feed, HighlightedString, Reader
 from reader.exceptions import FeedNotFoundError
 
-from discord_twitter_webhooks.settings import get_reader
+from discord_twitter_webhooks.reader_settings import get_reader
 
 if TYPE_CHECKING:
     from collections.abc import Iterable

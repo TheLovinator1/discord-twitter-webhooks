@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 from reader import Reader
 
-from discord_twitter_webhooks.settings import get_data_location, get_reader
+from discord_twitter_webhooks.reader_settings import get_data_location, get_reader
 
 if TYPE_CHECKING:
     from pathlib import Path

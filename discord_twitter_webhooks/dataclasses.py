@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Settings:
+    usernames: str = ""
     webhooks: str | None = None
     include_retweets: bool | None = None
     include_replies: bool | None = None
@@ -37,8 +38,8 @@ class Settings:
     unescape_html: bool = True
     remove_utm: bool = True
     remove_copyright: bool = True
-    username_link_destination: str = "Nitter"  # Can be "Nitter" or "Twitter"
-    hashtag_link_destination: str = "Nitter"  # Can be "Nitter" or "Twitter"
+    username_destination: str = "Nitter"  # Can be "Nitter" or "Twitter"
+    hashtag_destination: str = "Nitter"  # Can be "Nitter" or "Twitter"
 
 
 @dataclass
