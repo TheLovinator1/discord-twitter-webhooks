@@ -333,6 +333,12 @@ async def mark_as_unread(group_name: str) -> RedirectResponse:
                     reader.set_entry_read(entry, False)
                     logger.info(f"Marked {entry.title} as unread.")
 
+                    # Send the feed to the webhook.
+                    send_to_discord(reader)
+
+                    # Only do for one feed.
+                    break
+
     # Redirect to the index page.
     return RedirectResponse(url="/", status_code=303)
 
