@@ -190,7 +190,7 @@ async def modify_post(  # noqa: PLR0913
     usernames: Annotated[str, Form(title="Twitter Usernames")] = "",
     include_retweets: Annotated[bool, Form(title="Include Retweets?")] = False,
     include_replies: Annotated[bool, Form(title="Include Replies?")] = False,
-    send_text: Annotated[bool, Form(title="Send Text?")] = True,
+    send_text: Annotated[bool, Form(title="Send Text?")] = False,
     send_embed: Annotated[bool, Form(title="Send Embed?")] = False,
     embed_color: Annotated[str, Form(title="Embed Color")] = "#1DA1F2",
     embed_color_random: Annotated[bool, Form(title="Randomize Embed Color?")] = False,
