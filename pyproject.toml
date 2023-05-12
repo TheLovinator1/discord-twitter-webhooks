@@ -27,6 +27,7 @@ python-multipart = "^0.0.6"
 uvicorn = "^0.21.1"
 httpx = "^0.24.0"
 lxml = "^4.9.2"
+defusedxml = "^0.7.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"

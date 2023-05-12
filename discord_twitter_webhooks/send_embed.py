@@ -1,8 +1,8 @@
 from functools import lru_cache
 from random import randint
 from typing import TYPE_CHECKING
-from xml.etree import ElementTree
 
+from defusedxml import ElementTree
 from discord_webhook import DiscordEmbed, DiscordWebhook
 from loguru import logger
 from reader import Entry
@@ -12,6 +12,8 @@ from discord_twitter_webhooks.dataclasses import Settings
 from discord_twitter_webhooks.get_tweet_text import get_tweet_text
 
 if TYPE_CHECKING:
+    from xml.etree.ElementTree import Element
+
     from requests import Response
 
 
@@ -52,9 +54,12 @@ def get_avatar(rss_feed: str) -> str:
         # Parse XML and get the avatar
         xml_data: str = response.content.decode("utf-8")
 
-        # TODO: This is a security risk, we should use https://github.com/tiran/defusedxml
-        root: ElementTree.Element = ElementTree.fromstring(xml_data)  # noqa: S314
-        found: ElementTree.Element | None = root.find("channel/image/url")
+        try:
+            root: Element = ElementTree.fromstring(xml_data)
+            found: Element | None = root.find("channel/image/url")
+        except ElementTree.ParseError:
+            logger.error("Unable to parse XML from {}", rss_feed)
+            return default_avatar
 
         return found.text or default_avatar if found is not None else default_avatar
 
