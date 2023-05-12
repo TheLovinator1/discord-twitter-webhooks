@@ -54,10 +54,19 @@ def send_embed(entry: Entry, settings: Settings) -> None:
     embed = DiscordEmbed(description=tweet_text)
 
     if settings.embed_show_title:
-        embed.set_title(entry.title or "Untitled")
+        if entry.title:
+            embed.set_title(entry.title)
+        else:
+            logger.error("No title for tweet https://twitter.com/i/status/{}", entry.link)
 
     if settings.embed_show_author:
-        embed.set_author(name=entry.title or "Unknown")
+        if entry.author:
+            embed.set_author(name=entry.author)
+        else:
+            logger.error("No author for tweet https://twitter.com/i/status/{}", entry.link)
+
+    if settings.embed_timestamp:
+        embed.set_timestamp()
 
     embed.set_color(get_color(settings))
 

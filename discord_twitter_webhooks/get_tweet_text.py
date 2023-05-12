@@ -19,7 +19,7 @@ def get_tweet_text(entry: Entry, settings: Settings) -> str:
     Returns:
         The text to send in the embed.
     """
-    tweet_text: str = entry.summary or "Failed to get tweet text"
+    tweet_text: str = entry.summary or entry.title or f"Failed to get tweet text for {entry.link}"
     tweet_text = convert_html_to_md(tweet_text)
 
     if settings.remove_copyright:
