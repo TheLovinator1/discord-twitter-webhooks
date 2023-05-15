@@ -17,8 +17,8 @@ def username_with_link(text: str) -> str:
         Text with the username replaced with a link
     """
     regex: str = re.sub(
-        r" (@(\w*))",
-        r" [\g<1>](https://twitter.com/\g<2>)",
+        r"(@(\w){1,15}\b)",
+        r"[\g<1>](https://twitter.com/\g<2>)",
         text,
     )
 
@@ -71,8 +71,8 @@ def hashtag_with_link(text: str) -> str:
         Text with the hashtag replaced with a link
     """
     regex: str = re.sub(
-        r" (#(\w*))",
-        r" [\g<1>](https://twitter.com/hashtag/\g<2>)",
+        r"(#(\w*))",
+        r"[\g<1>](https://twitter.com/hashtag/\g<2>)",
         text,
     )
 
