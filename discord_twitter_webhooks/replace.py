@@ -51,7 +51,7 @@ def tco_url_link_with_real_link(entities: dict, text: str) -> str:
             new_url = new_url.rstrip("/")
 
             # Replace the old URL with the new URL.
-            replaced_text: str = text.replace(old_url, new_url)
+            replaced_text: str = replaced_text.replace(old_url, new_url)
 
     logger.debug("Replaced text: {}", replaced_text)
     return replaced_text
