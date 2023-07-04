@@ -23,15 +23,6 @@
           <a class="nav-link" href="{{ url_for('settings') }}">Settings</a>
         </li>
       </ul>
-      {# Search #}
-      <form action="{{ url_for('search') }}"
-            method="get"
-            class="ms-auto w-50 input-group">
-        <input name="query"
-               class="form-control bg-dark border-dark text-muted"
-               type="search"
-               placeholder="Search" />
-      </form>
       {# Donate button #}
       <ul class="navbar-nav ms-auto">
         <li class="nav-item d-none d-md-block">

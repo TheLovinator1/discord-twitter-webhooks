@@ -38,7 +38,7 @@ def get_data_location() -> Path:
 
 
 @lru_cache(maxsize=1)
-def get_reader(db_location: Path | None = None) -> Reader | None:
+def get_reader(db_location: Path | None = None) -> Reader:
     """Create the Reader.
 
     This function is used to create the Reader and handle any errors
@@ -47,16 +47,6 @@ def get_reader(db_location: Path | None = None) -> Reader | None:
     Args:
         db_location: Where to store the database.
 
-    Raises:
-        StorageError: An error occurred while connecting to storage
-        while creating the Reader database.
-        SearchError: An error occurred while enabling/disabling search.
-        InvalidPluginError: An error occurred while loading plugins.
-        PluginInitError: A plugin failed to initialize.
-        PluginError: An ambiguous plugin-related error occurred.
-        ReaderError: An ambiguous exception occurred while creating
-        the reader.
-
     Returns:
         Reader: The Reader if no errors occurred.
     """
@@ -64,4 +54,8 @@ def get_reader(db_location: Path | None = None) -> Reader | None:
     db_location = get_data_location() if db_location is None else db_location
     db_file: Path = db_location / "discord_twitter_webhooks.db"
     reader: Reader = make_reader(url=str(db_file))
+    if reader is None:
+        msg = f"Failed to create reader\ndb_location: {db_location}\ndb_file: {db_file}"
+        raise RuntimeError(msg)
+
     return reader

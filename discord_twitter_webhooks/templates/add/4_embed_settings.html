@@ -1,185 +1,185 @@
 <div class="p-2 border border-dark" id="embed_settings">
-  <h3>Embed Settings</h3>
-  {# Embed color #}
-  <label for="embed_color" class="form-label">Embed Color</label>
-  <input
-    type="color"
-    id="embed_color"
-    name="embed_color"
-    {% if settings.embed_color %}value="{{ settings.embed_color }}"{% endif %}
-    class="form-control form-control-color"
-  />
-
-  {# Random color #}
-  <div class="form-check form-switch">
+    <h3>Embed Settings</h3>
+    {# Embed color #}
+    <label for="embed_color" class="form-label">Embed Color</label>
     <input
-      class="form-check-input"
-      type="checkbox"
-      role="switch"
-      id="random_color"
-      name="random_color"
-      value="True"
-      {% if settings.random_color %}checked{% endif %}
+            type="color"
+            id="embed_color"
+            name="embed_color"
+            {% if settings.embed_color %}value="{{ settings.embed_color }}"{% endif %}
+            class="form-control form-control-color"
     />
-    <label class="form-check-label" for="random_color">Random color</label>
-    <div id="random_color_help" class="form-text">
-      Whether or not you want the embed color to be random. This will override
-      the embed color above.
-    </div>
-  </div>
-  <hr />
 
-  {# Show author #}
-  <div class="form-check form-switch">
-    <input
-      class="form-check-input"
-      type="checkbox"
-      role="switch"
-      id="embed_show_author"
-      name="embed_show_author"
-      value="True"
-      {% if settings.embed_show_author %}checked{% endif %}
-    />
-    <label class="form-check-label" for="embed_show_author">Embed author</label>
-    <div id="embed_show_author_help" class="form-text">
-      Whether or not you want the embed to have an author.
+    {# Random color #}
+    <div class="form-check form-switch">
+        <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="random_color"
+                name="random_color"
+                value="True"
+                {% if settings.embed_color == "random" %}checked{% endif %}
+        />
+        <label class="form-check-label" for="random_color">Random color</label>
+        <div id="random_color_help" class="form-text">
+            Whether or not you want the embed color to be random. This will override
+            the embed color above.
+        </div>
     </div>
-  </div>
+    <hr/>
 
-  {# Author name #}
-  <div class="row pb-2">
-    <label for="author_name" class="col-sm-1 col-form-label">Author</label>
-    <div class="col-sm-11">
-      <input
-        name="author_name"
-        type="text"
-        class="form-control bg-dark border-dark text-muted"
-        id="author_name"
-        {% if settings.author_name %}value="{{ settings.author_name }}"{% endif %}
-      />
-      <div id="author_name_help" class="form-text">
-        The name of the author of the embed.
-      </div>
+    {# Show author #}
+    <div class="form-check form-switch">
+        <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="embed_show_author"
+                name="embed_show_author"
+                value="True"
+                {% if settings.embed_show_author %}checked{% endif %}
+        />
+        <label class="form-check-label" for="embed_show_author">Embed author</label>
+        <div id="embed_show_author_help" class="form-text">
+            Whether or not you want the embed to have an author.
+        </div>
     </div>
-  </div>
 
-  {# Author URL #}
-  <div class="row pb-2">
-    <label for="embed_author_url" class="col-sm-1 col-form-label">Author URL</label>
-    <div class="col-sm-11">
-      <input
-        name="embed_author_url"
-        type="text"
-        class="form-control bg-dark border-dark text-muted"
-        id="embed_author_url"
-        value="{{ settings.embed_author_url }}"
-      />
-      <div id="embed_author_url_help" class="form-text">
-        The URL to link the author name to.
-      </div>
+    {# Author name #}
+    <div class="row pb-2">
+        <label for="embed_author_name" class="col-sm-1 col-form-label">Author</label>
+        <div class="col-sm-11">
+            <input
+                    name="embed_author_name"
+                    type="text"
+                    class="form-control bg-dark border-dark text-muted"
+                    id="embed_author_name"
+                    {% if settings.embed_author_name %}value="{{ settings.embed_author_name }}"{% endif %}
+            />
+            <div id="embed_author_name_help" class="form-text">
+                The name of the author of the embed.
+            </div>
+        </div>
     </div>
-  </div>
 
-  {# Author icon URL #}
-  <div class="row pb-2">
-    <label for="embed_author_icon_url" class="col-sm-1 col-form-label">Author Icon URL</label>
-    <div class="col-sm-11">
-      <input
-        name="embed_author_icon_url"
-        type="text"
-        class="form-control bg-dark border-dark text-muted"
-        id="embed_author_icon_url"
-        {% if settings.embed_author_icon_url %}value="{{ settings.embed_author_icon_url }}"{% endif %}
-      />
-      <div id="embed_author_icon_url_help" class="form-text">
-        The URL of the author's icon.
-      </div>
+    {# Author URL #}
+    <div class="row pb-2">
+        <label for="embed_author_url" class="col-sm-1 col-form-label">Author URL</label>
+        <div class="col-sm-11">
+            <input
+                    name="embed_author_url"
+                    type="text"
+                    class="form-control bg-dark border-dark text-muted"
+                    id="embed_author_url"
+                    value="{{ settings.embed_author_url }}"
+            />
+            <div id="embed_author_url_help" class="form-text">
+                The URL to link the author name to.
+            </div>
+        </div>
     </div>
-  </div>
-  <hr />
 
-  {# Embed URL #}
-  <div class="row pb-2">
-    <label for="embed_url" class="col-sm-1 col-form-label">URL</label>
-    <div class="col-sm-11">
-      <input
-        name="embed_url"
-        type="text"
-        class="form-control bg-dark border-dark text-muted"
-        id="embed_url"
-        {% if settings.embed_url %}value="{{ settings.embed_url }}"{% endif %}
-      />
-      <div id="embed_url_help" class="form-text">
-        The URL to link the embed title to.
-      </div>
+    {# Author icon URL #}
+    <div class="row pb-2">
+        <label for="embed_author_icon_url" class="col-sm-1 col-form-label">Author Icon URL</label>
+        <div class="col-sm-11">
+            <input
+                    name="embed_author_icon_url"
+                    type="text"
+                    class="form-control bg-dark border-dark text-muted"
+                    id="embed_author_icon_url"
+                    {% if settings.embed_author_icon_url %}value="{{ settings.embed_author_icon_url }}"{% endif %}
+            />
+            <div id="embed_author_icon_url_help" class="form-text">
+                The URL of the author's icon.
+            </div>
+        </div>
     </div>
-  </div>
+    <hr/>
 
-  {# Timestamp #}
-  <div class="form-check form-switch">
-    <input
-      class="form-check-input"
-      type="checkbox"
-      role="switch"
-      id="embed_timestamp"
-      name="embed_timestamp"
-      value="True"
-      {% if settings.embed_timestamp %}checked{% endif %}
-    />
-    <label class="form-check-label" for="embed_timestamp">Timestamp</label>
-    <div id="embed_timestamp_help" class="form-text">
-      Whether or not you want the embed to have a timestamp.
+    {# Embed URL #}
+    <div class="row pb-2">
+        <label for="embed_url" class="col-sm-1 col-form-label">URL</label>
+        <div class="col-sm-11">
+            <input
+                    name="embed_url"
+                    type="text"
+                    class="form-control bg-dark border-dark text-muted"
+                    id="embed_url"
+                    {% if settings.embed_url %}value="{{ settings.embed_url }}"{% endif %}
+            />
+            <div id="embed_url_help" class="form-text">
+                The URL to link the embed title to.
+            </div>
+        </div>
     </div>
-  </div>
 
-  {# Footer text #}
-  <div class="row pb-2">
-    <label for="embed_footer_text" class="col-sm-1 col-form-label">Footer</label>
-    <div class="col-sm-11">
-      <input
-        name="embed_footer_text"
-        type="text"
-        class="form-control bg-dark border-dark text-muted"
-        id="embed_footer_text"
-        {% if settings.embed_footer_text %}value="{{ settings.embed_footer_text }}"{% endif %}
-      />
-      <div id="embed_footer_text_help" class="form-text">The footer text.</div>
+    {# Timestamp #}
+    <div class="form-check form-switch">
+        <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="embed_timestamp"
+                name="embed_timestamp"
+                value="True"
+                {% if settings.embed_timestamp %}checked{% endif %}
+        />
+        <label class="form-check-label" for="embed_timestamp">Timestamp</label>
+        <div id="embed_timestamp_help" class="form-text">
+            Whether or not you want the embed to have a timestamp.
+        </div>
     </div>
-  </div>
 
-  {# Footer icon URL #}
-  <div class="row pb-2">
-    <label for="embed_footer_icon_url" class="col-sm-1 col-form-label"
-      >Footer Icon URL</label
-    >
-    <div class="col-sm-11">
-      <input
-        name="embed_footer_icon_url"
-        type="text"
-        class="form-control bg-dark border-dark text-muted"
-        id="embed_footer_icon_url"
-        {% if settings.embed_footer_icon_url %}value="{{ settings.embed_footer_icon_url }}"{% endif %}
-      />
-      <div id="embed_footer_icon_url_help" class="form-text">
-        The URL of the footer icon.
-      </div>
+    {# Footer text #}
+    <div class="row pb-2">
+        <label for="embed_footer_text" class="col-sm-1 col-form-label">Footer</label>
+        <div class="col-sm-11">
+            <input
+                    name="embed_footer_text"
+                    type="text"
+                    class="form-control bg-dark border-dark text-muted"
+                    id="embed_footer_text"
+                    {% if settings.embed_footer_text %}value="{{ settings.embed_footer_text }}"{% endif %}
+            />
+            <div id="embed_footer_text_help" class="form-text">The footer text.</div>
+        </div>
     </div>
-  </div>
-  
-  {# Show title #}
-  <div class="form-check form-switch">
-    <input
-      class="form-check-input"
-      type="checkbox"
-      role="switch"
-      id="embed_show_title"
-      name="embed_show_title"
-      value="True"
-      {% if settings.embed_show_title %}checked{% endif %}
-    />
-    <label class="form-check-label" for="embed_show_title">Embed title</label>
-    <div id="url_help" class="form-text">
-      Whether or not you want the embed to have a title.
+
+    {# Footer icon URL #}
+    <div class="row pb-2">
+        <label for="embed_footer_icon_url" class="col-sm-1 col-form-label"
+        >Footer Icon URL</label
+        >
+        <div class="col-sm-11">
+            <input
+                    name="embed_footer_icon_url"
+                    type="text"
+                    class="form-control bg-dark border-dark text-muted"
+                    id="embed_footer_icon_url"
+                    {% if settings.embed_footer_icon_url %}value="{{ settings.embed_footer_icon_url }}"{% endif %}
+            />
+            <div id="embed_footer_icon_url_help" class="form-text">
+                The URL of the footer icon.
+            </div>
+        </div>
     </div>
-  </div>
+
+    {# Show title #}
+    <div class="form-check form-switch">
+        <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="embed_show_title"
+                name="embed_show_title"
+                value="True"
+                {% if settings.embed_show_title %}checked{% endif %}
+        />
+        <label class="form-check-label" for="embed_show_title">Embed title</label>
+        <div id="url_help" class="form-text">
+            Whether or not you want the embed to have a title.
+        </div>
+    </div>
 </div>

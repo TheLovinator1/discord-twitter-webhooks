@@ -1,40 +1,36 @@
 <div class="p-2 border border-dark" id="what_to_send">
-  <h3>What to send</h3>
-  {# Include retweets? #}
-  <div class="form-check form-switch">
-    <input
-      class="form-check-input"
-      type="checkbox"
-      role="switch"
-      id="include_retweets"
-      name="include_retweets"
-      value="True"
-      {% if settings.include_retweets %}checked{% endif %}
-    />
-    <label class="form-check-label" for="include_retweets"
-      >Include retweets</label
-    >
-    <div id="url_help" class="form-text">
-      Whether or not you want retweets to be sent to Discord.
+    <h3>What to send</h3>
+    {# Include retweets? #}
+    <div class="form-check form-switch">
+        <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="send_retweets"
+                name="send_retweets"
+                value="True"
+                {% if settings.send_retweets %}checked{% endif %}
+        />
+        <label class="form-check-label" for="send_retweets">Send retweets?</label>
+        <div id="url_help" class="form-text">
+            Whether or not you want retweets to be sent to Discord.
+        </div>
     </div>
-  </div>
 
-  {# Include replies? #}
-  <div class="form-check form-switch">
-    <input
-      class="form-check-input"
-      type="checkbox"
-      role="switch"
-      id="include_replies"
-      name="include_replies"
-      value="True"
-      {% if settings.include_replies %}checked{% endif %}
-    />
-    <label class="form-check-label" for="include_replies"
-      >Include replies</label
-    >
-    <div id="url_help" class="form-text">
-      Whether or not you want replies to be sent to Discord.
+    {# Include replies? #}
+    <div class="form-check form-switch">
+        <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="send_replies"
+                name="send_replies"
+                value="True"
+                {% if settings.send_replies %}checked{% endif %}
+        />
+        <label class="form-check-label" for="send_replies">Send replies?</label>
+        <div id="url_help" class="form-text">
+            Whether or not you want replies to be sent to Discord.
+        </div>
     </div>
-  </div>
 </div>

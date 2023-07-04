@@ -1,7 +1,13 @@
+import re
+from html import unescape
+
 from bs4 import BeautifulSoup
+from reader import Entry
+
+from discord_twitter_webhooks._dataclasses import Group
 
 
-def convert_html_to_md(html: str) -> str:  # noqa: C901
+def convert_html_to_md(html: str) -> str:
     """Convert HTML to markdown.
 
     Args:
@@ -47,3 +53,35 @@ def convert_html_to_md(html: str) -> str:  # noqa: C901
         tag.replace_with(tag.text)
 
     return clean_soup.text.strip()
+
+
+def get_tweet_text(entry: Entry, group: Group) -> str:
+    """Get the text to send in the embed.
+
+    Args:
+        entry: The entry to send.
+        group: The settings to use.
+
+    Returns:
+        The text to send in the embed.
+    """
+    tweet_text: str = entry.summary or entry.title or f"Failed to get tweet text for <{entry.link}>"
+    tweet_text = convert_html_to_md(tweet_text)
+
+    if group.remove_copyright:
+        # Copyright symbols are bloat and adds nothing.
+        tweet_text = tweet_text.replace("©", "")
+        tweet_text = tweet_text.replace("®", "")
+        tweet_text = tweet_text.replace("™", "")
+    if group.remove_utm:
+        # Remove the utm_source parameter from the url. https://en.wikipedia.org/wiki/UTM_parameters
+        tweet_text = re.sub(r"([?&])utm_source=[^&]*", "", tweet_text)
+        tweet_text = re.sub(r"([?&])utm_campaign=[^&]*", "", tweet_text)
+        tweet_text = re.sub(r"([?&])utm_medium=[^&]*", "", tweet_text)
+        tweet_text = re.sub(r"([?&])utm_term=[^&]*", "", tweet_text)
+        tweet_text = re.sub(r"([?&])utm_content=[^&]*", "", tweet_text)
+    if group.unescape_html:
+        # Convert HTML entities to their corresponding characters. For example, "&amp;" becomes "&".
+        tweet_text = unescape(tweet_text)
+
+    return tweet_text

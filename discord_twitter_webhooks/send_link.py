@@ -1,15 +1,14 @@
 from loguru import logger
 from reader import Entry
 
-from discord_twitter_webhooks.dataclasses import Settings
+from discord_twitter_webhooks._dataclasses import Group
 
 
-def send_link(entry: Entry, settings: Settings) -> None:
+def send_link(entry: Entry, group: Group) -> None:
     """Send a link to Discord.
 
     Args:
         entry: The entry to send.
-        settings: The settings to use.
-        reader: The reader to use.
+        group: The settings to use.
     """
-    logger.debug(f"Sending {entry.title} as a link to {settings.webhooks}")
+    logger.debug(f"Sending {entry.title} as a link to {group.webhooks}")

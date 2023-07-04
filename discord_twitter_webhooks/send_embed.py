@@ -8,8 +8,8 @@ from loguru import logger
 from reader import Entry
 from requests import request
 
-from discord_twitter_webhooks.dataclasses import Settings
-from discord_twitter_webhooks.get_tweet_text import get_tweet_text
+from discord_twitter_webhooks._dataclasses import Group
+from discord_twitter_webhooks.tweet_text import get_tweet_text
 
 if TYPE_CHECKING:
     from xml.etree.ElementTree import Element
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from requests import Response
 
 
-def get_color(settings: Settings) -> int:
+def get_color(settings: Group) -> int:
     """Get the color of the embed.
 
     Returns:
@@ -26,7 +26,7 @@ def get_color(settings: Settings) -> int:
     twitter_blue = "#1DA1F2"
     embed_color: str = twitter_blue
     if webhook_embed_color := settings.embed_color:
-        if settings.embed_color_random:
+        if settings.embed_color == "random":
             embed_color = hex(randint(0, 16777215))[2:]  # noqa: S311
         elif len(webhook_embed_color) == 7 and webhook_embed_color[0] == "#":  # noqa: PLR2004
             embed_color: str = webhook_embed_color
@@ -67,48 +67,47 @@ def get_avatar(rss_feed: str) -> str:
     return default_avatar
 
 
-def send_embed(entry: Entry, settings: Settings) -> None:
+def send_embed(entry: Entry, group: Group) -> None:
     """Send an embed to Discord.
 
     Args:
         entry: The entry to send.
-        settings: The settings to use.
-        reader: The reader to use.
+        group: The settings to use.
     """
-    logger.info(f"Sending {entry.title} as an embed to {settings.webhooks}")
+    logger.info(f"Sending {entry.title} as an embed to {group.webhooks}")
 
-    if not settings.webhooks:
+    if not group.webhooks:
         logger.error(f"No webhooks set for {entry.title}, skipping")
         return
 
     # We will add the URL later, so we can send embeds to multiple webhooks.
     webhook = DiscordWebhook(url="")
 
-    tweet_text: str = get_tweet_text(entry, settings)
+    tweet_text: str = get_tweet_text(entry, group)
     embed = DiscordEmbed(description=tweet_text)
     entry_link: str = entry.link or ""
 
-    if settings.embed_show_title:
+    if group.embed_show_title:
         if entry.title:
             embed.set_title(entry.title)
         else:
             logger.error("No title for {}", entry_link)
 
-    if settings.embed_show_author:
+    if group.embed_show_author:
         if entry.author:
             avatar: str = get_avatar(entry.feed_url)
             embed.set_author(name=entry.author, url=entry_link, icon_url=avatar)
         else:
             logger.error("No author for {}", entry_link)
 
-    if settings.embed_timestamp:
+    if group.embed_timestamp:
         embed.set_timestamp()
 
-    embed.set_color(get_color(settings))
+    embed.set_color(get_color(group))
 
     webhook.add_embed(embed)
 
-    for _webhook in settings.webhooks.split(","):
+    for _webhook in group.webhooks:
         logger.debug("Webhook URL: {}", _webhook)
         webhook.url = _webhook
         response: Response = webhook.execute()
@@ -116,5 +115,4 @@ def send_embed(entry: Entry, settings: Settings) -> None:
         if response.ok:
             logger.info("Webhook posted for tweet https://twitter.com/i/status/{}", entry.link)
         else:
-            logger.error(f"Got {response.status_code} from {webhook}. Response: {response.text}")
             logger.error(f"Got {response.status_code} from {webhook}. Response: {response.text}")

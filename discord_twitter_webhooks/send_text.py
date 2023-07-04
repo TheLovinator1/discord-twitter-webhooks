@@ -4,24 +4,23 @@ from discord_webhook import DiscordWebhook
 from loguru import logger
 from reader import Entry
 
-from discord_twitter_webhooks.dataclasses import Settings
-from discord_twitter_webhooks.get_tweet_text import get_tweet_text
+from discord_twitter_webhooks._dataclasses import Group
+from discord_twitter_webhooks.tweet_text import get_tweet_text
 
 if TYPE_CHECKING:
     from requests import Response
 
 
-def send_text(entry: Entry, settings: Settings) -> None:
+def send_text(entry: Entry, group: Group) -> None:
     """Send text to Discord.
 
     Args:
         entry: The entry to send.
-        settings: The settings to use.
-        reader: The reader to use.
+        group: The settings to use.
     """
-    logger.debug(f"Sending {entry.title} to {settings.webhooks} as text")
+    logger.debug(f"Sending {entry.title} to {group.webhooks} as text")
 
-    if not settings.webhooks:
+    if not group.webhooks:
         logger.error(f"No webhooks set for {entry.title}, skipping")
         return
 
@@ -29,9 +28,9 @@ def send_text(entry: Entry, settings: Settings) -> None:
     webhook = DiscordWebhook(url="")
 
     # The text that will be sent to Discord.
-    webhook.content = get_tweet_text(entry, settings)
+    webhook.content = get_tweet_text(entry, group)
 
-    for _webhook in settings.webhooks.split(","):
+    for _webhook in group.webhooks:
         logger.debug("Webhook URL: {}", _webhook)
         webhook.url = _webhook
         response: Response = webhook.execute()

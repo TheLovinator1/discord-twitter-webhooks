@@ -1,48 +1,49 @@
 {% extends "base.html" %}
 {% block header %}
-  <h1>
-    {% block title %}Feeds{% endblock title %}
-  </h1>
+    <h1>
+        {% block title %}Feeds{% endblock title %}
+    </h1>
 {% endblock header %}
 {% block content %}
-  {% if feed_list|length == 0 %}
-    <div class="p-2 mb-2 border border-dark">
-      No feeds found. Add one <a class="text-muted" href="{{ url_for('add') }}">here</a>.
-    </div>
-  {% endif %}
-  <ul class="list-group">
-    {% for feed_item in feed_list %}
-      <div class="p-2 mb-2 border border-dark">
-        <div class="feed">
-          <h2>{{ feed_item.name }}</h2>
-          <a class="text-muted"
-             href="{{ url_for('mark_as_unread', group_name=feed_item.name ) }}">Mark as unread</a>
-          <br />
-          webhook url: <a class="text-muted" href="{{ feed_item.webhook }}">{{ feed_item.webhook }}</a>
-          <br />
-          usernames:
-          <ul>
-            {% for feed in feed_item.feeds %}
-              <li>
-                {% if feed.title %}
-                  <a class="text-muted" href="{{ feed.link }} ">{{ feed.title }}</a>
-                {% else %}
-                  {{ feed.url }}
-                  <span class="text-danger"><-- broken, please fix</span>
-                {% endif %}
-              </li>
-            {% endfor %}
-          </ul>
-          <form action="{{ url_for('remove_group_post') }}" method="post">
-            <input type="hidden" name="name" value="{{ feed_item.name }}" />
-            <input type="submit" value="Delete" class="btn btn-danger btn-sm" />
-          </form>
-
-          {# Button to edit group #}
-          <a class="btn btn-primary btn-sm" href="{{ url_for('modify', group_name=feed_item.name) }}">Edit</a>
-
+    {% if feed_list|length == 0 %}
+        <div class="p-2 mb-2 border border-dark">
+            No feeds found. Add one <a class="text-muted" href="{{ url_for('add') }}">here</a>.
         </div>
-      </div>
-    {% endfor %}
-  </ul>
+    {% endif %}
+    <ul class="list-group">
+        {% for group in groups %}
+            <div class="p-2 mb-2 border border-dark">
+                <div class="feed">
+                    <h2>{{ feed_item.name }}</h2>
+                    {{ group.uuid }}
+                    <a class="text-muted"
+                       href="{{ url_for('mark_as_unread', uuid=group.uuid ) }}">Mark as unread</a>
+                    <br/>
+                    Webhooks: {% for hook in group.webhooks %}{{ hook.url }} {% endfor %}<br/>
+                    <br/>
+                    usernames:
+                    <ul>
+                        {% for feed in group.feeds %}
+                            <li>
+                                {% if feed.title %}
+                                    <a class="text-muted" href="{{ feed.link }} ">{{ feed.title }}</a>
+                                {% else %}
+                                    {{ feed.url }}
+                                    <span class="text-danger"><-- broken, please fix</span>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <form action="{{ url_for('remove_group_post') }}" method="post">
+                        <input type="hidden" name="uuid" value="{{ group.uuid }}"/>
+                        <input type="submit" value="Delete" class="btn btn-danger btn-sm"/>
+                    </form>
+
+                    {# Button to edit group #}
+                    <a class="btn btn-primary btn-sm" href="{{ url_for('modify', uuid=group.uuid) }}">Edit</a>
+
+                </div>
+            </div>
+        {% endfor %}
+    </ul>
 {% endblock content %}
