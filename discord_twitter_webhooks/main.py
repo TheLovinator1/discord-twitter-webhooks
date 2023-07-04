@@ -12,7 +12,7 @@ from fastapi.templating import Jinja2Templates
 from loguru import logger
 from reader import Reader
 
-from discord_twitter_webhooks._dataclasses import ApplicationSettings, Group, get_group
+from discord_twitter_webhooks._dataclasses import ApplicationSettings, Group, get_group, get_app_settings
 from discord_twitter_webhooks.reader_settings import get_reader
 from discord_twitter_webhooks.send_to_discord import send_to_discord
 
@@ -31,7 +31,15 @@ async def index(request: Request) -> Response:
         The index page.
     """
     groups = reader.get_tag((), "groups", [])
-    return templates.TemplateResponse("index.html", {"request": request, "groups": groups})
+    list_of_groups = [get_group(reader, group) for group in groups]
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "groups": list_of_groups,
+            "app_settings": get_app_settings(reader),
+        },
+    )
 
 
 @app.get("/add", response_class=HTMLResponse)

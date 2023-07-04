@@ -5,32 +5,28 @@
     </h1>
 {% endblock header %}
 {% block content %}
-    {% if feed_list|length == 0 %}
+    {% if groups|length == 0 %}
         <div class="p-2 mb-2 border border-dark">
-            No feeds found. Add one <a class="text-muted" href="{{ url_for('add') }}">here</a>.
+            No groups found. Add one <a class="text-muted" href="{{ url_for('add') }}">here</a>.
         </div>
     {% endif %}
     <ul class="list-group">
         {% for group in groups %}
             <div class="p-2 mb-2 border border-dark">
                 <div class="feed">
-                    <h2>{{ feed_item.name }}</h2>
+                    <h2>{{ group.name }}</h2>
                     {{ group.uuid }}
                     <a class="text-muted"
                        href="{{ url_for('mark_as_unread', uuid=group.uuid ) }}">Mark as unread</a>
                     <br/>
-                    Webhooks: {% for hook in group.webhooks %}{{ hook.url }} {% endfor %}<br/>
+                    Webhooks: {% for hook in group.webhooks %}<a href="{{ hook }}">{{ hook }}</a> {% endfor %}<br/>
                     <br/>
                     usernames:
                     <ul>
-                        {% for feed in group.feeds %}
+                        {% for name in group.usernames %}
                             <li>
-                                {% if feed.title %}
-                                    <a class="text-muted" href="{{ feed.link }} ">{{ feed.title }}</a>
-                                {% else %}
-                                    {{ feed.url }}
-                                    <span class="text-danger"><-- broken, please fix</span>
-                                {% endif %}
+                                <a class="text-muted"
+                                   href="{{ app_settings.nitter_instance }}{{ name }} ">{{ name }}</a>
                             </li>
                         {% endfor %}
                     </ul>
