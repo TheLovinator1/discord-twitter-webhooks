@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Literal
 
+from loguru import logger
 from reader import Reader
 
 
@@ -58,23 +59,35 @@ class ApplicationSettings:
     send_errors_to_discord: bool = False
     error_webhook: str = ""
 
+    def __post_init__(self) -> None:
+        self.nitter_instance = self.nitter_instance.rstrip("/")
+
+        if self.send_errors_to_discord and not self.error_webhook:
+            logger.warning("send_errors_to_discord is True, but no error_webhook is set. Disabling.")
+            self.send_errors_to_discord = False
+
 
 def get_app_settings(reader: Reader) -> ApplicationSettings:
     """Get the application settings."""
-    return reader.get_tag((), "app_settings", ApplicationSettings())
+    app_settings = reader.get_tag((), "app_settings", ApplicationSettings())
+    logger.debug("Got application settings: {}", app_settings)
+    return ApplicationSettings(**app_settings)
 
 
 def set_app_settings(reader: Reader, app_settings: ApplicationSettings) -> None:
     """Set the application settings."""
     reader.set_tag((), "app_settings", app_settings.__dict__)
+    logger.debug("Saved application settings: {}", app_settings)
 
 
 def get_group(reader: Reader, uuid: str) -> Group:
     """Get the group."""
     group = reader.get_tag((), uuid, Group())
+    logger.debug("Got group: {}", group)
     return Group(**group)
 
 
 def set_group(reader: Reader, uuid: str, group: Group) -> None:
     """Set the group."""
     reader.set_tag((), uuid, group.__dict__)
+    logger.debug("Saved group: {}", group)
