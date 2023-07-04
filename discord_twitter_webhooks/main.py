@@ -2,6 +2,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Annotated
+from uuid import uuid4
 
 import uvicorn
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -84,10 +85,10 @@ async def modify(request: Request, uuid: str) -> Response:
 @app.post("/add")
 @app.post("/modify")
 async def add_post(
-    uuid: Annotated[str, Form(title="UUID")],
     name: Annotated[str, Form(title="Group Name")],
     webhooks: Annotated[str, Form(title="Webhook URLs")],
     usernames: Annotated[str, Form(title="Twitter Usernames")],
+    uuid: Annotated[str, Form(title="UUID")] = "",
     send_retweets: Annotated[bool, Form(title="Include Retweets?")] = True,
     send_replies: Annotated[bool, Form(title="Include Replies?")] = True,
     send_as_text: Annotated[bool, Form(title="Send Text?")] = False,
@@ -118,6 +119,9 @@ async def add_post(
     Returns:
         str: The add page.
     """
+    if not uuid:
+        uuid = str(uuid4())
+
     webhooks_split = webhooks.splitlines()
     usernames_split = usernames.splitlines()
 
@@ -156,17 +160,25 @@ async def add_post(
     # Add the group to the reader
     reader.set_tag((), uuid, group.__dict__)
     for _name in usernames_split:
+        name_url = f"{get_app_settings(reader).nitter_instance}/{_name}/rss"  # TODO: Check if URL is valid
         # Add the rss feed to the reader
-        reader.add_feed(_name, exist_ok=True)
+        reader.add_feed(name_url, exist_ok=True)
 
         # Get the feed, so we can add the group to it
-        our_feed = reader.get_feed(_name)
-        groups = reader.get_tag(our_feed, "groups", []).append(uuid)  # type: ignore
-        reader.set_tag(our_feed, "groups", set(groups))  # type: ignore
+        our_feed = reader.get_feed(name_url)
+        groups = reader.get_tag(our_feed, "groups", [])  # type: ignore
+        groups.append(uuid)
+        groups = set(groups)
+        reader.set_tag(our_feed, "groups", list(groups))  # type: ignore
+        logger.info(f"Added group {group.uuid} to feed {name_url}")
 
     # Add the group to the groups list
-    groups = reader.get_tag((), "groups", []).append(uuid)  # type: ignore
-    reader.set_tag((), "groups", set(groups))  # type: ignore
+    groups = reader.get_tag((), "groups", [])
+    groups.append(uuid)
+    groups = set(groups)
+    reader.set_tag((), "groups", list(groups))  # type: ignore
+    logger.info(f"Added group {group.uuid} to groups list")
+    logger.info(f"Group list is now {groups}")
 
     # Redirect to the index page.
     return RedirectResponse(url="/", status_code=303)
