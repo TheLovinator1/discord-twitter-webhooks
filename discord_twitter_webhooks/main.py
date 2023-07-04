@@ -53,7 +53,7 @@ async def add(request: Request) -> Response:
         "add.html",
         {
             "request": request,
-            "settings": None,
+            "settings": Group(),
             "modifying": False,
             "group_name": None,
         },
