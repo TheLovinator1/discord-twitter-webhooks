@@ -19,7 +19,8 @@
                     <a class="text-muted"
                        href="{{ url_for('mark_as_unread', uuid=group.uuid ) }}">Mark as unread</a>
                     <br/>
-                    Webhooks: {% for hook in group.webhooks %}<a href="{{ hook }}">{{ hook }}</a> {% endfor %}<br/>
+                    Webhooks: {% for hook in group.webhooks %}
+                    <a class="text-muted" href="{{ hook }}">{{ hook }}</a> {% endfor %}<br/>
                     <br/>
                     usernames:
                     <ul>

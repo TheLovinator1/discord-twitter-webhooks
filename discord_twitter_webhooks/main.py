@@ -12,8 +12,15 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 from reader import Reader
+from starlette import status
 
-from discord_twitter_webhooks._dataclasses import ApplicationSettings, Group, get_group, get_app_settings
+from discord_twitter_webhooks._dataclasses import (
+    ApplicationSettings,
+    Group,
+    get_group,
+    get_app_settings,
+    set_app_settings,
+)
 from discord_twitter_webhooks.reader_settings import get_reader
 from discord_twitter_webhooks.send_to_discord import send_to_discord
 
@@ -33,6 +40,8 @@ async def index(request: Request) -> Response:
     """
     groups = reader.get_tag((), "groups", [])
     list_of_groups = [get_group(reader, group) for group in groups]
+    list_of_groups = [group for group in list_of_groups if group]  # Remove None values
+
     return templates.TemplateResponse(
         "index.html",
         {
@@ -75,9 +84,8 @@ async def modify(request: Request, uuid: str) -> Response:
         "modify.html",
         {
             "request": request,
-            "settings": settings,
+            "settings": group,
             "modifying": True,
-            "group": group,
         },
     )
 
@@ -85,6 +93,7 @@ async def modify(request: Request, uuid: str) -> Response:
 @app.post("/add")
 @app.post("/modify")
 async def add_post(
+    request: Request,
     name: Annotated[str, Form(title="Group Name")],
     webhooks: Annotated[str, Form(title="Webhook URLs")],
     usernames: Annotated[str, Form(title="Twitter Usernames")],
@@ -119,6 +128,10 @@ async def add_post(
     Returns:
         str: The add page.
     """
+    # Check if we are modifying and if no uuid
+    if not uuid and "modify" in request.url.path:
+        return "Failed to modify group. No UUID provided."
+
     if not uuid:
         uuid = str(uuid4())
 
@@ -133,6 +146,7 @@ async def add_post(
         name=name,
         webhooks=webhooks_split,
         usernames=usernames_split,
+        rss_feeds=[],
         send_retweets=send_retweets,
         send_replies=send_replies,
         send_as_text=send_as_text,
@@ -157,6 +171,10 @@ async def add_post(
         remove_utm=remove_utm,
         remove_copyright=remove_copyright,
     )
+
+    # This will be used when adding group.rss_feeds
+    rss_feeds = []
+
     # Add the group to the reader
     reader.set_tag((), uuid, group.__dict__)
     for _name in usernames_split:
@@ -164,24 +182,26 @@ async def add_post(
         # Add the rss feed to the reader
         reader.add_feed(name_url, exist_ok=True)
 
-        # Get the feed, so we can add the group to it
+        # Add what groups the feed is connected to
         our_feed = reader.get_feed(name_url)
         groups = reader.get_tag(our_feed, "groups", [])  # type: ignore
         groups.append(uuid)
-        groups = set(groups)
+        groups = set(groups)  # Remove duplicates
         reader.set_tag(our_feed, "groups", list(groups))  # type: ignore
         logger.info(f"Added group {group.uuid} to feed {name_url}")
+
+        rss_feeds.append(name_url)
 
     # Add the group to the groups list
     groups = reader.get_tag((), "groups", [])
     groups.append(uuid)
-    groups = set(groups)
+    groups = set(groups)  # Remove duplicates
     reader.set_tag((), "groups", list(groups))  # type: ignore
     logger.info(f"Added group {group.uuid} to groups list")
     logger.info(f"Group list is now {groups}")
 
     # Redirect to the index page.
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)  # TODO: What status code should this be?
 
 
 @app.post("/remove_group")
@@ -193,12 +213,18 @@ async def remove_group_post(uuid: Annotated[str, Form()]) -> RedirectResponse:
     """
     # TODO: We should also remove the rss feed if it was the last group using it.
     group: Group = reader.get_tag((), uuid)  # type: ignore
-    logger.info(f"Removing group {group.uuid}\n{group}")
+    logger.info(f"Removing group {group}")
 
     reader.delete_tag((), uuid)
 
+    groups = reader.get_tag((), "groups", [])
+    logger.info(f"Group list is {groups}")
+    groups.remove(uuid)
+    reader.set_tag((), "groups", groups)
+    logger.info(f"Group list is now {groups}")
+
     # Redirect to the index page.
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)  # TODO: What status code should this be?
 
 
 @app.get("/mark_as_unread/{uuid}")
@@ -215,7 +241,7 @@ async def mark_as_unread(uuid: str) -> RedirectResponse:
     logger.info(f"Marking feed {uuid} as unread")
 
     # Redirect to the index page.
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)  # TODO: What status code should this be?
 
 
 @app.get("/settings")
@@ -228,7 +254,7 @@ async def settings(request: Request) -> Response:
     Returns:
         Response: The settings page.
     """
-    application_settings: ApplicationSettings = reader.get_tag((), "settings", ApplicationSettings())
+    application_settings: ApplicationSettings = get_app_settings(reader)
     return templates.TemplateResponse("settings.html", {"request": request, "settings": application_settings})
 
 
@@ -257,7 +283,7 @@ async def settings_post(
         error_webhook=error_webhook,
     )
 
-    reader.set_tag((), "settings", app_settings.__dict__)
+    set_app_settings(reader, app_settings)
     return templates.TemplateResponse(
         "settings.html",
         {
@@ -278,7 +304,7 @@ def startup() -> None:
     logger.add(
         sys.stderr,
         format=log_format,
-        level="INFO",
+        level="DEBUG",
         colorize=True,
         backtrace=False,
         diagnose=False,

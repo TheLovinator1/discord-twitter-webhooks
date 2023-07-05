@@ -1,25 +1,26 @@
 {% extends "base.html" %}
 {% block header %}
     {% block title %}
-Add a feed
+        Add a feed
     {% endblock title %}
 {% endblock header %}
 {% block content %}
-<script src="{{ url_for('static', path='/add.js') }}"></script>
-<form name="add" action="{{ url_for('add_post') }}" method="post">
-    {% include "add/1_feed_details.html" %}
-    <br />
-    {% include "add/2_what_to_send.html" %}
-    <br />
-    {% include "add/3_how_to_send.html" %}
-    <br />
-    {% include "add/4_embed_settings.html" %}
-    <br />
-    {% include "add/5_send_link.html" %}
-    <br />
-    {% include "add/8_other.html" %}
-    <div class="d-md-flex">
-      <button class="btn btn-dark btn-sm">Add feed</button>
-    </div>
-  </form>
+    <script src="{{ url_for('static', path='/add.js') }}"></script>
+    <form name="add" action="{{ url_for('add_post') }}" method="post">
+        <input type="hidden" id="uuid" name="uuid" value="{{ settings.uuid }}"/>
+        {% include "add/1_feed_details.html" %}
+        <br/>
+        {% include "add/2_what_to_send.html" %}
+        <br/>
+        {% include "add/3_how_to_send.html" %}
+        <br/>
+        {% include "add/4_embed_settings.html" %}
+        <br/>
+        {% include "add/5_send_link.html" %}
+        <br/>
+        {% include "add/8_other.html" %}
+        <div class="d-md-flex">
+            <button class="btn btn-dark btn-sm">Add feed</button>
+        </div>
+    </form>
 {% endblock content %}

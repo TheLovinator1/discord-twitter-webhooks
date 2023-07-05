@@ -17,7 +17,7 @@ from discord_webhook import DiscordWebhook
 from loguru import logger
 from reader import Entry
 
-from discord_twitter_webhooks._dataclasses import Group
+from discord_twitter_webhooks._dataclasses import Group, get_group
 from discord_twitter_webhooks.tweet_text import get_tweet_text
 
 if TYPE_CHECKING:
@@ -163,12 +163,12 @@ def send_to_discord(reader: Reader) -> None:
         return
 
     for entry in entries:
-        group: Group = reader.get_tag(entry)
-        if group.send_as_link:
-            send_link(entry=entry, group=group)
-        elif group.send_as_text:
-            send_text(entry=entry, group=group)
-        elif group.send_as_embed:
-            send_embed(entry=entry, group=group)
-        else:
-            logger.warning(f"Unknown settings for tag {group.name}.")
+        for _group in reader.get_tag((), "groups", []):
+            group = get_group(reader, str(_group))
+            if group.rss_feeds == _group:
+                if group.send_as_link:
+                    send_link(entry=entry, group=group)
+                if group.send_as_text:
+                    send_text(entry=entry, group=group)
+                if group.send_as_embed:
+                    send_embed(entry=entry, group=group)

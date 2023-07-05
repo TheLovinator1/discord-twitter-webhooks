@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Literal
 
 from loguru import logger
-from reader import Reader
+from reader import Reader, TagNotFoundError
 
 
 @dataclass
@@ -16,6 +16,7 @@ class Group:
     name: str = ""
     usernames: list[str] = field(default_factory=list)
     webhooks: list[str] = field(default_factory=list)
+    rss_feeds: list[str] = field(default_factory=list)
     send_retweets: bool = True
     send_replies: bool = True
 
@@ -69,7 +70,13 @@ class ApplicationSettings:
 
 def get_app_settings(reader: Reader) -> ApplicationSettings:
     """Get the application settings."""
-    app_settings = reader.get_tag((), "app_settings", ApplicationSettings())
+    try:
+        app_settings = reader.get_tag((), "app_settings")
+    except TagNotFoundError:
+        logger.info("You should fill out the application settings.")
+        set_app_settings(reader, ApplicationSettings())
+        return ApplicationSettings()
+
     logger.debug("Got application settings: {}", app_settings)
     return ApplicationSettings(**app_settings)
 
@@ -82,9 +89,12 @@ def set_app_settings(reader: Reader, app_settings: ApplicationSettings) -> None:
 
 def get_group(reader: Reader, uuid: str) -> Group:
     """Get the group."""
-    group = reader.get_tag((), uuid, Group())
-    logger.debug("Got group: {}", group)
-    return Group(**group)
+    try:
+        group = reader.get_tag((), uuid)
+        logger.debug("Got group: {}", group)
+        return Group(**group)
+    except TagNotFoundError:
+        logger.info("Group {} not found.", uuid)
 
 
 def set_group(reader: Reader, uuid: str, group: Group) -> None:

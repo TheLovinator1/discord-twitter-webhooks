@@ -1,30 +1,26 @@
 {% extends "base.html" %}
 {% block header %}
     {% block title %}
-Modify {{ group_name }}
+        Modify {{ group_name }}
     {% endblock title %}
 {% endblock header %}
 {% block content %}
-<script src="{{ url_for('static', path='/add.js') }}"></script>
-  <form name="modify" action="{{ url_for('modify_post') }}" method="post">
-    <input type="hidden" name="name" value="{{ group_name }}" />
-    {% include "add/1_feed_details.html" %}
-    <br />
-    {% include "add/2_what_to_send.html" %}
-    <br />
-    {% include "add/3_how_to_send.html" %}
-    <br />
-    {% include "add/4_embed_settings.html" %}
-    <br />
-    {% include "add/5_send_link.html" %}
-    <br />
-    {% include "add/6_translate.html" %}
-    <br />
-    {% include "add/7_blackwhitelist.html" %}
-    <br />
-    {% include "add/8_other.html" %}
-    <div class="d-md-flex">
-      <button class="btn btn-dark btn-sm">Modify {{ group_name }}</button>
-    </div>
-  </form>
+    <script src="{{ url_for('static', path='/add.js') }}"></script>
+    <form name="modify" action="{{ url_for('add_post') }}" method="post">
+        <input type="hidden" id="uuid" name="uuid" value="{{ settings.uuid }}"/>
+        {% include "add/1_feed_details.html" %}
+        <br/>
+        {% include "add/2_what_to_send.html" %}
+        <br/>
+        {% include "add/3_how_to_send.html" %}
+        <br/>
+        {% include "add/4_embed_settings.html" %}
+        <br/>
+        {% include "add/5_send_link.html" %}
+        <br/>
+        {% include "add/8_other.html" %}
+        <div class="d-md-flex">
+            <button class="btn btn-dark btn-sm">Modify {{ group_name }}</button>
+        </div>
+    </form>
 {% endblock content %}
