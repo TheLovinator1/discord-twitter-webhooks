@@ -43,6 +43,11 @@ class Group:
     embed_show_title: bool = False
     embed_show_author: bool = True
 
+    # Translate settings
+    translate: bool = False
+    translate_to: str = "en-GB"
+    translate_from: str = "auto"
+
     # Other settings
     unescape_html: bool = True
     remove_utm: bool = True
@@ -59,6 +64,7 @@ class ApplicationSettings:
     nitter_instance: str = "https://nitter.lovinator.space"
     send_errors_to_discord: bool = False
     error_webhook: str = ""
+    deepL_auth_key: str = ""
 
     def __post_init__(self) -> None:
         self.nitter_instance = self.nitter_instance.rstrip("/")

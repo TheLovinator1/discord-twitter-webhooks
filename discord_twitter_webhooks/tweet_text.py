@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from reader import Entry
 
 from discord_twitter_webhooks._dataclasses import Group
+from translate import translate_html
 
 
 def convert_html_to_md(html: str) -> str:
@@ -66,6 +67,12 @@ def get_tweet_text(entry: Entry, group: Group) -> str:
         The text to send in the embed.
     """
     tweet_text: str = entry.summary or entry.title or f"Failed to get tweet text for <{entry.link}>"
+
+    # Translate the tweet text
+    if group.translate:
+        # TODO: Maybe send the original text as a field or something?
+        tweet_text = translate_html(tweet_text, group.translate_from, group.translate_to)
+
     tweet_text = convert_html_to_md(tweet_text)
 
     if group.remove_copyright:

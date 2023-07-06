@@ -261,6 +261,23 @@ jsbeautifier = "*"
 six = ">=1.13.0"
 
 [[package]]
+name = "deepl"
+version = "1.15.0"
+description = "Python library for the DeepL API."
+optional = false
+python-versions = ">=3.6.2,<4"
+files = [
+    {file = "deepl-1.15.0-py3-none-any.whl", hash = "sha256:c8cddd1acd6808ab803d70d5f50fbffd1983d12d7d6b85d0c8b78f5cab1cbc5f"},
+    {file = "deepl-1.15.0.tar.gz", hash = "sha256:051142e11e5dd60c47c84248e35162d00cfc1aa9831bb990e85c7fa36dce19c1"},
+]
+
+[package.dependencies]
+requests = ">=2,<3"
+
+[package.extras]
+keyring = ["keyring (>=23.4.1,<24.0.0)"]
+
+[[package]]
 name = "defusedxml"
 version = "0.7.1"
 description = "XML bomb protection for Python stdlib modules"
@@ -1356,4 +1373,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "71776dfec9037f84802d5e9763dbc71db66c51bd338266c0f6ed737b4e4fca43"
+content-hash = "97cce187d8b45ee3556c4ced98d8f2222a69d46a307c3a655e7763cd2acde223"

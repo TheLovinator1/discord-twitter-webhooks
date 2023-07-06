@@ -137,7 +137,7 @@ def send_link(entry: Entry, group: Group) -> None:
     """
     webhook = DiscordWebhook(url="")
 
-    what_to_send = f"{entry.title}"
+    what_to_send = f"{entry.title}"  # TODO: Check if entry.title is the right thing to send
     if group.send_as_link_preview:
         what_to_send = f"<{entry.title}>"
 

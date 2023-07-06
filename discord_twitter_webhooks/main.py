@@ -23,6 +23,7 @@ from discord_twitter_webhooks._dataclasses import (
 )
 from discord_twitter_webhooks.reader_settings import get_reader
 from discord_twitter_webhooks.send_to_discord import send_to_discord
+from translate import languages_from, languages_to
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
@@ -60,12 +61,14 @@ async def add(request: Request) -> Response:
         The add page.
     """
     return templates.TemplateResponse(
-        "add.html",
+        "feed.html",
         {
             "request": request,
             "settings": Group(),
             "modifying": False,
             "group_name": None,
+            "languages_from": languages_from,
+            "languages_to": languages_to,
         },
     )
 
@@ -81,11 +84,13 @@ async def modify(request: Request, uuid: str) -> Response:
     group: Group = get_group(reader, uuid)
 
     return templates.TemplateResponse(
-        "modify.html",
+        "feed.html",
         {
             "request": request,
             "settings": group,
             "modifying": True,
+            "languages_from": languages_from,
+            "languages_to": languages_to,
         },
     )
 
@@ -122,23 +127,24 @@ async def add_post(
     unescape_html: Annotated[bool, Form(title="Unescape HTML?")] = True,
     remove_utm: Annotated[bool, Form(title="Remove UTM?")] = True,
     remove_copyright: Annotated[bool, Form(title="Remove Copyright?")] = True,
-) -> RedirectResponse:
-    """Create a new group.
-
-    Returns:
-        str: The add page.
-    """
-    # Check if we are modifying and if no uuid
-    if not uuid and "modify" in request.url.path:
-        return "Failed to modify group. No UUID provided."
-
+    translate: Annotated[bool, Form(title="Translate?")] = False,
+    translate_from: Annotated[str, Form(title="Translate From")] = "auto",
+    translate_to: Annotated[str, Form(title="Translate To")] = "en-GB",
+):
+    """Create or modify a group."""
     if not uuid:
+        if "modify" in request.url.path:
+            return "Failed to modify group. No UUID provided."
+
+        # Create a new UUID if we are adding a new group
         uuid = str(uuid4())
 
+    # Webhooks and usernames are a single string with each item on a new line, so we split them to a real list
     webhooks_split = webhooks.splitlines()
     usernames_split = usernames.splitlines()
 
     if embed_color_random:
+        # We will randomize the color later before sending the embed
         embed_color = "random"
 
     group = Group(
@@ -170,6 +176,9 @@ async def add_post(
         unescape_html=unescape_html,
         remove_utm=remove_utm,
         remove_copyright=remove_copyright,
+        translate=translate,
+        translate_from=translate_from,
+        translate_to=translate_to,
     )
 
     # This will be used when adding group.rss_feeds
@@ -186,8 +195,7 @@ async def add_post(
         our_feed = reader.get_feed(name_url)
         groups = reader.get_tag(our_feed, "groups", [])  # type: ignore
         groups.append(uuid)
-        groups = set(groups)  # Remove duplicates
-        reader.set_tag(our_feed, "groups", list(groups))  # type: ignore
+        reader.set_tag(our_feed, "groups", list(set(groups)))  # type: ignore
         logger.info(f"Added group {group.uuid} to feed {name_url}")
 
         rss_feeds.append(name_url)
@@ -195,10 +203,9 @@ async def add_post(
     # Add the group to the groups list
     groups = reader.get_tag((), "groups", [])
     groups.append(uuid)
-    groups = set(groups)  # Remove duplicates
-    reader.set_tag((), "groups", list(groups))  # type: ignore
+    reader.set_tag((), "groups", list(set(groups)))  # type: ignore
     logger.info(f"Added group {group.uuid} to groups list")
-    logger.info(f"Group list is now {groups}")
+    logger.info(f"Group list is now {set(groups)}")
 
     # Redirect to the index page.
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)  # TODO: What status code should this be?
@@ -264,6 +271,7 @@ async def settings_post(
     nitter_instance: Annotated[str, Form(title="Nitter instance")] = "",
     error_webhook: Annotated[str, Form(title="Error webhook")] = "",
     send_errors_to_discord: Annotated[bool, Form(title="Send errors to Discord?")] = False,
+    deepL_auth_key: Annotated[str, Form(title="DeepL auth key")] = "",
 ) -> Response:
     """Save the settings.
 
@@ -272,6 +280,7 @@ async def settings_post(
         nitter_instance: The Nitter instance to use.
         send_errors_to_discord: Whether to send errors to Discord.
         error_webhook: The webhook to send errors to.
+        deepL_auth_key: The DeepL auth key to use.
     """
     if send_errors_to_discord and not error_webhook:
         logger.warning("You have enabled sending errors to Discord, but have not set a webhook. Disabling.")
@@ -281,6 +290,7 @@ async def settings_post(
         nitter_instance=nitter_instance,
         send_errors_to_discord=send_errors_to_discord,
         error_webhook=error_webhook,
+        deepL_auth_key=deepL_auth_key,
     )
 
     set_app_settings(reader, app_settings)
