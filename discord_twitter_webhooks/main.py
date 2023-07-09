@@ -225,10 +225,8 @@ async def remove_group_post(uuid: Annotated[str, Form()]) -> RedirectResponse:
     reader.delete_tag((), uuid)
 
     groups = reader.get_tag((), "groups", [])
-    logger.info(f"Group list is {groups}")
     groups.remove(uuid)
     reader.set_tag((), "groups", groups)
-    logger.info(f"Group list is now {groups}")
 
     # Redirect to the index page.
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)  # TODO: What status code should this be?
