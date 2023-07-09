@@ -37,14 +37,14 @@
             </div>
             {# DeepL Auth Key #}
             <div class="row pb-2">
-                <label for="deepL_auth_key" class="col-sm-1 col-form-label">DeepL auth key</label>
+                <label for="deepl_auth_key" class="col-sm-1 col-form-label">DeepL auth key</label>
                 <div class="col-sm-11">
-                    <input name="deepL_auth_key"
+                    <input name="deepl_auth_key"
                            type="text"
-                           value="{%- if settings.deepL_auth_key -%}{{ settings.deepL_auth_key }}{%- endif -%}"
+                           value="{%- if settings.deepl_auth_key -%}{{ settings.deepl_auth_key }}{%- endif -%}"
                            class="form-control bg-dark border-dark text-muted"
-                           id="deepL_auth_key"/>
-                    <div id="deepL_auth_key_help" class="form-text">
+                           id="deepl_auth_key"/>
+                    <div id="deepl_auth_key_help" class="form-text">
                         DeepL Auth Key to use for translations. Can be found <a class="text-muted"
                                                                                 href="https://www.deepl.com/account/summary">here</a>.
                     </div>

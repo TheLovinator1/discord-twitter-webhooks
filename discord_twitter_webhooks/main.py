@@ -269,7 +269,7 @@ async def settings_post(
     nitter_instance: Annotated[str, Form(title="Nitter instance")] = "",
     error_webhook: Annotated[str, Form(title="Error webhook")] = "",
     send_errors_to_discord: Annotated[bool, Form(title="Send errors to Discord?")] = False,
-    deepL_auth_key: Annotated[str, Form(title="DeepL auth key")] = "",
+    deepl_auth_key: Annotated[str, Form(title="DeepL auth key")] = "",
 ) -> Response:
     """Save the settings.
 
@@ -278,7 +278,7 @@ async def settings_post(
         nitter_instance: The Nitter instance to use.
         send_errors_to_discord: Whether to send errors to Discord.
         error_webhook: The webhook to send errors to.
-        deepL_auth_key: The DeepL auth key to use.
+        deepl_auth_key: The DeepL auth key to use.
     """
     if send_errors_to_discord and not error_webhook:
         logger.warning("You have enabled sending errors to Discord, but have not set a webhook. Disabling.")
@@ -288,7 +288,7 @@ async def settings_post(
         nitter_instance=nitter_instance,
         send_errors_to_discord=send_errors_to_discord,
         error_webhook=error_webhook,
-        deepL_auth_key=deepL_auth_key,
+        deepl_auth_key=deepl_auth_key,
     )
 
     set_app_settings(reader, app_settings)
