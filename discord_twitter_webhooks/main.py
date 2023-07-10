@@ -284,6 +284,7 @@ async def mark_as_unread(uuid: str):
             send_text(entry=entry, group=group)
         if group.send_as_embed:
             send_embed(entry=entry, group=group)
+        break
 
     # Redirect to the index page.
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)  # TODO: What status code should this be?
