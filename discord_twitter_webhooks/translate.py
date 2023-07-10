@@ -49,13 +49,24 @@ languages_to["pt-PT"] = "Portuguese (European)"
 def translate_html(html: str, translate_from: str | None = "auto", translate_to: languages_to = "en") -> str:
     """Translate HTML text to another language."""
     if translate_from == "auto":
+        logger.debug("Auto-detecting language when translating.")
         translate_from = None
 
     auth_key = get_app_settings(get_reader()).deepl_auth_key
     if not auth_key:
-        logger.warning("No DeepL auth key set. Not translating.")
+        logger.error("No DeepL auth key set. Not translating.")
         return html
 
-    translator = deepl.Translator(auth_key)
-    result = translator.translate_text(html, target_lang=translate_to, source_lang=translate_from, tag_handling="html")
+    try:
+        translator = deepl.Translator(auth_key)
+        result = translator.translate_text(
+            html,
+            target_lang=translate_to,
+            source_lang=translate_from,
+            tag_handling="html",
+        )
+    except deepl.exceptions.DeepLException as e:
+        logger.error("Error while translating: {}", e)
+        return html
+
     return result.text
