@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from defusedxml import ElementTree
 from discord_webhook import DiscordEmbed
 from reader import Reader
+from reader.types import EntryLike
 from requests import request
 
 if TYPE_CHECKING:
@@ -36,7 +37,7 @@ def send_webhook(webhook, entry, group) -> None:
             logger.error(f"Got {response.status_code} from {webhook}. Response: {response.text}")
 
 
-def send_text(entry: Entry, group: Group) -> None:
+def send_text(entry: Entry | EntryLike, group: Group) -> None:
     """Send text to Discord.
 
     Args:
@@ -86,7 +87,7 @@ def get_avatar(rss_feed: str) -> str:
     return default_avatar
 
 
-def send_embed(entry: Entry, group: Group) -> None:
+def send_embed(entry: Entry | EntryLike, group: Group) -> None:
     """Send an embed to Discord.
 
     Args:
@@ -128,7 +129,7 @@ def send_embed(entry: Entry, group: Group) -> None:
     send_webhook(webhook, entry, group)
 
 
-def send_link(entry: Entry, group: Group) -> None:
+def send_link(entry: Entry | EntryLike, group: Group) -> None:
     """Send a link to Discord.
 
     Args:

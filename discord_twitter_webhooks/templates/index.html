@@ -19,10 +19,20 @@
                     <a class="text-muted"
                        href="{{ url_for('mark_as_unread', uuid=group.uuid ) }}">Mark as unread</a>
                     <br/>
-                    Webhooks: {% for hook in group.webhooks %}
-                    <a class="text-muted" href="{{ hook }}">{{ hook }}</a> {% endfor %}<br/>
+
+                    {# Discord webhooks #}
+                    Webhooks:
+                    <ul>
+                        {% for hook in group.webhooks %}
+                            <li>
+                                <a class="text-muted" href="{{ hook }}">{{ hook }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
                     <br/>
-                    usernames:
+
+                    {# Twitter usernames to follow #}
+                    Usernames:
                     <ul>
                         {% for name in group.usernames %}
                             <li>
@@ -31,6 +41,8 @@
                             </li>
                         {% endfor %}
                     </ul>
+
+                    {# Button to remove #}
                     <form action="{{ url_for('remove_group_post') }}" method="post">
                         <input type="hidden" name="uuid" value="{{ group.uuid }}"/>
                         <input type="submit" value="Delete" class="btn btn-danger btn-sm"/>

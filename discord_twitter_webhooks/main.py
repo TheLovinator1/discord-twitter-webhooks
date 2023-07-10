@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 from reader import Reader
+from reader.types import EntryLike
 from starlette import status
 
 from discord_twitter_webhooks._dataclasses import (
@@ -22,7 +23,7 @@ from discord_twitter_webhooks._dataclasses import (
     set_app_settings,
 )
 from discord_twitter_webhooks.reader_settings import get_reader
-from discord_twitter_webhooks.send_to_discord import send_to_discord
+from discord_twitter_webhooks.send_to_discord import send_to_discord, send_link, send_text, send_embed
 from translate import languages_from, languages_to
 
 app = FastAPI()
@@ -30,6 +31,9 @@ app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), na
 templates = Jinja2Templates(directory=Path(__file__).parent / "templates")
 
 reader: Reader = get_reader()
+
+# TODO: Add /debug page to show all the database fields
+# TODO: Add backup/restore functionality
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -147,12 +151,16 @@ async def add_post(
         # We will randomize the color later before sending the embed
         embed_color = "random"
 
+    # Get the RSS feeds for each username
+    # TODO: Check if links are valid
+    rss_feeds = [f"{get_app_settings(reader).nitter_instance}/{feed}/rss" for feed in usernames_split]
+
     group = Group(
         uuid=uuid,
         name=name,
         webhooks=webhooks_split,
         usernames=usernames_split,
-        rss_feeds=[],
+        rss_feeds=rss_feeds,
         send_retweets=send_retweets,
         send_replies=send_replies,
         send_as_text=send_as_text,
@@ -233,17 +241,49 @@ async def remove_group_post(uuid: Annotated[str, Form()]) -> RedirectResponse:
 
 
 @app.get("/mark_as_unread/{uuid}")
-async def mark_as_unread(uuid: str) -> RedirectResponse:
+async def mark_as_unread(uuid: str):
     """Mark a feed as unread.
 
     Args:
         uuid: The uuid of the feed to mark as unread.
 
     Returns:
-        str: The index page.
+        The index page. Or an error page if the feed could not be marked as unread.
     """
     # TODO: Mark feed as unread and send to Discord.
     logger.info(f"Marking feed {uuid} as unread")
+
+    # Get the group
+    group: Group = get_group(reader, uuid)
+
+    if not group.rss_feeds:
+        return HTMLResponse(f"No RSS feeds found for group {uuid}")
+
+    # Get the feed
+    feed = reader.get_feed(group.rss_feeds[0], None)
+    logger.info(f"Feed is {feed}")
+
+    # Get the entries
+    entries = reader.get_entries(feed=feed)
+    entries = list(entries)
+
+    if not entries:
+        # TODO: Return a proper error page
+        return HTMLResponse(f"Failed to mark feed {uuid} as unread. No entries found.")
+
+    # Mark the entry as unread
+    entry: EntryLike
+    for entry in entries:
+        reader.mark_entry_as_unread(entry)
+        break
+
+    for entry in entries:
+        if group.send_as_link:
+            send_link(entry=entry, group=group)
+        if group.send_as_text:
+            send_text(entry=entry, group=group)
+        if group.send_as_embed:
+            send_embed(entry=entry, group=group)
 
     # Redirect to the index page.
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)  # TODO: What status code should this be?
@@ -328,7 +368,10 @@ def startup() -> None:
 
 
 def sched_func() -> None:
-    """A function to be called by the scheduler."""
+    """The scheduler can't call a function with arguments, so we need to wrap it."""
+    # TODO: We should update group.rss_feeds if the global nitter_instance has changed.
+    # TODO: Check for errors and send to Discord. There is group.last_exception we can use.
+    # TODO: Send to Discord if Nitter instance has problems.
     send_to_discord(reader)
 
 

@@ -97,7 +97,6 @@ def get_group(reader: Reader, uuid: str) -> Group:
     """Get the group."""
     try:
         group = reader.get_tag((), uuid)
-        logger.debug("Got group: {}", group)
         return Group(**group)
     except TagNotFoundError:
         logger.info("Group {} not found.", uuid)
