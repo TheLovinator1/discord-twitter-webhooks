@@ -66,6 +66,11 @@ def get_tweet_text(entry: Entry, group: Group) -> str:
     Returns:
         The text to send in the embed.
     """
+    # TODO: Replace Nitter links with Twitter links, add group.use_nitter_links to the group settings or something.
+    # TODO: We should replace "<p><a href="https://nitter.lovinator.space/User/status/1234#m">nitter.lovinator.space/User/status/1234#m</a></p>"
+    #  in entry.summary with the text from the tweet if it is a retweet or quote tweet.
+
+    # entry.summary has text and HTML tags, entry.title has only text
     tweet_text: str = entry.summary or entry.title or f"Failed to get tweet text for <{entry.link}>"
 
     # Translate the tweet text
