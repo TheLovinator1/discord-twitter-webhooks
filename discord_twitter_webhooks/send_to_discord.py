@@ -122,7 +122,7 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
     embed_color: str = group.embed_color
     if group.embed_color == "random":
         embed_color = hex(randint(0, 16777215))[2:]  # noqa: S311
-    embed.set_color(embed_color)
+    embed.set_color(embed_color.lstrip("#"))
 
     webhook.add_embed(embed)
 
