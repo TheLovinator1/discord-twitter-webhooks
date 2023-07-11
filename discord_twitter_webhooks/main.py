@@ -1,3 +1,4 @@
+import functools
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -302,6 +303,22 @@ async def settings(request: Request) -> Response:
     """
     application_settings: ApplicationSettings = get_app_settings(reader)
     return templates.TemplateResponse("settings.html", {"request": request, "settings": application_settings})
+
+
+@functools.lru_cache(maxsize=1)
+@app.get("/favicon.svg")
+async def favicon():
+    """Get the favicon.
+
+    Returns:
+        Response: The favicon.
+    """
+    svg = """
+<svg xmlns="http://www.w3.org/2000/svg">
+<text x="50%" y="50%" dy=".3em" text-anchor="middle">🐦</text>
+</svg>
+    """
+    return Response(content=svg, media_type="image/svg+xml")
 
 
 @app.post("/settings")
