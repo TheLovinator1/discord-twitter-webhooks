@@ -1,7 +1,8 @@
-from functools import lru_cache
+import re
 from random import randint
 from typing import TYPE_CHECKING
 
+import requests
 from defusedxml import ElementTree
 from discord_webhook import DiscordEmbed
 from reader import Reader
@@ -32,7 +33,7 @@ def send_webhook(webhook, entry, group) -> None:
         response: Response = webhook.execute()
 
         if response.ok:
-            logger.info("Webhook posted for {}", entry.link)  # TODO: Double check me when Twitter works again
+            logger.info("Webhook posted for {}", entry.link)
         else:
             logger.error(f"Got {response.status_code} from {webhook}. Response: {response.text}")
 
@@ -58,33 +59,66 @@ def send_text(entry: Entry | EntryLike, group: Group) -> None:
     send_webhook(webhook, entry, group)
 
 
-# TODO: Should we use requests-cache?
-# TODO: Add a way to clear the cache in the web interface or on a timer?
-@lru_cache(maxsize=128)
 def get_avatar(rss_feed: str) -> str:
     """Get the avatar of the embed.
 
     Returns:
         The avatar of the embed as an int.
     """
-    # Go to the rss feed and get the avatar
-    response: Response = request("GET", rss_feed)
     default_avatar: str = "https://pbs.twimg.com/profile_images/1354479643882004483/Btnfm47p_400x400.jpg"
-    if response.ok:
-        # Parse XML and get the avatar
-        xml_data: str = response.content.decode("utf-8")
+    # Go to the RSS feed and get the avatar
+    try:
+        response: Response = request("GET", rss_feed, timeout=5)
+    except requests.exceptions.ReadTimeout as e:
+        logger.error("Read timeout for {} - {}", rss_feed, e)
+        return default_avatar
 
-        try:
-            root: Element = ElementTree.fromstring(xml_data)
-            found: Element | None = root.find("channel/image/url")
-        except ElementTree.ParseError:
-            logger.error("Unable to parse XML from {}", rss_feed)
-            return default_avatar
+    if not response.ok:
+        logger.error(f"Got {response.status_code} from {rss_feed}. Response: {response.text}")
+        return default_avatar
 
-        return found.text or default_avatar if found is not None else default_avatar
+    # Parse XML and get the avatar
+    xml_data: str = response.content.decode("utf-8")
 
-    logger.error(f"Got {response.status_code} from {rss_feed}. Response: {response.text}")
-    return default_avatar
+    try:
+        root: Element = ElementTree.fromstring(xml_data)
+        found: Element | None = root.find("channel/image/url")
+    except ElementTree.ParseError:
+        logger.error("Unable to parse XML from {}", rss_feed)
+        return default_avatar
+
+    return found.text or default_avatar if found is not None else default_avatar
+
+
+def create_image_embeds(entry: Entry | EntryLike):
+    """Get the images from the entry and create embeds from them.
+
+    We can unofficially have up to 4 images in an embed.
+    https://github.com/lovvskillz/python-discord-webhook/issues/126
+
+    Args:
+        entry: The entry to get the images from.
+
+    Returns:
+        A list of embeds.
+    """
+    embeds = []
+    entry_summary: str = str(entry.summary) or ""
+    urls = re.findall('src="(https?://[^"]+)"', entry_summary)
+
+    if not urls:
+        logger.debug("No images found in {}", entry.link or "entry.link is None")
+        return embeds
+
+    logger.debug("Found {} images in {}", len(urls), entry.link or "entry.link is None")
+    for i in range(1, min(len(urls), 4) + 1):
+        embed = DiscordEmbed(url=entry.link)
+        embed.set_image(url=urls[i - 1])
+        embeds.append(embed)
+        logger.debug("Added image {} to embeds", i)
+
+    logger.debug("We have {} embeds", len(embeds))
+    return embeds
 
 
 def send_embed(entry: Entry | EntryLike, group: Group) -> None:
@@ -94,13 +128,9 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
         entry: The entry to send.
         group: The settings to use.
     """
-    logger.info(f"Sending {entry.title} as an embed to {group.webhooks}")
-
-    # We will add the URL later, so we can send embeds to multiple webhooks.
-    webhook = DiscordWebhook(url="")
-
     tweet_text: str = get_tweet_text(entry, group)
-    embed = DiscordEmbed(description=tweet_text)
+    embed = DiscordEmbed(description=tweet_text, url=entry.link)
+
     entry_author = group.embed_author_name or entry.author
     author_avatar = group.embed_author_icon_url or get_avatar(entry.feed_url)
 
@@ -124,7 +154,12 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
         embed_color = hex(randint(0, 16777215))[2:]  # noqa: S311
     embed.set_color(embed_color.lstrip("#"))
 
-    webhook.add_embed(embed)
+    if embeds := create_image_embeds(entry):
+        embeds.insert(0, embed)
+        webhook = DiscordWebhook(url=entry.link, embeds=embeds, rate_limit_retry=True)  # type: ignore
+    else:
+        webhook = DiscordWebhook(url="", rate_limit_retry=True)
+        webhook.add_embed(embed)
 
     send_webhook(webhook, entry, group)
 
@@ -178,4 +213,3 @@ def send_to_discord(reader: Reader) -> None:
 
                     # Mark the entry as read (sent)
                     reader.mark_entry_as_read(entry)
-                    logger.info("Sent {} to Discord", entry.link)
