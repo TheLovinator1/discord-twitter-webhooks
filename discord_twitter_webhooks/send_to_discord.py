@@ -163,13 +163,19 @@ def send_to_discord(reader: Reader) -> None:
         logger.info("No new entries found.")
         return
 
+    entry: Entry | EntryLike
     for entry in entries:
         for _group in reader.get_tag((), "groups", []):
             group = get_group(reader, str(_group))
-            if group.rss_feeds == _group:
-                if group.send_as_link:
-                    send_link(entry=entry, group=group)
-                if group.send_as_text:
-                    send_text(entry=entry, group=group)
-                if group.send_as_embed:
-                    send_embed(entry=entry, group=group)
+            for feeds in group.rss_feeds:
+                if entry.feed_url == feeds:
+                    if group.send_as_link:
+                        send_link(entry=entry, group=group)
+                    if group.send_as_text:
+                        send_text(entry=entry, group=group)
+                    if group.send_as_embed:
+                        send_embed(entry=entry, group=group)
+
+                    # Mark the entry as read (sent)
+                    reader.mark_entry_as_read(entry)
+                    logger.info("Sent {} to Discord", entry.link)
