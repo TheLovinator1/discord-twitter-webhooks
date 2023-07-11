@@ -140,9 +140,7 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
 
     # Add an author to the embed, is name of tweeter and a small image of the avatar
     if group.embed_show_author:
-        embed.set_author(  # TODO: Double check me when Twitter works again
-            name=entry_author, url=entry.link, icon_url=author_avatar
-        )
+        embed.set_author(name=entry_author, url=entry.link, icon_url=author_avatar)
 
     # Show a timestamp at the bottom of the embed
     if group.embed_timestamp:
@@ -171,14 +169,14 @@ def send_link(entry: Entry | EntryLike, group: Group) -> None:
         entry: The entry to send.
         group: The settings to use.
     """
-    webhook = DiscordWebhook(url="")
+    # TODO: Change webhook username to the tweeter so we can see who posted it?
+    # TODO: Append username and action (tweeted, retweeted, liked) to the webhook username or content?
+    # TODO: Add support for changing the Nitter link to the original Twitter link
+    what_to_send = f"{entry.link}"
+    if not group.send_as_link_preview:
+        what_to_send = f"<{entry.link}>"
 
-    what_to_send = f"{entry.title}"  # TODO: Check if entry.title is the right thing to send
-    if group.send_as_link_preview:
-        what_to_send = f"<{entry.title}>"
-
-    webhook.content = what_to_send
-    send_webhook(webhook, entry, group)
+    send_webhook(DiscordWebhook(url="", content=what_to_send), entry, group)
 
 
 def send_to_discord(reader: Reader) -> None:
