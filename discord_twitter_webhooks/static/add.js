@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const checkbox_send_embed = document.querySelector('#send_embed');
+    const checkbox_send_embed = document.querySelector('#send_as_embed');
     const div_embed_settings = document.querySelector('#embed_settings');
-    const checkbox_send_text = document.querySelector('#send_text');
+    const checkbox_send_text = document.querySelector('#send_as_text');
     const div_text_settings = document.querySelector('#text_settings');
-    const checkbox_send_link = document.querySelector('#send_link');
+    const checkbox_send_link = document.querySelector('#send_as_link');
     const div_link_settings = document.querySelector('#link_settings');
 
     // Check if checkbox for embed is checked on page load
