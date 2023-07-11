@@ -45,8 +45,14 @@ def send_text(entry: Entry | EntryLike, group: Group) -> None:
         entry: The entry to send.
         group: The settings to use.
     """
+    # TODO: Append images to the end of the text
+    # TODO: Append username before the text
+    # TODO: Remove the Discord embeds to hashtags and @s
     webhook = DiscordWebhook(url="")
     tweet_text = get_tweet_text(entry, group)
+    if not tweet_text:
+        logger.debug("No text for {}", entry.link)
+        tweet_text = "*No text*"
 
     # Send the tweet text to Discord
     webhook.content = tweet_text
