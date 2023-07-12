@@ -100,9 +100,8 @@ async def modify(request: Request, uuid: str) -> Response:
     )
 
 
-@app.post("/add")
-@app.post("/modify")
-async def add_post(
+@app.post("/feed")
+async def feed(
     request: Request,
     name: Annotated[str, Form(title="Group Name")],
     webhooks: Annotated[str, Form(title="Webhook URLs")],
@@ -138,10 +137,7 @@ async def add_post(
 ):
     """Create or modify a group."""
     if not uuid:
-        if "modify" in request.url.path:
-            return "Failed to modify group. No UUID provided."
-
-        # Create a new UUID if we are adding a new group
+        logger.info(f"Creating new group {name}")
         uuid = str(uuid4())
 
     # Webhooks and usernames are a single string with each item on a new line, so we split them to a real list
@@ -155,7 +151,7 @@ async def add_post(
 
     # Get the RSS feeds for each username
     # TODO: Check if the RSS feed is valid
-    rss_feeds = [f"{get_app_settings(reader).nitter_instance}/{feed}/rss" for feed in usernames_split]
+    rss_feeds = [f"{get_app_settings(reader).nitter_instance}/{_feed}/rss" for _feed in usernames_split]
 
     group = Group(
         uuid=uuid,
