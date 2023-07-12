@@ -145,15 +145,16 @@ async def add_post(
         uuid = str(uuid4())
 
     # Webhooks and usernames are a single string with each item on a new line, so we split them to a real list
-    webhooks_split = webhooks.splitlines()
-    usernames_split = usernames.splitlines()
+    # We are removing duplicates with set()
+    webhooks_split = list(set(webhooks.splitlines()))
+    usernames_split = list(set(usernames.splitlines()))
 
     if embed_color_random:
         # We will randomize the color later before sending the embed
         embed_color = "random"
 
     # Get the RSS feeds for each username
-    # TODO: Check if links are valid
+    # TODO: Check if the RSS feed is valid
     rss_feeds = [f"{get_app_settings(reader).nitter_instance}/{feed}/rss" for feed in usernames_split]
 
     group = Group(
@@ -212,7 +213,7 @@ async def add_post(
     # Add the group to the groups list
     groups = reader.get_tag((), "groups", [])
     groups.append(uuid)
-    reader.set_tag((), "groups", list(set(groups)))  # type: ignore
+    reader.set_tag((), "groups", list(set(groups)))
     logger.info(f"Added group {group.uuid} to groups list")
     logger.info(f"Group list is now {set(groups)}")
 
@@ -228,7 +229,7 @@ async def remove_group_post(uuid: Annotated[str, Form()]) -> RedirectResponse:
         str: The index page.
     """
     # TODO: We should also remove the rss feed if it was the last group using it.
-    group: Group = reader.get_tag((), uuid)  # type: ignore
+    group: Group = get_group(reader, uuid)
     logger.info(f"Removing group {group}")
 
     reader.delete_tag((), uuid)
@@ -315,9 +316,9 @@ async def favicon():
         Response: The favicon.
     """
     svg = """
-<svg xmlns="http://www.w3.org/2000/svg">
-<text x="50%" y="50%" dy=".3em" text-anchor="middle">🐦</text>
-</svg>
+    <svg xmlns="http://www.w3.org/2000/svg">
+        <text x="50%" y="50%" dy=".3em" text-anchor="middle">🐦</text>
+    </svg>
     """
     return Response(content=svg, media_type="image/svg+xml")
 
