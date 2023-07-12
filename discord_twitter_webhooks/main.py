@@ -25,7 +25,7 @@ from discord_twitter_webhooks._dataclasses import (
 )
 from discord_twitter_webhooks.reader_settings import get_reader
 from discord_twitter_webhooks.send_to_discord import send_to_discord, send_link, send_text, send_embed
-from translate import languages_from, languages_to
+from discord_twitter_webhooks.translate import languages_from, languages_to
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")

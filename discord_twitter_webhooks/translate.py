@@ -1,8 +1,8 @@
 import deepl
 from loguru import logger
 
-from _dataclasses import get_app_settings
-from reader_settings import get_reader
+from discord_twitter_webhooks._dataclasses import get_app_settings
+from discord_twitter_webhooks.reader_settings import get_reader
 
 _languages = {
     "bg": "Bulgarian",

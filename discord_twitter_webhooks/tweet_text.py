@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from reader import Entry
 
 from discord_twitter_webhooks._dataclasses import Group
-from translate import translate_html
+from discord_twitter_webhooks.translate import translate_html
 
 
 def convert_html_to_md(html: str) -> str:
