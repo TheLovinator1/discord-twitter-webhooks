@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 from reader import Reader
-from reader.types import EntryLike
+from reader.types import EntryLike, FeedLike
 from starlette import status
 
 from discord_twitter_webhooks._dataclasses import (
@@ -229,7 +229,6 @@ async def remove_group_post(uuid: Annotated[str, Form()]) -> RedirectResponse:
     Returns:
         str: The index page.
     """
-    # TODO: We should also remove the rss feed if it was the last group using it.
     group: Group = get_group(reader, uuid)
     logger.info(f"Removing group {group}")
 
@@ -238,6 +237,20 @@ async def remove_group_post(uuid: Annotated[str, Form()]) -> RedirectResponse:
     groups = reader.get_tag((), "groups", [])
     groups.remove(uuid)
     reader.set_tag((), "groups", groups)
+
+    # Remove the group tag from every RSS feed that has it
+    _feed: FeedLike
+    for _feed in reader.get_feeds():
+        if uuid in reader.get_tag(_feed, "groups", []):
+            groups = reader.get_tag(_feed, "groups", [])
+            groups.remove(uuid)
+            reader.set_tag(_feed, "groups", groups)
+
+    # Remove the feed if it is no longer used by any groups
+    for _feed in reader.get_feeds():
+        if not reader.get_tag(_feed, "groups", []):
+            reader.delete_feed(_feed)
+            logger.info(f"Removed feed {_feed} due to no groups using it")
 
     # Redirect to the index page.
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)  # TODO: What status code should this be?
