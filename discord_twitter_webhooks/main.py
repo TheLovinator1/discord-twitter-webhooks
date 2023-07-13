@@ -197,6 +197,11 @@ async def feed(
         # Add the rss feed to the reader
         reader.add_feed(name_url, exist_ok=True)
 
+        # Mark every entry as read
+        _entry: EntryLike
+        for _entry in reader.get_entries(feed=name_url):
+            reader.mark_entry_as_read(_entry)
+
         # Add what groups the feed is connected to
         our_feed = reader.get_feed(name_url)
         groups = reader.get_tag(our_feed, "groups", [])  # type: ignore
