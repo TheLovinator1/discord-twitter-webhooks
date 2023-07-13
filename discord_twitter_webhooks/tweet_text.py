@@ -80,6 +80,9 @@ def get_tweet_text(entry: Entry, group: Group) -> str:
 
     tweet_text = convert_html_to_md(tweet_text)
 
+    # Only allow two newlines in a row
+    tweet_text = re.sub(r"\n{3,}", "\n\n", tweet_text)
+
     if group.remove_copyright:
         # Copyright symbols are bloat and adds nothing.
         tweet_text = tweet_text.replace("©", "")
