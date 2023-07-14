@@ -102,7 +102,6 @@ async def modify(request: Request, uuid: str) -> Response:
 
 @app.post("/feed")
 async def feed(
-    request: Request,
     name: Annotated[str, Form(title="Group Name")],
     webhooks: Annotated[str, Form(title="Webhook URLs")],
     usernames: Annotated[str, Form(title="Twitter Usernames")],
@@ -197,6 +196,9 @@ async def feed(
         # Add the rss feed to the reader
         reader.add_feed(name_url, exist_ok=True)
 
+        # Download the entries
+        reader.update_feeds(new=True)
+
         # Mark every entry as read
         _entry: EntryLike
         for _entry in reader.get_entries(feed=name_url):
@@ -276,11 +278,14 @@ async def mark_as_unread(uuid: str):
         return HTMLResponse(f"No RSS feeds found for group {uuid}")
 
     # Get the feed
-    feed = reader.get_feed(group.rss_feeds[0], None)
-    logger.info(f"Feed is {feed}")
+    _feed = reader.get_feed(group.rss_feeds[0], None)
+    logger.info(f"Feed is {_feed}")
+
+    # Update the feed
+    reader.update_feeds(feed=_feed)
 
     # Get the entries
-    entries = reader.get_entries(feed=feed)
+    entries = reader.get_entries(feed=_feed)
     entries = list(entries)
 
     if not entries:

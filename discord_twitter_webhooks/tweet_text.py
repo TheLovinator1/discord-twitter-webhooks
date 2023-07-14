@@ -40,12 +40,16 @@ def convert_html_to_md(html: str) -> str:
         else:
             link_text: str = link.text or link.get("href")
             link.replace_with(f"[{link_text}]({link.get('href')})")
+            # TODO: This breaks for https://nitter.lovinator.space/Steam/status/1679694708761669634#m
+            #  and https://nitter.lovinator.space/SteamDB/status/1677217359487021056#m
 
     for strikethrough in soup.find_all("s") + soup.find_all("del") + soup.find_all("strike"):
         strikethrough.replace_with(f"~~{strikethrough.text}~~")
 
     for br in soup.find_all("br"):
         br.replace_with("\n")
+
+    # TODO: We are removing <video> tags, but we should send those to Discord as well.
 
     clean_soup: BeautifulSoup = BeautifulSoup(str(soup).replace("</p>", "</p>\n"), features="lxml")
 
