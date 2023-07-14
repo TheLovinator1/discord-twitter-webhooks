@@ -1,4 +1,5 @@
 import re
+from functools import lru_cache
 from random import randint
 from typing import TYPE_CHECKING
 
@@ -65,6 +66,7 @@ def send_text(entry: Entry | EntryLike, group: Group) -> None:
     send_webhook(webhook, entry, group)
 
 
+@lru_cache(maxsize=128)
 def get_avatar(rss_feed: str) -> str:
     """Get the avatar of the embed.
 
