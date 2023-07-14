@@ -161,8 +161,16 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
     embed.set_color(embed_color.lstrip("#"))
 
     if embeds := create_image_embeds(entry):
-        embeds.insert(0, embed)
-        webhook = DiscordWebhook(url=entry.link, embeds=embeds, rate_limit_retry=True)  # type: ignore
+        # Only do this if more than one image is found
+        if len(embeds) > 1:
+            embeds.insert(0, embed)
+            webhook = DiscordWebhook(url=entry.link, embeds=embeds, rate_limit_retry=True)  # type: ignore
+        else:
+            if embeds[0].image:
+                image = embeds[0].image
+                embed.set_image(image["url"])
+            webhook = DiscordWebhook(url=entry.link, rate_limit_retry=True)
+            webhook.add_embed(embed)
     else:
         webhook = DiscordWebhook(url="", rate_limit_retry=True)
         webhook.add_embed(embed)
