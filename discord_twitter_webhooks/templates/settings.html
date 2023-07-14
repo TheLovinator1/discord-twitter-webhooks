@@ -12,8 +12,8 @@
             <h3>Feed Details</h3>
             {# Nitter instance #}
             <div class="row pb-2">
-                <label for="nitter_instance" class="col-sm-1 col-form-label">Nitter instance</label>
-                <div class="col-sm-11">
+                <label for="nitter_instance" class="col-sm-2 col-form-label">Nitter instance</label>
+                <div class="col-sm-10">
                     <input name="nitter_instance"
                            type="text"
                            value="{%- if settings.nitter_instance -%}{{ settings.nitter_instance }}{%- endif -%}"
@@ -37,8 +37,8 @@
             </div>
             {# DeepL Auth Key #}
             <div class="row pb-2">
-                <label for="deepl_auth_key" class="col-sm-1 col-form-label">DeepL auth key</label>
-                <div class="col-sm-11">
+                <label for="deepl_auth_key" class="col-sm-2 col-form-label">DeepL auth key</label>
+                <div class="col-sm-10">
                     <input name="deepl_auth_key"
                            type="text"
                            value="{%- if settings.deepl_auth_key -%}{{ settings.deepl_auth_key }}{%- endif -%}"
@@ -52,23 +52,15 @@
             </div>
             {# Error webhook #}
             <div class="row pb-2">
-                <label for="error_webhook" class="col-sm-1 col-form-label">Error webhook</label>
-                <div class="col-sm-11">
+                <label for="error_webhook" class="col-sm-2 col-form-label">Error webhook</label>
+                <div class="col-sm-10">
                     <input name="error_webhook"
                            type="text"
                            value="{%- if settings.error_webhook -%}{{ settings.error_webhook }}{%- endif -%}"
                            class="form-control bg-dark border-dark text-muted"
                            id="error_webhook"/>
                     <div id="error_webhook_help" class="form-text">
-                        Discord webhook URLs to send errors to, you can add several by separating
-                        them with a new line with <code>Shift+Enter</code>.
-                        <br/>
-                        Read more about webhooks
-                        <a class="text-muted"
-                           href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks">here</a>.
-                        <br/>
-                        Right click channel in Discord -> Integrations -> Webhooks -> Create
-                        Webhook
+                        Discord webhook URL to send errors to.
                     </div>
                 </div>
             </div>

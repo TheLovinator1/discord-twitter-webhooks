@@ -2,6 +2,7 @@
     <h3>Send link settings</h3>
     {# Send link preview #}
     <div class="form-check form-switch">
+        <label class="form-check-label" for="send_as_link_preview">Send link preview</label>
         <input
                 class="form-check-input"
                 type="checkbox"
@@ -10,7 +11,6 @@
                 name="send_as_link_preview"
                 {% if settings.send_as_link_preview %}checked{% endif %}
         />
-        <label class="form-check-label" for="send_as_link_preview">Send link preview</label>
         <div id="send_as_link_preview_help" class="form-text">
             Whether or not you want the link to have a preview.
         </div>

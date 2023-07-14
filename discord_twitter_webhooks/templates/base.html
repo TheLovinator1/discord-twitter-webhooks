@@ -22,13 +22,15 @@
     {% block head %}
     {% endblock head %}
 </head>
-<body class="text-white-50">
+<body>
 {% include "nav.html" %}
 <div class="p-2 mb-2">
     <div class="container-fluid">
         <div class="d-grid p-2">
             {% block content %}
             {% endblock content %}
+        </div>
+        <div class="d-grid p-2">
             <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
                 <p class="col-md-4 mb-0 text-muted d-none d-md-block">
                     Made by:

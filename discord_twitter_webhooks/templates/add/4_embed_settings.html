@@ -9,9 +9,9 @@
             {% if settings.embed_color %}value="{{ settings.embed_color }}"{% endif %}
             class="form-control form-control-color"
     />
-
     {# Random color #}
     <div class="form-check form-switch">
+        <label class="form-check-label" for="random_color">Random color</label>
         <input
                 class="form-check-input"
                 type="checkbox"
@@ -21,7 +21,6 @@
                 value="True"
                 {% if settings.embed_color == "random" %}checked{% endif %}
         />
-        <label class="form-check-label" for="random_color">Random color</label>
         <div id="random_color_help" class="form-text">
             Whether or not you want the embed color to be random. This will override
             the embed color above.
@@ -31,6 +30,7 @@
 
     {# Show author #}
     <div class="form-check form-switch">
+        <label class="form-check-label" for="embed_show_author">Embed author</label>
         <input
                 class="form-check-input"
                 type="checkbox"
@@ -40,7 +40,6 @@
                 value="True"
                 {% if settings.embed_show_author %}checked{% endif %}
         />
-        <label class="form-check-label" for="embed_show_author">Embed author</label>
         <div id="embed_show_author_help" class="form-text">
             Whether or not you want the embed to have an author.
         </div>
@@ -48,8 +47,8 @@
 
     {# Author name #}
     <div class="row pb-2">
-        <label for="embed_author_name" class="col-sm-1 col-form-label">Author</label>
-        <div class="col-sm-11">
+        <label for="embed_author_name" class="col-sm-2 col-form-label">Author</label>
+        <div class="col-sm-10">
             <input
                     name="embed_author_name"
                     type="text"
@@ -65,8 +64,8 @@
 
     {# Author URL #}
     <div class="row pb-2">
-        <label for="embed_author_url" class="col-sm-1 col-form-label">Author URL</label>
-        <div class="col-sm-11">
+        <label for="embed_author_url" class="col-sm-2 col-form-label">Author URL</label>
+        <div class="col-sm-10">
             <input
                     name="embed_author_url"
                     type="text"
@@ -82,8 +81,8 @@
 
     {# Author icon URL #}
     <div class="row pb-2">
-        <label for="embed_author_icon_url" class="col-sm-1 col-form-label">Author Icon URL</label>
-        <div class="col-sm-11">
+        <label for="embed_author_icon_url" class="col-sm-2 col-form-label">Author Icon URL</label>
+        <div class="col-sm-10">
             <input
                     name="embed_author_icon_url"
                     type="text"
@@ -100,8 +99,8 @@
 
     {# Embed URL #}
     <div class="row pb-2">
-        <label for="embed_url" class="col-sm-1 col-form-label">URL</label>
-        <div class="col-sm-11">
+        <label for="embed_url" class="col-sm-2 col-form-label">URL</label>
+        <div class="col-sm-10">
             <input
                     name="embed_url"
                     type="text"
@@ -134,8 +133,8 @@
 
     {# Footer text #}
     <div class="row pb-2">
-        <label for="embed_footer_text" class="col-sm-1 col-form-label">Footer</label>
-        <div class="col-sm-11">
+        <label for="embed_footer_text" class="col-sm-2 col-form-label">Footer</label>
+        <div class="col-sm-10">
             <input
                     name="embed_footer_text"
                     type="text"
@@ -149,10 +148,10 @@
 
     {# Footer icon URL #}
     <div class="row pb-2">
-        <label for="embed_footer_icon_url" class="col-sm-1 col-form-label"
+        <label for="embed_footer_icon_url" class="col-sm-2 col-form-label"
         >Footer Icon URL</label
         >
-        <div class="col-sm-11">
+        <div class="col-sm-10">
             <input
                     name="embed_footer_icon_url"
                     type="text"
