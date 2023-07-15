@@ -2,6 +2,7 @@ import re
 from html import unescape
 
 from bs4 import BeautifulSoup
+from loguru import logger
 from reader import Entry
 
 from discord_twitter_webhooks._dataclasses import Group
@@ -18,6 +19,7 @@ def convert_html_to_md(html: str) -> str:  # noqa: C901
         Our markdown.
     """
     soup: BeautifulSoup = BeautifulSoup(html, features="lxml")
+    logger.debug(f"Converting HTML to markdown: {soup}")
 
     for bold in soup.find_all("b") + soup.find_all("strong"):
         bold.replace_with(f"**{bold.text}**")
@@ -55,6 +57,7 @@ def convert_html_to_md(html: str) -> str:  # noqa: C901
 
     # Remove all other tags
     for tag in clean_soup.find_all(True):
+        logger.debug("Removing tag {}", tag)
         tag.replace_with(tag.text)
 
     return clean_soup.text.strip()

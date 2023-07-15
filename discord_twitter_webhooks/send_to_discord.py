@@ -1,11 +1,15 @@
 import re
+import tempfile
 from functools import lru_cache
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import requests
+from bs4 import BeautifulSoup
 from defusedxml import ElementTree
 from discord_webhook import DiscordEmbed, DiscordWebhook
 from loguru import logger
+from moviepy.editor import VideoFileClip
 from reader import Entry, Reader
 from reader.types import EntryLike
 from requests import request
@@ -157,7 +161,31 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
         webhook = DiscordWebhook(url="", rate_limit_retry=True)
         webhook.add_embed(embed)
 
+    # Send a link to the mp4 if it's a video or gif
+    soup: BeautifulSoup = BeautifulSoup(entry.summary, features="lxml")
+    source = soup.find("source", attrs={"type": "video/mp4"})
+    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    if source:
+        # Download the mp4
+        response: Response = request("GET", source["src"], timeout=5)
+        if response.ok:
+            with Path.open(temp_file, "wb") as f:
+                f.write(response.content)
+
+                # Convert the mp4 to a gif
+                VideoFileClip(temp_file).write_gif(temp_file.name.replace(".mp4", ".gif"))
+
+                # Add the gif to the webhook
+                with Path.open(temp_file.name.replace(".mp4", ".gif"), "rb") as g:
+                    webhook.add_file(file=g.read(), filename="video.gif")
+                embed.set_image(url="attachment://video.gif")
+
     send_webhook(webhook, entry, group)
+
+    # Remove our temporary files
+    if Path.exists(temp_file.name):
+        temp_file.close()
+        Path.unlink(temp_file.name)
 
 
 def send_link(entry: Entry | EntryLike, group: Group) -> None:

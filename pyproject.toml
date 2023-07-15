@@ -29,6 +29,7 @@ httpx = "^0.24.0"
 lxml = "^4.9.2"
 defusedxml = "^0.7.1"
 deepl = "^1.15.0"
+moviepy = "^1.0.3"
 
 [tool.poetry.group.dev.dependencies]
 djlint = "^1.19.17"
