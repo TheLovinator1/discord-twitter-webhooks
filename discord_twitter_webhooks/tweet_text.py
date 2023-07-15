@@ -39,7 +39,7 @@ def convert_html_to_md(html: str) -> str:  # noqa: C901
             link.decompose()
         else:
             link_text: str = link.text or link.get("href")
-            link.replace_with(f"[{link_text}]({link.get('href')})")
+            link.replace_with(f"[{link_text}](<{link.get('href')}>)")
             # TODO: This breaks for https://nitter.lovinator.space/Steam/status/1679694708761669634#m
             #  and https://nitter.lovinator.space/SteamDB/status/1677217359487021056#m
 

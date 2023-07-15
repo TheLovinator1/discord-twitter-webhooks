@@ -1,6 +1,5 @@
 import re
 from functools import lru_cache
-from random import randint
 from typing import TYPE_CHECKING
 
 import requests
@@ -53,15 +52,13 @@ def send_text(entry: Entry | EntryLike, group: Group) -> None:
     tweet_text = get_tweet_text(entry, group)
     if not tweet_text:
         logger.debug("No text for {}", entry.link)
-        tweet_text = "*No text*"
+        tweet_text = "*Tweet has no text.*"
+
+    if group.send_as_text_username:
+        tweet_text = f"[{entry.author}](<{entry.link}>):\n{tweet_text}"
 
     # Send the tweet text to Discord
     webhook.content = tweet_text
-
-    # Convert the text to a link if the user wants to
-    if group.send_as_text_link:
-        entry_link = group.send_as_text_link_url or entry.link
-        webhook.content = f"[{tweet_text}]({entry_link})"  # TODO: Double check me when Twitter works again
 
     send_webhook(webhook, entry, group)
 
@@ -139,26 +136,11 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
     tweet_text: str = get_tweet_text(entry, group)
     embed = DiscordEmbed(description=tweet_text, url=entry.link)
 
-    entry_author = group.embed_author_name or entry.author
-    author_avatar = group.embed_author_icon_url or get_avatar(entry.feed_url)
-
-    # Show the tweeter as a title of the embed
-    if group.embed_show_title:
-        embed.set_title(entry_author)
-
-    # Add an author to the embed, is name of tweeter and a small image of the avatar
-    if group.embed_show_author:
-        embed.set_author(name=entry_author, url=entry.link, icon_url=author_avatar)
-
-    # Show a timestamp at the bottom of the embed
-    if group.embed_timestamp:
-        embed.set_timestamp()
-
-    # Embed color
-    embed_color: str = group.embed_color
-    if group.embed_color == "random":
-        embed_color = hex(randint(0, 16777215))[2:]  # noqa: S311
-    embed.set_color(embed_color.lstrip("#"))
+    entry_author = entry.author
+    author_avatar = get_avatar(entry.feed_url)
+    embed.set_author(name=entry_author, url=entry.link, icon_url=author_avatar)
+    embed.set_timestamp()
+    embed.set_color("1DA1F2")
 
     if embeds := create_image_embeds(entry):
         # Only do this if more than one image is found
@@ -216,6 +198,10 @@ def send_to_discord(reader: Reader) -> None:
     for entry in entries:
         for _group in reader.get_tag((), "groups", []):
             group = get_group(reader, str(_group))
+            if not group:
+                logger.error("Group {} not found", _group)
+                continue
+
             for feeds in group.rss_feeds:
                 if entry.feed_url == feeds:
                     if group.send_as_link:

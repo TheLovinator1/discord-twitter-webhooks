@@ -116,24 +116,10 @@ async def feed(  # noqa: PLR0913, ANN201
     send_retweets: Annotated[bool, Form(title="Include Retweets?")] = True,
     send_replies: Annotated[bool, Form(title="Include Replies?")] = True,
     send_as_text: Annotated[bool, Form(title="Send Text?")] = False,
+    send_as_text_username: Annotated[bool, Form(title="Append username before text?")] = False,
     send_as_embed: Annotated[bool, Form(title="Send Embed?")] = False,
-    embed_color: Annotated[str, Form(title="Embed Color")] = "#1DA1F2",
-    embed_color_random: Annotated[bool, Form(title="Randomize Embed Color?")] = False,
-    embed_author_name: Annotated[str, Form(title="Embed Author Name")] = "",
-    embed_author_url: Annotated[str, Form(title="Embed Author URL")] = "",
-    embed_author_icon_url: Annotated[str, Form(title="Embed Author Icon URL")] = "",
-    embed_url: Annotated[str, Form(title="Embed URL")] = "",
-    embed_timestamp: Annotated[bool, Form(title="Show Timestamp?")] = False,
-    embed_image: Annotated[str, Form(title="Embed Image URL")] = "",
-    embed_footer_text: Annotated[str, Form(title="Embed Footer Text")] = "",
-    embed_footer_icon_url: Annotated[str, Form(title="Embed Footer Icon URL")] = "",
-    embed_show_title: Annotated[bool, Form(title="Show Title?")] = False,
-    embed_show_author: Annotated[bool, Form(title="Show Author?")] = False,
     send_as_link: Annotated[bool, Form(title="Send Only Link?")] = False,
     send_as_link_preview: Annotated[bool, Form(title="Should the link make a preview?")] = False,
-    send_as_text_link_preview: Annotated[bool, Form(title="Should the link make a preview?")] = False,
-    send_as_text_link: Annotated[bool, Form(title="Make the text a link?")] = False,
-    send_as_text_link_url: Annotated[str, Form(title="Custom Link URL")] = "",
     unescape_html: Annotated[bool, Form(title="Unescape HTML?")] = True,
     remove_utm: Annotated[bool, Form(title="Remove UTM?")] = True,
     remove_copyright: Annotated[bool, Form(title="Remove Copyright?")] = True,
@@ -151,10 +137,6 @@ async def feed(  # noqa: PLR0913, ANN201
     webhooks_split = list(set(webhooks.splitlines()))
     usernames_split = list(set(usernames.splitlines()))
 
-    if embed_color_random:
-        # We will randomize the color later before sending the embed
-        embed_color = "random"
-
     # Get the RSS feeds for each username
     # TODO: Check if the RSS feed is valid
     rss_feeds = [f"{get_app_settings(reader).nitter_instance}/{_feed}/rss" for _feed in usernames_split]
@@ -168,23 +150,10 @@ async def feed(  # noqa: PLR0913, ANN201
         send_retweets=send_retweets,
         send_replies=send_replies,
         send_as_text=send_as_text,
+        send_as_text_username=send_as_text_username,
         send_as_embed=send_as_embed,
-        embed_color=embed_color,
-        embed_author_name=embed_author_name,
-        embed_author_url=embed_author_url,
-        embed_author_icon_url=embed_author_icon_url,
-        embed_url=embed_url,
-        embed_timestamp=embed_timestamp,
-        embed_image=embed_image,
-        embed_footer_text=embed_footer_text,
-        embed_footer_icon_url=embed_footer_icon_url,
-        embed_show_title=embed_show_title,
-        embed_show_author=embed_show_author,
         send_as_link=send_as_link,
         send_as_link_preview=send_as_link_preview,
-        send_as_text_link=send_as_text_link,
-        send_as_text_link_preview=send_as_text_link_preview,
-        send_as_text_link_url=send_as_text_link_url,
         unescape_html=unescape_html,
         remove_utm=remove_utm,
         remove_copyright=remove_copyright,
@@ -353,8 +322,6 @@ async def favicon():  # noqa: ANN201
 async def settings_post(
     request: Request,
     nitter_instance: Annotated[str, Form(title="Nitter instance")] = "",
-    error_webhook: Annotated[str, Form(title="Error webhook")] = "",
-    send_errors_to_discord: Annotated[bool, Form(title="Send errors to Discord?")] = False,
     deepl_auth_key: Annotated[str, Form(title="DeepL auth key")] = "",
 ) -> Response:
     """Save the settings.
@@ -362,18 +329,10 @@ async def settings_post(
     Args:
         request: The request object.
         nitter_instance: The Nitter instance to use.
-        send_errors_to_discord: Whether to send errors to Discord.
-        error_webhook: The webhook to send errors to.
         deepl_auth_key: The DeepL auth key to use.
     """
-    if send_errors_to_discord and not error_webhook:
-        logger.warning("You have enabled sending errors to Discord, but have not set a webhook. Disabling.")
-        send_errors_to_discord = False
-
     app_settings = ApplicationSettings(
         nitter_instance=nitter_instance,
-        send_errors_to_discord=send_errors_to_discord,
-        error_webhook=error_webhook,
         deepl_auth_key=deepl_auth_key,
     )
 
@@ -408,16 +367,12 @@ def startup() -> None:
     scheduler: BackgroundScheduler = BackgroundScheduler()
 
     # Check for new entries every 15 minutes. They will be sent to Discord if they are new.
-    # TODO: Make this configurable.
     scheduler.add_job(sched_func, "interval", minutes=15, next_run_time=datetime.now(tz=timezone.utc))
     scheduler.start()
 
 
 def sched_func() -> None:
     """The scheduler can't call a function with arguments, so we need to wrap it."""
-    # TODO: We should update group.rss_feeds if the global nitter_instance has changed.
-    # TODO: Check for errors and send to Discord. There is group.last_exception we can use.
-    # TODO: Send to Discord if Nitter instance has problems.
     send_to_discord(reader)
 
 

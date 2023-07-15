@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Literal
 
 from loguru import logger
 from reader import Reader, TagNotFoundError
@@ -25,22 +24,7 @@ class Group:
     send_as_link_preview: bool = True
 
     send_as_text: bool = False
-    send_as_text_link: bool = False
-    send_as_text_link_preview: bool = False
-    send_as_text_link_url: str = ""
-
-    # Embed settings
-    embed_color: str | Literal["random"] = "#1DA1F2"
-    embed_author_name: str = ""
-    embed_author_url: str = ""
-    embed_author_icon_url: str = ""
-    embed_url: str = ""
-    embed_timestamp: bool = True
-    embed_image: str = ""
-    embed_footer_text: str = ""
-    embed_footer_icon_url: str = ""
-    embed_show_title: bool = False
-    embed_show_author: bool = True
+    send_as_text_username: bool = True
 
     # Translate settings
     translate: bool = False

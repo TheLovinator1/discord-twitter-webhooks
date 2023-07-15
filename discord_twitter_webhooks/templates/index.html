@@ -7,9 +7,7 @@
 {% block content %}
     {% if groups|length == 0 %}
         <div class="p-2 mb-2 border border-dark">
-            No groups found. If you haven't added a Nitter instance yet, please do so first
-            <a href="{{ url_for('settings') }}">here</a>. If you have, please add a group
-            <a href="{{ url_for('add') }}">here</a>.
+            No groups found. You can add one <a href="{{ url_for('add') }}">here</a>.
         </div>
     {% endif %}
     <ul class="list-group">
