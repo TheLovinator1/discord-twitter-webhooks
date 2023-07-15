@@ -164,28 +164,28 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
     # Send a link to the mp4 if it's a video or gif
     soup: BeautifulSoup = BeautifulSoup(entry.summary, features="lxml")
     source = soup.find("source", attrs={"type": "video/mp4"})
-    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
     if source:
         # Download the mp4
         response: Response = request("GET", source["src"], timeout=5)
         if response.ok:
-            with Path.open(temp_file, "wb") as f:
+            with Path.open(Path(temp_file.name), "wb") as f:
                 f.write(response.content)
 
                 # Convert the mp4 to a gif
-                VideoFileClip(temp_file).write_gif(temp_file.name.replace(".mp4", ".gif"))
+                VideoFileClip(temp_file.name).write_gif(temp_file.name.replace(".mp4", ".gif"))
 
                 # Add the gif to the webhook
-                with Path.open(temp_file.name.replace(".mp4", ".gif"), "rb") as g:
+                with Path.open(Path(temp_file.name.replace(".mp4", ".gif")), "rb") as g:
                     webhook.add_file(file=g.read(), filename="video.gif")
                 embed.set_image(url="attachment://video.gif")
 
     send_webhook(webhook, entry, group)
 
     # Remove our temporary files
-    if Path.exists(temp_file.name):
+    if Path.exists(Path(temp_file.name)):
         temp_file.close()
-        Path.unlink(temp_file.name)
+        Path.unlink(Path(temp_file.name))
 
 
 def send_link(entry: Entry | EntryLike, group: Group) -> None:
