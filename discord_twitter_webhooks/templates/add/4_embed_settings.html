@@ -1,5 +1,15 @@
 <div class="p-2 border border-dark" id="embed_settings">
     <h3>Embed Settings</h3>
+    <div class="form-check form-switch">
+        <label class="form-check-label" for="send_as_embed">Send as embed?</label>
+        <input class="form-check-input"
+               type="checkbox"
+               role="switch"
+               name="send_as_embed"
+               id="send_as_embed"
+               {% if settings.send_as_embed %}checked{% endif %}
+               value="True"/>
+    </div>
     {# Embed color #}
     <label for="embed_color" class="form-label">Embed Color</label>
     <input
