@@ -5,29 +5,29 @@ from typing import TYPE_CHECKING
 
 import requests
 from defusedxml import ElementTree
-from discord_webhook import DiscordEmbed
-from reader import Reader
+from discord_webhook import DiscordEmbed, DiscordWebhook
+from loguru import logger
+from reader import Entry, Reader
 from reader.types import EntryLike
 from requests import request
-
-if TYPE_CHECKING:
-    from xml.etree.ElementTree import Element
-
-    from requests import Response
-from typing import TYPE_CHECKING
-
-from discord_webhook import DiscordWebhook
-from loguru import logger
-from reader import Entry
 
 from discord_twitter_webhooks._dataclasses import Group, get_group
 from discord_twitter_webhooks.tweet_text import get_tweet_text
 
 if TYPE_CHECKING:
+    from xml.etree.ElementTree import Element
+
     from requests import Response
 
 
-def send_webhook(webhook, entry, group) -> None:
+def send_webhook(webhook: DiscordWebhook, entry: Entry | EntryLike, group: Group) -> None:
+    """Send a webhook to Discord.
+
+    Args:
+        webhook: The webhook to send.
+        entry: The entry to send.
+        group: The settings to use.
+    """
     for _webhook in group.webhooks:
         logger.debug("Webhook URL: {}", _webhook)
         webhook.url = _webhook
@@ -98,7 +98,7 @@ def get_avatar(rss_feed: str) -> str:
     return found.text or default_avatar if found is not None else default_avatar
 
 
-def create_image_embeds(entry: Entry | EntryLike):
+def create_image_embeds(entry: Entry | EntryLike) -> list[DiscordEmbed]:
     """Get the images from the entry and create embeds from them.
 
     We can unofficially have up to 4 images in an embed.
@@ -110,7 +110,7 @@ def create_image_embeds(entry: Entry | EntryLike):
     Returns:
         A list of embeds.
     """
-    embeds = []
+    embeds: list[DiscordEmbed] = []
     entry_summary: str = str(entry.summary) or ""
     urls = re.findall('src="(https?://[^"]+)"', entry_summary)
 
@@ -164,7 +164,7 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
         # Only do this if more than one image is found
         if len(embeds) > 1:
             embeds.insert(0, embed)
-            webhook = DiscordWebhook(url=entry.link, embeds=embeds, rate_limit_retry=True)  # type: ignore
+            webhook = DiscordWebhook(url=entry.link, embeds=embeds, rate_limit_retry=True)  # type: ignore  # noqa: PGH003, E501
         else:
             if embeds[0].image:
                 image = embeds[0].image

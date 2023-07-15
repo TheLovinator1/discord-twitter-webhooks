@@ -53,6 +53,10 @@ def get_reader(db_location: Path | None = None) -> Reader:
     # Check for errors and return them to the user
     db_location = get_data_location() if db_location is None else db_location
     db_file: Path = db_location / "discord_twitter_webhooks.db"
+
+    # Create db_location if it doesn't exist
+    db_location.mkdir(parents=True, exist_ok=True)
+
     reader: Reader = make_reader(url=str(db_file))
     if reader is None:
         msg = f"Failed to create reader\ndb_location: {db_location}\ndb_file: {db_file}"

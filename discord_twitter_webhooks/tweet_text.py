@@ -8,7 +8,7 @@ from discord_twitter_webhooks._dataclasses import Group
 from discord_twitter_webhooks.translate import translate_html
 
 
-def convert_html_to_md(html: str) -> str:
+def convert_html_to_md(html: str) -> str:  # noqa: C901
     """Convert HTML to markdown.
 
     Args:
@@ -71,7 +71,7 @@ def get_tweet_text(entry: Entry, group: Group) -> str:
         The text to send in the embed.
     """
     # TODO: Replace Nitter links with Twitter links, add group.use_nitter_links to the group settings or something.
-    # TODO: We should replace "<p><a href="https://nitter.lovinator.space/User/status/1234#m">nitter.lovinator.space/User/status/1234#m</a></p>"
+    # TODO: We should replace "<p><a href="https://nitter.lovinator.space/User/status/1234#m">nitter.lovinator.space/User/status/1234#m</a></p>" # noqa: E501
     #  in entry.summary with the text from the tweet if it is a retweet or quote tweet.
 
     # entry.summary has text and HTML tags, entry.title has only text

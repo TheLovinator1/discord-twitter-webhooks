@@ -1,19 +1,10 @@
 services:
   discord-twitter-webhooks:
     image: thelovinator/discord-twitter-webhooks
-    env_file:
-      - .env
     container_name: discord-twitter-webhooks
-    environment:
-      # Please read .env.example for more variables
-      - WEBHOOK_URL=${WEBHOOK_URL}
-      - BEARER_TOKEN=${BEARER_TOKEN}
-      - RULE=${RULE}
-      - LOG_LEVEL=${LOG_LEVEL}
-
-    # The bot will only stop after we get a keep-alive signal from the
-    # Twitter API, this can take 20 seconds.
-    # By default, stop waits 10 seconds for the container to exit before
-    # sending SIGKILL.
-    stop_grace_period: 30s
+    user: "1000:1000"
+    ports:
+      - 8000:8000
+    volumes:
+      - ./data/discord-twitter-webhooks:/home/botuser/.local/share/discord_twitter_webhooks
     restart: unless-stopped

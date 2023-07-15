@@ -1,41 +1,32 @@
 
-FROM python:3.11-slim as base
+FROM python:3.11-slim
 
-ENV LANG C.UTF-8
-ENV LC_ALL C.UTF-8
-ENV POETRY_VIRTUALENVS_IN_PROJECT=1
-ENV POETRY_NO_INTERACTION=1
-ENV POETRY_HOME=/opt/poetry
-ENV PYSETUP_PATH=/opt/pysetup
-ENV VENV_PATH="/opt/pysetup/.venv"
-ENV PIP_NO_CACHE_DIR=off
-ENV PIP_DISABLE_PIP_VERSION_CHECK=on
-ENV PIP_DEFAULT_TIMEOUT=100
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONFAULTHANDLER=1
-ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
-ENV PYTHONPATH="${PYTHONPATH}:/discord_twitter_webhooks"
+# Create a non-root user
+RUN useradd --create-home botuser
 
-FROM base as python-deps
+# Switch to the non-root user
+USER botuser
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl build-essential
+# Add /home/botuser/.local/bin to the PATH
+ENV PATH=/home/botuser/.local/bin:$PATH
 
-RUN --mount=type=cache,target=/root/.cache \
-    curl -sSL https://install.python-poetry.org | python3 -
+# Set the working directory inside the container
+WORKDIR /app
 
-WORKDIR $PYSETUP_PATH
-COPY pyproject.toml ./
+# Copy the requirements file into the container
+COPY requirements.txt .
 
-RUN --mount=type=cache,target=/root/.cache \
-    poetry install --only main
-
-FROM base as runtime
-
-# Copy virtual env from python-deps stage
-COPY --from=python-deps $PYSETUP_PATH $PYSETUP_PATH
+# Install the Python requirements
+RUN pip install --no-cache-dir --disable-pip-version-check -r requirements.txt
 
 # Copy source code
-COPY discord_twitter_webhooks /discord_twitter_webhooks/
+COPY discord_twitter_webhooks /app/discord_twitter_webhooks/
 
-CMD [ "python", "/discord_twitter_webhooks/main.py" ]
+# Expose the port that Uvicorn will listen on
+EXPOSE 8000
+
+# Create a volume for the database
+VOLUME /home/botuser/.local/share/discord_twitter_webhooks
+
+# Start Uvicorn
+CMD [ "uvicorn", "discord_twitter_webhooks.main:app", "--host", "0.0.0.0", "--port", "8000" ]

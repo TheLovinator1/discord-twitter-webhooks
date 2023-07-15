@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Literal
 
 from loguru import logger
@@ -8,8 +8,7 @@ from reader import Reader, TagNotFoundError
 
 @dataclass
 class Group:
-    """The user can add multiple groups, each group can have multiple usernames and webhooks.
-    Each group can have its own settings."""
+    """The user can add multiple groups, each group can have multiple usernames and webhooks."""
 
     # TODO: Change username and hashtag URL.
     uuid: str = ""
@@ -53,20 +52,21 @@ class Group:
     remove_utm: bool = True
     remove_copyright: bool = True
 
-    created_at: str = field(default_factory=lambda: datetime.now().isoformat())
+    created_at: str = field(default_factory=lambda: datetime.now(tz=timezone.utc).isoformat())
 
 
 @dataclass
 class ApplicationSettings:
     """Settings for the application."""
 
-    # TODO: Grab every instance from https://github.com/zedeus/nitter/wiki/Instances and use a different one each time we check for new tweets.
+    # TODO: Grab every instance from https://github.com/zedeus/nitter/wiki/Instances and use a different one each
+    #  time we check for new tweets.
     nitter_instance: str = "https://nitter.lovinator.space"
     send_errors_to_discord: bool = False
     error_webhook: str = ""
     deepl_auth_key: str = ""
 
-    def __post_init__(self) -> None:
+    def __post_init__(self: "ApplicationSettings") -> None:
         self.nitter_instance = self.nitter_instance.rstrip("/")
 
         if self.send_errors_to_discord and not self.error_webhook:

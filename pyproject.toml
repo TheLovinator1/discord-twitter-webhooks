@@ -12,9 +12,6 @@ keywords = ["bot", "discord", "discord-twitter-webhooks", "tweepy"]
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/TheLovinator1/discord-twitter-webhooks/issues"
 
-[tool.poetry.scripts]
-bot = "discord_twitter_webhooks.main:start"
-
 [tool.poetry.dependencies]
 python = "^3.11"
 discord-webhook = "^1.1.0"
@@ -29,9 +26,6 @@ httpx = "^0.24.0"
 lxml = "^4.9.2"
 defusedxml = "^0.7.1"
 deepl = "^1.15.0"
-
-[tool.poetry.dev-dependencies]
-pytest = "^7.1.2"
 
 [tool.poetry.group.dev.dependencies]
 djlint = "^1.19.17"
@@ -105,18 +99,18 @@ select = [
     "RUF",
 ]
 ignore = [
-    "D100",    # pydocstyle - missing docstring in public module
-    "D101",    # pydocstyle - missing docstring in public class
-    "D102",    # pydocstyle - missing docstring in public method
-    "D103",    # pydocstyle - missing docstring in public function
-    "D104",    # pydocstyle - missing docstring in public package
-    "D105",    # pydocstyle - missing docstring in magic method
-    "D106",    # pydocstyle - missing docstring in public nested class
-    "D107",    # pydocstyle - missing docstring in __init__
+    "D100", # pydocstyle - missing docstring in public module
+    "D101", # pydocstyle - missing docstring in public class
+    "D102", # pydocstyle - missing docstring in public method
+    "D103", # pydocstyle - missing docstring in public function
+    "D104", # pydocstyle - missing docstring in public package
+    "D105", # pydocstyle - missing docstring in magic method
+    "D106", # pydocstyle - missing docstring in public nested class
+    "D107", # pydocstyle - missing docstring in __init__
     "PLE1205", # https://github.com/charliermarsh/ruff/issues/3351
-    "FBT001",  # Boolean positional arg in function definition
-    "FBT002",  # Boolean default value in function definition
-    "FBT003",  # Allow positional boolean values in function calls
+    "FBT001", # Boolean positional arg in function definition
+    "FBT002", # Boolean default value in function definition
+    "FBT003", # Allow positional boolean values in function calls
 ]
 
 [tool.ruff.pydocstyle]

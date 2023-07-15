@@ -2,7 +2,7 @@ import functools
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 from uuid import uuid4
 
 import uvicorn
@@ -13,19 +13,26 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 from reader import Reader
-from reader.types import EntryLike, FeedLike
 from starlette import status
 
 from discord_twitter_webhooks._dataclasses import (
     ApplicationSettings,
     Group,
-    get_group,
     get_app_settings,
+    get_group,
     set_app_settings,
 )
 from discord_twitter_webhooks.reader_settings import get_reader
-from discord_twitter_webhooks.send_to_discord import send_to_discord, send_link, send_text, send_embed
+from discord_twitter_webhooks.send_to_discord import (
+    send_embed,
+    send_link,
+    send_text,
+    send_to_discord,
+)
 from discord_twitter_webhooks.translate import languages_from, languages_to
+
+if TYPE_CHECKING:
+    from reader.types import EntryLike, FeedLike
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
@@ -101,7 +108,7 @@ async def modify(request: Request, uuid: str) -> Response:
 
 
 @app.post("/feed")
-async def feed(
+async def feed(  # noqa: PLR0913, ANN201
     name: Annotated[str, Form(title="Group Name")],
     webhooks: Annotated[str, Form(title="Webhook URLs")],
     usernames: Annotated[str, Form(title="Twitter Usernames")],
@@ -206,9 +213,9 @@ async def feed(
 
         # Add what groups the feed is connected to
         our_feed = reader.get_feed(name_url)
-        groups = reader.get_tag(our_feed, "groups", [])  # type: ignore
+        groups = reader.get_tag(our_feed, "groups", [])  # type: ignore  # noqa: PGH003
         groups.append(uuid)
-        reader.set_tag(our_feed, "groups", list(set(groups)))  # type: ignore
+        reader.set_tag(our_feed, "groups", list(set(groups)))  # type: ignore  # noqa: PGH003
         logger.info(f"Added group {group.uuid} to feed {name_url}")
 
         rss_feeds.append(name_url)
@@ -259,7 +266,7 @@ async def remove_group_post(uuid: Annotated[str, Form()]) -> RedirectResponse:
 
 
 @app.get("/mark_as_unread/{uuid}")
-async def mark_as_unread(uuid: str):
+async def mark_as_unread(uuid: str):  # noqa: ANN201
     """Mark a feed as unread.
 
     Args:
@@ -328,7 +335,7 @@ async def settings(request: Request) -> Response:
 
 @functools.lru_cache(maxsize=1)
 @app.get("/favicon.svg")
-async def favicon():
+async def favicon():  # noqa: ANN201
     """Get the favicon.
 
     Returns:

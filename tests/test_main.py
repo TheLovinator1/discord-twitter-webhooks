@@ -96,13 +96,13 @@ def test_add_new_group() -> None:
     )
 
     # Check that the page loaded successfully.
-    assert response.status_code == 200
+    assert response.is_success
 
     # Check that the page is not empty.
     assert response.text
 
     # Check that the page has something on it.
-    assert len(response.text) > 100
+    assert len(response.text) > 100  # noqa: PLR2004
 
     # Check that the index page is smaller than the old index page.
     assert len(response.text) > len(old_index_page.text)
