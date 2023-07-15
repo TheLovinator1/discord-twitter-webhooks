@@ -170,11 +170,8 @@ def send_link(entry: Entry | EntryLike, group: Group) -> None:
     # TODO: Change webhook username to the tweeter so we can see who posted it?
     # TODO: Append username and action (tweeted, retweeted, liked) to the webhook username or content?
     # TODO: Add support for changing the Nitter link to the original Twitter link
-    what_to_send = f"{entry.link}"
-    if not group.send_as_link_preview:
-        what_to_send = f"<{entry.link}>"
 
-    send_webhook(DiscordWebhook(url="", content=what_to_send), entry, group)
+    send_webhook(DiscordWebhook(url="", content=f"{entry.link}"), entry, group)
 
 
 def send_to_discord(reader: Reader) -> None:

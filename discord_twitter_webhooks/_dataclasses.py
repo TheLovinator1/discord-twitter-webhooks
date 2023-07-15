@@ -20,10 +20,13 @@ class Group:
 
     # What to send
     send_as_embed: bool = True
-    send_as_link: bool = False
-    send_as_link_preview: bool = True
 
+    # Send as a link to the tweet
+    send_as_link: bool = False
+
+    # Send as the text of the tweet
     send_as_text: bool = False
+    # If we should append the username to the text
     send_as_text_username: bool = True
 
     # Translate settings
@@ -33,7 +36,6 @@ class Group:
 
     # Other settings
     unescape_html: bool = True
-    remove_utm: bool = True
     remove_copyright: bool = True
 
     created_at: str = field(default_factory=lambda: datetime.now(tz=timezone.utc).isoformat())

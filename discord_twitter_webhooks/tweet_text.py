@@ -92,13 +92,6 @@ def get_tweet_text(entry: Entry, group: Group) -> str:
         tweet_text = tweet_text.replace("©", "")
         tweet_text = tweet_text.replace("®", "")
         tweet_text = tweet_text.replace("™", "")
-    if group.remove_utm:
-        # Remove the utm_source parameter from the url. https://en.wikipedia.org/wiki/UTM_parameters
-        tweet_text = re.sub(r"([?&])utm_source=[^&]*", "", tweet_text)
-        tweet_text = re.sub(r"([?&])utm_campaign=[^&]*", "", tweet_text)
-        tweet_text = re.sub(r"([?&])utm_medium=[^&]*", "", tweet_text)
-        tweet_text = re.sub(r"([?&])utm_term=[^&]*", "", tweet_text)
-        tweet_text = re.sub(r"([?&])utm_content=[^&]*", "", tweet_text)
     if group.unescape_html:
         # Convert HTML entities to their corresponding characters. For example, "&amp;" becomes "&".
         tweet_text = unescape(tweet_text)
