@@ -12,6 +12,9 @@ keywords = ["bot", "discord", "discord-twitter-webhooks", "tweepy"]
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/TheLovinator1/discord-twitter-webhooks/issues"
 
+[tool.poetry.scripts]
+bot = 'discord_twitter_webhooks.main:start'
+
 [tool.poetry.dependencies]
 python = "^3.11"
 discord-webhook = "^1.1.0"

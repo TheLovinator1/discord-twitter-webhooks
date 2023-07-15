@@ -15,7 +15,7 @@ repos:
 
   # Check if Poetry is configured correctly, and if the lock file is up to date, and if the requirements.txt file is up to date.
   - repo: https://github.com/python-poetry/poetry
-    rev: "1.4.0"
+    rev: "1.5.0"
     hooks:
       - id: poetry-check
         name: Check if Poetry is configured correctly by running `poetry check`
@@ -32,14 +32,14 @@ repos:
           ]
 
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "0.11.2"
+    rev: "0.13.0"
     hooks:
       - id: pyproject-fmt
         name: Format pyproject.toml with pyproject-fmt
 
   # Add a trailing comma to Python stuff.
   - repo: https://github.com/asottile/add-trailing-comma
-    rev: v2.4.0
+    rev: v3.0.0
     hooks:
       - id: add-trailing-comma
         args: [--py36-plus]
@@ -110,7 +110,7 @@ repos:
   # Run Ruff on all Python files. We do this before Black so that Black can
   # format the code that Ruff changes.
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.0.265"
+    rev: "v0.0.278"
     hooks:
       - id: ruff
         name: Lint Python code with Ruff
@@ -118,7 +118,7 @@ repos:
 
   # Run Black on all Python files. This will format the code.
   - repo: https://github.com/psf/black
-    rev: 23.3.0
+    rev: 23.7.0
     hooks:
       - id: black
         name: Format Python code with Black
@@ -133,7 +133,7 @@ repos:
 
   # Run Pyupgrade on all Python files. This will upgrade the code to Python 3.11.
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.4.0
+    rev: v3.9.0
     hooks:
       - id: pyupgrade
         name: Upgrade Python syntax to Python 3.11 with pyupgrade

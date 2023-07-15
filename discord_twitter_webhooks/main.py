@@ -421,5 +421,10 @@ def sched_func() -> None:
     send_to_discord(reader)
 
 
-if __name__ == "__main__":
+def start() -> None:
+    """Start the server."""
     uvicorn.run(app, port=8000)
+
+
+if __name__ == "__main__":
+    start()
