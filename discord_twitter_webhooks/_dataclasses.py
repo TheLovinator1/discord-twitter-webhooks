@@ -61,17 +61,11 @@ class ApplicationSettings:
 
     # TODO: Grab every instance from https://github.com/zedeus/nitter/wiki/Instances and use a different one each
     #  time we check for new tweets.
-    nitter_instance: str = "https://nitter.lovinator.space"
-    send_errors_to_discord: bool = False
-    error_webhook: str = ""
+    nitter_instance: str = "https://nitter.net"
     deepl_auth_key: str = ""
 
     def __post_init__(self: "ApplicationSettings") -> None:
         self.nitter_instance = self.nitter_instance.rstrip("/")
-
-        if self.send_errors_to_discord and not self.error_webhook:
-            logger.warning("send_errors_to_discord is True, but no error_webhook is set. Disabling.")
-            self.send_errors_to_discord = False
 
 
 def get_app_settings(reader: Reader) -> ApplicationSettings:

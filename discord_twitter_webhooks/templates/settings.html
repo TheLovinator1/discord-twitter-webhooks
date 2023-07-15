@@ -50,35 +50,6 @@
                     </div>
                 </div>
             </div>
-            {# Error webhook #}
-            <div class="row pb-2">
-                <label for="error_webhook" class="col-sm-2 col-form-label">Error webhook</label>
-                <div class="col-sm-10">
-                    <input name="error_webhook"
-                           type="text"
-                           value="{%- if settings.error_webhook -%}{{ settings.error_webhook }}{%- endif -%}"
-                           class="form-control bg-dark border-dark text-muted"
-                           id="error_webhook"/>
-                    <div id="error_webhook_help" class="form-text">
-                        Discord webhook URL to send errors to.
-                    </div>
-                </div>
-            </div>
-            {# Send error webhooks? #}
-            <div class="form-check form-switch">
-                <input class="form-check-input"
-                       type="checkbox"
-                       role="switch"
-                       id="send_errors_to_discord"
-                       name="send_errors_to_discord"
-                       {% if settings.send_errors_to_discord %}checked{% endif %}
-                />
-                <label class="form-check-label" for="send_errors_to_discord">Send error webhooks?</label>
-                <div id="send_errors_to_discord_help" class="form-text">
-                    If enabled, the bot will send a webhook to the URL specified above when
-                    an error occurs.
-                </div>
-            </div>
             <div class="d-md-flex">
                 <button class="btn btn-dark btn-sm">Update settings</button>
             </div>
