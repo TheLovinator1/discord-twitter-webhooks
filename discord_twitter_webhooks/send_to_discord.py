@@ -226,7 +226,7 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901
     Args:
         reader: The reader which contains the entries.
     """
-    reader.update_feeds()
+    reader.update_feeds(workers=4)
 
     # Loop through the unread (unsent) entries.
     entries = list(reader.get_entries(read=False))

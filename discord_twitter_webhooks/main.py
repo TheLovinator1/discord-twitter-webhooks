@@ -12,7 +12,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
-from reader import Reader
+from reader import InvalidFeedURLError, Reader, StorageError
 from starlette import status
 
 from discord_twitter_webhooks._dataclasses import (
@@ -169,10 +169,14 @@ async def feed(  # noqa: PLR0913, ANN201
     for _name in usernames_split:
         name_url = f"{get_app_settings(reader).nitter_instance}/{_name}/rss"  # TODO: Check if URL is valid
         # Add the rss feed to the reader
-        reader.add_feed(name_url, exist_ok=True)
-
-        # Download the entries
-        reader.update_feeds(new=True)
+        try:
+            reader.add_feed(name_url, exist_ok=True)
+        except InvalidFeedURLError:
+            logger.error(f"Invalid URL {name_url}")
+            continue
+        except StorageError:
+            logger.error(f"Got StorageError when adding {name_url}")
+            continue
 
         # Mark every entry as read
         _entry: EntryLike
@@ -256,7 +260,7 @@ async def mark_as_unread(uuid: str):  # noqa: ANN201, C901
     logger.info(f"Feed is {_feed}")
 
     # Update the feed
-    reader.update_feeds(feed=_feed)
+    reader.update_feeds(feed=_feed, workers=4)
 
     # Get the entries
     entries = reader.get_entries(feed=_feed)
