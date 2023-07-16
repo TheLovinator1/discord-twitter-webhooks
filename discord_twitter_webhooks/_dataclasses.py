@@ -17,6 +17,7 @@ class Group:
     rss_feeds: list[str] = field(default_factory=list)
     send_retweets: bool = True
     send_replies: bool = False
+    only_send_if_media: bool = False
 
     # What to send
     send_as_embed: bool = True
@@ -85,6 +86,7 @@ def get_group(reader: Reader, uuid: str) -> Group:
             rss_feeds=group["rss_feeds"],
             send_retweets=group["send_retweets"],
             send_replies=group["send_replies"],
+            only_send_if_media=group["only_send_if_media"],
             send_as_embed=group["send_as_embed"],
             send_as_link=group["send_as_link"],
             send_as_text=group["send_as_text"],

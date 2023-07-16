@@ -24,6 +24,7 @@ from discord_twitter_webhooks._dataclasses import (
 )
 from discord_twitter_webhooks.reader_settings import get_reader
 from discord_twitter_webhooks.send_to_discord import (
+    has_media,
     send_embed,
     send_link,
     send_text,
@@ -115,6 +116,7 @@ async def feed(  # noqa: PLR0913, ANN201
     uuid: Annotated[str, Form(title="UUID")] = "",
     send_retweets: Annotated[bool, Form(title="Include Retweets?")] = False,
     send_replies: Annotated[bool, Form(title="Include Replies?")] = False,
+    only_send_if_media: Annotated[bool, Form(title="Only Send if tweet has media?")] = False,
     send_as_text: Annotated[bool, Form(title="Send Text?")] = False,
     send_as_text_username: Annotated[bool, Form(title="Append username before text?")] = False,
     send_as_embed: Annotated[bool, Form(title="Send Embed?")] = False,
@@ -147,6 +149,7 @@ async def feed(  # noqa: PLR0913, ANN201
         rss_feeds=rss_feeds,
         send_retweets=send_retweets,
         send_replies=send_replies,
+        only_send_if_media=only_send_if_media,
         send_as_text=send_as_text,
         send_as_text_username=send_as_text_username,
         send_as_embed=send_as_embed,
@@ -231,7 +234,7 @@ async def remove_group_post(uuid: Annotated[str, Form()]) -> RedirectResponse:
 
 
 @app.get("/mark_as_unread/{uuid}")
-async def mark_as_unread(uuid: str):  # noqa: ANN201
+async def mark_as_unread(uuid: str):  # noqa: ANN201, C901
     """Mark a feed as unread.
 
     Args:
@@ -275,6 +278,10 @@ async def mark_as_unread(uuid: str):  # noqa: ANN201
 
         if not group.send_replies and entry.title.startswith("R to "):
             logger.info(f"Skipping entry {entry} as it is a reply")
+            continue
+
+        if group.only_send_if_media and not has_media(entry):
+            logger.info(f"Skipping entry {entry} as it has no media attached")
             continue
 
         if group.send_as_link:

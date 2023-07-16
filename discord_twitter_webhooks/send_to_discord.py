@@ -201,6 +201,23 @@ def send_link(entry: Entry | EntryLike, group: Group) -> None:
     send_webhook(DiscordWebhook(url="", content=f"{entry.link}"), entry, group)
 
 
+def has_media(entry: Entry | EntryLike) -> bool:
+    """Check if the entry has media.
+
+    Args:
+        entry: The entry to check.
+
+    Returns:
+        True if the entry has media, False otherwise.
+    """
+    soup: BeautifulSoup = BeautifulSoup(entry.summary, features="lxml")
+    logger.debug("Checking if {} has media", entry.link or "entry.link is None")
+    logger.debug("Soup: {}", soup)
+    video_files = bool(soup.find("source", attrs={"type": "video/mp4"}))
+    images = bool(soup.find("img"))
+    return video_files or images
+
+
 def send_to_discord(reader: Reader) -> None:  # noqa: C901
     """Send all new entries to Discord.
 
@@ -233,6 +250,10 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901
 
                 if not group.send_replies and entry.title.startswith("R to "):
                     logger.info(f"Skipping entry {entry} as it is a reply")
+                    continue
+
+                if group.only_send_if_media and not has_media(entry):
+                    logger.info(f"Skipping entry {entry} as it has no media attached")
                     continue
 
                 if entry.feed_url == feeds:

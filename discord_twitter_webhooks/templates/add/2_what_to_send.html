@@ -30,4 +30,19 @@
             Whether or not you want replies to be sent to Discord.
         </div>
     </div>
+
+    {# Only send if tweet has media #}
+    <div class="form-check form-switch">
+        <label class="form-check-label" for="only_send_if_media">Only send if tweet has media?</label>
+        <input class="form-check-input"
+               type="checkbox"
+               role="switch"
+               id="only_send_if_media"
+               name="only_send_if_media"
+               {% if settings.only_send_if_media %}checked{% endif %}
+               value="True"/>
+        <div id="only_send_if_media_help" class="form-text">
+            Only send tweets if they have media (images, videos, etc) attached.
+        </div>
+    </div>
 </div>
