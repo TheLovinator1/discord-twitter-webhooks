@@ -193,7 +193,7 @@ async def feed(  # noqa: PLR0913, ANN201
     logger.info(f"Group list is now {set(groups)}")
 
     # Redirect to the index page.
-    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)  # TODO: What status code should this be?
+    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.post("/remove_group")
@@ -227,7 +227,7 @@ async def remove_group_post(uuid: Annotated[str, Form()]) -> RedirectResponse:
             logger.info(f"Removed feed {_feed} due to no groups using it")
 
     # Redirect to the index page.
-    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)  # TODO: What status code should this be?
+    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get("/mark_as_unread/{uuid}")
@@ -240,7 +240,6 @@ async def mark_as_unread(uuid: str):  # noqa: ANN201
     Returns:
         The index page. Or an error page if the feed could not be marked as unread.
     """
-    # TODO: Mark feed as unread and send to Discord.
     logger.info(f"Marking feed {uuid} as unread")
 
     # Get the group
@@ -289,7 +288,7 @@ async def mark_as_unread(uuid: str):  # noqa: ANN201
         reader.mark_entry_as_read(entry)
 
     # Redirect to the index page.
-    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)  # TODO: What status code should this be?
+    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get("/settings")
