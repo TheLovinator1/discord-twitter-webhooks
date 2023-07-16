@@ -3,16 +3,15 @@
     {# Include retweets? #}
     <div class="form-check form-switch">
         <label class="form-check-label" for="send_retweets">Send retweets?</label>
-        <input
-                class="form-check-input"
-                type="checkbox"
-                role="switch"
-                id="send_retweets"
-                name="send_retweets"
-                value="True"
-                {% if settings.send_retweets %}checked{% endif %}
+        <input class="form-check-input"
+               type="checkbox"
+               role="switch"
+               name="send_retweets"
+               id="send_retweets"
+               {% if settings.send_retweets %}checked{% endif %}
+               value="True"
         />
-        <div id="url_help" class="form-text">
+        <div id="send_retweets_help" class="form-text">
             Whether or not you want retweets to be sent to Discord.
         </div>
     </div>
@@ -20,16 +19,14 @@
     {# Include replies? #}
     <div class="form-check form-switch">
         <label class="form-check-label" for="send_replies">Send replies?</label>
-        <input
-                class="form-check-input"
-                type="checkbox"
-                role="switch"
-                id="send_replies"
-                name="send_replies"
-                value="True"
-                {% if settings.send_replies %}checked{% endif %}
-        />
-        <div id="url_help" class="form-text">
+        <input class="form-check-input"
+               type="checkbox"
+               role="switch"
+               id="send_replies"
+               name="send_replies"
+               {% if settings.send_replies %}checked{% endif %}
+               value="True"/>
+        <div id="send_replies_help" class="form-text">
             Whether or not you want replies to be sent to Discord.
         </div>
     </div>

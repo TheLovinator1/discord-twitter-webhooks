@@ -16,7 +16,7 @@ class Group:
     webhooks: list[str] = field(default_factory=list)
     rss_feeds: list[str] = field(default_factory=list)
     send_retweets: bool = True
-    send_replies: bool = True
+    send_replies: bool = False
 
     # What to send
     send_as_embed: bool = True
@@ -80,9 +80,3 @@ def get_group(reader: Reader, uuid: str) -> Group:
         return Group(**group)
     except TagNotFoundError:
         logger.info("Group {} not found.", uuid)
-
-
-def set_group(reader: Reader, uuid: str, group: Group) -> None:
-    """Set the group."""
-    reader.set_tag((), uuid, group.__dict__)
-    logger.debug("Saved group: {}", group)

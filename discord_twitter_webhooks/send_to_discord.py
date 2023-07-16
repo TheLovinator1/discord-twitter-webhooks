@@ -202,7 +202,7 @@ def send_link(entry: Entry | EntryLike, group: Group) -> None:
     send_webhook(DiscordWebhook(url="", content=f"{entry.link}"), entry, group)
 
 
-def send_to_discord(reader: Reader) -> None:
+def send_to_discord(reader: Reader) -> None:  # noqa: C901
     """Send all new entries to Discord.
 
     This is called by the scheduler every 5 minutes. It will check for new entries and send them to Discord.
@@ -228,6 +228,14 @@ def send_to_discord(reader: Reader) -> None:
                 continue
 
             for feeds in group.rss_feeds:
+                if not group.send_retweets and entry.title.startswith("RT by "):
+                    logger.info(f"Skipping entry {entry} as it is a retweet")
+                    continue
+
+                if not group.send_replies and entry.title.startswith("R to "):
+                    logger.info(f"Skipping entry {entry} as it is a reply")
+                    continue
+
                 if entry.feed_url == feeds:
                     if group.send_as_link:
                         send_link(entry=entry, group=group)

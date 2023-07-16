@@ -113,14 +113,14 @@ async def feed(  # noqa: PLR0913, ANN201
     webhooks: Annotated[str, Form(title="Webhook URLs")],
     usernames: Annotated[str, Form(title="Twitter Usernames")],
     uuid: Annotated[str, Form(title="UUID")] = "",
-    send_retweets: Annotated[bool, Form(title="Include Retweets?")] = True,
-    send_replies: Annotated[bool, Form(title="Include Replies?")] = True,
+    send_retweets: Annotated[bool, Form(title="Include Retweets?")] = False,
+    send_replies: Annotated[bool, Form(title="Include Replies?")] = False,
     send_as_text: Annotated[bool, Form(title="Send Text?")] = False,
     send_as_text_username: Annotated[bool, Form(title="Append username before text?")] = False,
     send_as_embed: Annotated[bool, Form(title="Send Embed?")] = False,
     send_as_link: Annotated[bool, Form(title="Send Only Link?")] = False,
-    unescape_html: Annotated[bool, Form(title="Unescape HTML?")] = True,
-    remove_copyright: Annotated[bool, Form(title="Remove Copyright?")] = True,
+    unescape_html: Annotated[bool, Form(title="Unescape HTML?")] = False,
+    remove_copyright: Annotated[bool, Form(title="Remove Copyright?")] = False,
     translate: Annotated[bool, Form(title="Translate?")] = False,
     translate_from: Annotated[str, Form(title="Translate From")] = "auto",
     translate_to: Annotated[str, Form(title="Translate To")] = "en-GB",
@@ -270,6 +270,14 @@ async def mark_as_unread(uuid: str):  # noqa: ANN201
         reader.mark_entry_as_unread(entry)
 
     for entry in entries:
+        if not group.send_retweets and entry.title.startswith("RT by "):
+            logger.info(f"Skipping entry {entry} as it is a retweet")
+            continue
+
+        if not group.send_replies and entry.title.startswith("R to "):
+            logger.info(f"Skipping entry {entry} as it is a reply")
+            continue
+
         if group.send_as_link:
             send_link(entry=entry, group=group)
         if group.send_as_text:
