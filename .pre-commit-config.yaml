@@ -1,3 +1,5 @@
+default_install_hook_types: [ pre-commit, pre-push ]
+
 default_language_version:
   python: python3.11
 
@@ -9,7 +11,7 @@ repos:
         name: Update Poetry to the latest version
         entry: poetry self update
         language: system
-        types: [python]
+        types: [ python ]
         pass_filenames: false
         always_run: true
 
@@ -42,7 +44,7 @@ repos:
     rev: v3.0.0
     hooks:
       - id: add-trailing-comma
-        args: [--py36-plus]
+        args: [ --py36-plus ]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
@@ -85,15 +87,15 @@ repos:
         name: Remove the byte-order marker (BOM) from files.
       - id: fix-encoding-pragma
         name: Remove the encoding pragma from Python files.
-        args: [--remove]
+        args: [ --remove ]
       - id: mixed-line-ending
         name: Check for files with mixed line endings and replace them with the most common line ending.
       - id: name-tests-test
         name: Check that test functions are named test_*.
-        args: [--pytest-test-first]
+        args: [ --pytest-test-first ]
       - id: trailing-whitespace
         name: Check for trailing whitespace.
-        args: [--markdown-linebreak-ext=md]
+        args: [ --markdown-linebreak-ext=md ]
         exclude_types:
           - "html"
 
@@ -114,7 +116,7 @@ repos:
     hooks:
       - id: ruff
         name: Lint Python code with Ruff
-        args: ["--fix", "--exit-non-zero-on-fix"]
+        args: [ "--fix", "--exit-non-zero-on-fix" ]
 
   # Run Black on all Python files. This will format the code.
   - repo: https://github.com/psf/black
@@ -129,7 +131,7 @@ repos:
     hooks:
       - id: isort
         name: Sort Python imports with isort
-        args: ["--profile", "black", "--filter-files"]
+        args: [ "--profile", "black", "--filter-files" ]
 
   # Run Pyupgrade on all Python files. This will upgrade the code to Python 3.11.
   - repo: https://github.com/asottile/pyupgrade
@@ -137,7 +139,7 @@ repos:
     hooks:
       - id: pyupgrade
         name: Upgrade Python syntax to Python 3.11 with pyupgrade
-        args: ["--py311-plus"]
+        args: [ "--py311-plus" ]
 
   # Run Flake8 on all Python files.
   - repo: https://github.com/pycqa/flake8
@@ -145,7 +147,7 @@ repos:
     hooks:
       - id: flake8
         name: Lint Python code with Flake8
-        args: ["--max-line-length", "120"]
+        args: [ "--max-line-length", "120" ]
 
   # Run Pytest before committing.
   - repo: local
@@ -154,6 +156,6 @@ repos:
         name: Test Python code with Pytest
         entry: poetry run pytest
         language: system
-        types: [python]
+        types: [ python ]
         pass_filenames: false
         always_run: true
