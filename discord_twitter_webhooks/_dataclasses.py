@@ -47,7 +47,7 @@ class ApplicationSettings:
 
     # TODO: Grab every instance from https://github.com/zedeus/nitter/wiki/Instances and use a different one each
     #  time we check for new tweets.
-    nitter_instance: str = "https://nitter.net"
+    nitter_instance: str = "https://nitter.lovinator.space"
     deepl_auth_key: str = ""
 
     def __post_init__(self: "ApplicationSettings") -> None:
