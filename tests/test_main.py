@@ -36,7 +36,7 @@ def test_index_page() -> None:
     # Remove a group button is only shown if there is at least one group.
     # Add a new feed button is only shown if there are no groups.
     try:
-        assert "Add a new feed" in response.text
+        assert "No groups found. You can add one" in response.text
     except AssertionError:
         assert "remove_group" in response.text
     except Exception as err:  # noqa: BLE001
