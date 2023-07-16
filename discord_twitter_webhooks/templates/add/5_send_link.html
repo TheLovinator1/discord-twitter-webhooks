@@ -1,0 +1,17 @@
+<div class="p-2 border border-dark" id="link_settings">
+    <h3>Send as link</h3>
+    {# Send only link #}
+    <div class="form-check form-switch">
+        <label class="form-check-label" for="send_as_link">Send as a link?</label>
+        <input class="form-check-input"
+               type="checkbox"
+               role="switch"
+               name="send_as_link"
+               id="send_as_link"
+               {% if settings.send_as_link %}checked{% endif %}
+               value="True"/>
+        <div id="send_as_link_help" class="form-text">
+            Do you want the tweet to be sent as a link?
+        </div>
+    </div>
+</div>

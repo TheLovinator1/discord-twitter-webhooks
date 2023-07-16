@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description"
+          content="Stay updated with the latest news and events with our easy-to-use Twitter bot. Never miss a message or announcement again with real-time notifications directly to your Discord server."/>
+    <meta name="keywords"
+          content="discord, twitter, bot, notifications, announcements, updates, real-time, server, messages, news, events, feed."/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+          crossorigin="anonymous"/>
+    <link href="{{ url_for('static', path='/style.css') }}" rel="stylesheet"/>
+    <link rel="icon" href="/favicon.svg"/>
+
+    <title>
+        discord-twitter-webhooks
+        {% block title %}
+        {% endblock title %}
+    </title>
+    {% block head %}
+    {% endblock head %}
+</head>
+<body>
+{% include "nav.html" %}
+<div class="p-2 mb-2">
+    <div class="container-fluid">
+        <div class="d-grid p-2">
+            {% block content %}
+            {% endblock content %}
+        </div>
+        <div class="d-grid p-2">
+            <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+                <p class="col-md-4 mb-0 text-muted d-none d-md-block">
+                    Made by:
+                    <br/><a class="text-muted" href="https://github.com/TheLovinator1">TheLovinator</a>
+                    <br/><a class="text-muted" href="https://github.com/thebetauser">h1pp0</a>
+                    <br/><a class="text-muted" href="https://github.com/dziban303">Dziban303</a>
+                    <br/><a class="text-muted" href="https://github.com/accik">Akseli</a>
+                </p>
+                <ul class="nav col-md-4 justify-content-end">
+                    <li class="nav-item">
+                        <a href="https://github.com/TheLovinator1/discord-twitter-webhooks/issues"
+                           class="nav-link px-2 text-muted">Report an issue</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="https://github.com/TheLovinator1/discord-twitter-webhooks/issues"
+                           class="nav-link px-2 text-muted">Send feedback</a>
+                    </li>
+                </ul>
+            </footer>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+</body>
+</html>

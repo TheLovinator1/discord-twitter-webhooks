@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block header %}
+    <h1>
+        {% block title %}
+            Settings
+        {% endblock title %}
+    </h1>
+{% endblock header %}
+{% block content %}
+    <form name="add" action="{{ url_for('settings_post') }}" method="post">
+        <div class="p-2 border border-dark">
+            <h3>Feed Details</h3>
+            {# Nitter instance #}
+            <div class="row pb-2">
+                <label for="nitter_instance" class="col-sm-2 col-form-label">Nitter instance</label>
+                <div class="col-sm-10">
+                    <input name="nitter_instance"
+                           type="text"
+                           value="{%- if settings.nitter_instance -%}{{ settings.nitter_instance }}{%- endif -%}"
+                           class="form-control bg-dark border-dark text-muted"
+                           id="nitter_instance"/>
+                    <div id="nitter_help" class="form-text">
+                        The URL of the Nitter instance you want to use.
+                        <br/>
+                        You can find a list of instances
+                        <a class="text-muted"
+                           href="https://github.com/zedeus/nitter/wiki/Instances">here</a>.
+                        <br/>
+                        <br/>
+                        I highly recommend using your own instance, it is very easy to set up
+                        and you can find instructions <a class="text-muted" href="">here</a>.
+                        <br/>
+                        It will be faster, more private, and you won't clog down the public
+                        instance.
+                    </div>
+                </div>
+            </div>
+            {# DeepL Auth Key #}
+            <div class="row pb-2">
+                <label for="deepl_auth_key" class="col-sm-2 col-form-label">DeepL auth key</label>
+                <div class="col-sm-10">
+                    <input name="deepl_auth_key"
+                           type="text"
+                           value="{%- if settings.deepl_auth_key -%}{{ settings.deepl_auth_key }}{%- endif -%}"
+                           class="form-control bg-dark border-dark text-muted"
+                           id="deepl_auth_key"/>
+                    <div id="deepl_auth_key_help" class="form-text">
+                        DeepL Auth Key to use for translations. Can be found <a class="text-muted"
+                                                                                href="https://www.deepl.com/account/summary">here</a>.
+                    </div>
+                </div>
+            </div>
+            <div class="d-md-flex">
+                <button class="btn btn-dark btn-sm">Update settings</button>
+            </div>
+        </div>
+    </form>
+{% endblock content %}

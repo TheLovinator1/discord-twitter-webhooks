@@ -1,0 +1,45 @@
+<div class="p-2 border border-dark" id="other_settings">
+    <h3>Translate</h3>
+    {# Should translate? #}
+    <div class="form-check form-switch">
+        <label class="form-check-label" for="translate">Translate</label>
+        <input class="form-check-input"
+               type="checkbox"
+               role="switch"
+               id="translate"
+               name="translate"
+               value="True"
+               {% if settings.translate %}checked{% endif %}
+        />
+        <div id="translate_help" class="form-text">Whether or not you want to translate the message. Note that you need
+            to add a DeepL API key in the <a class="text-muted" href="{{ url_for('settings') }}">settings</a> for this
+            to work.
+        </div>
+    </div>
+    <br/>
+
+    {# Translate from? #}
+    <label for="translate_from">Translate from</label>
+    <select class="form-select" name="translate_from" id="translate_from" style="width:auto;">
+        {% for key, value in languages_from.items() %}
+            <option value="{{ language }}"
+                    {% if settings.translate_from == key %}selected{% endif %}>{{ value }}</option>
+        {% endfor %}
+    </select>
+    <div id="translate_from" class="form-text">
+        The language the tweet is in, you can leave this as automatic if you want.
+    </div>
+
+    {# Translate from? #}
+    <label for="translate_from">Translate from</label>
+    <select class="form-select" name="translate_to" id="translate_from"
+            style="width:auto;">
+        {% for key, value in languages_to.items() %}
+            <option value="{{ key }}"
+                    {% if settings.translate_to == key %}selected{% endif %}>{{ value }}</option>
+        {% endfor %}
+    </select>
+    <div id="translate_to" class="form-text">
+        The language you want to translate the tweet to.
+    </div>
+</div>

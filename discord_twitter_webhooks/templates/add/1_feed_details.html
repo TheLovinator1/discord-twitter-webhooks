@@ -1,0 +1,52 @@
+<div class="p-2 border border-dark" id="feed_details">
+    <h3>Feed Details</h3>
+    {# Group name #}
+    <div class="row pb-2">
+        <label for="name" class="col-sm-2 col-form-label">Name</label>
+        <div class="col-sm-10">
+            <input
+                    name="name"
+                    type="text"
+                    class="form-control bg-dark border-dark text-muted"
+                    id="name"
+                    {% if settings.name %}value="{{ settings.name }}"{% endif %}
+            />
+            <div id="name_help" class="form-text">
+                A name to identify this group. Can be anything you want.
+            </div>
+        </div>
+    </div>
+
+    {# Twitter usernames #}
+    <div class="row pb-2">
+        <label for="usernames" class="col-sm-2 col-form-label">Usernames</label>
+        <div class="col-sm-10">
+      <textarea
+              name="usernames"
+              class="form-control bg-dark border-dark text-muted"
+              id="usernames"
+              rows="3"
+      >{% for name in settings.usernames %}{{ name }}{% if not loop.last %}&#10;{% endif %}{% endfor %}</textarea>
+            <div id="usernames_help" class="form-text">
+                Twitter usernames to follow, separate each webhook with a new line. You can add new line with <code>Shift+Enter</code>.
+            </div>
+        </div>
+    </div>
+
+    {# Webhooks #}
+    <div class="row pb-2">
+        <label for="webhooks" class="col-sm-2 col-form-label">Webhook URLs</label>
+        <div class="col-sm-10">
+      <textarea
+              name="webhooks"
+              class="form-control bg-dark border-dark text-muted"
+              id="webhooks"
+              rows="3"
+      >{% for url in settings.webhooks %}{{ url }}{% if not loop.last %}&#10;{% endif %}{% endfor %}</textarea>
+            <div id="webhooks_help" class="form-text">
+                Discord webhook URLs to send tweets to, separated by newlines. Add new line with
+                <code>Shift+Enter</code>.
+            </div>
+        </div>
+    </div>
+</div>
