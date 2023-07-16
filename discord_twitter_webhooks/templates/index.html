@@ -15,20 +15,8 @@
             <div class="p-2 mb-2 border border-dark">
                 <div class="feed">
                     <h2>{{ group.name }}</h2>
-                    {{ group.uuid }}
-                    <a class="text-muted"
-                       href="{{ url_for('mark_as_unread', uuid=group.uuid ) }}">Mark as unread</a>
-                    <br/>
-
-                    {# Discord webhooks #}
-                    Webhooks:
-                    <ul>
-                        {% for hook in group.webhooks %}
-                            <li>
-                                <a class="text-muted" href="{{ hook }}">{{ hook }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    <a class="text-muted" href="{{ url_for('mark_as_unread', uuid=group.uuid ) }}">Debug - Mark as
+                        unread</a>
                     <br/>
 
                     {# Twitter usernames to follow #}
@@ -41,7 +29,16 @@
                             </li>
                         {% endfor %}
                     </ul>
-
+                    {# Discord webhooks #}
+                    Webhooks:
+                    <ul>
+                        {% for hook in group.webhooks %}
+                            <li>
+                                <a class="text-muted" href="{{ hook }}">{{ hook }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <br/>
                     {# Button to remove #}
                     <form action="{{ url_for('remove_group_post') }}" method="post">
                         <input type="hidden" name="uuid" value="{{ group.uuid }}"/>

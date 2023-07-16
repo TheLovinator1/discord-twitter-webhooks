@@ -39,7 +39,11 @@
                        id="send_as_text"
                        {% if settings.send_as_text %}checked{% endif %}
                        value="True"/>
+                <div id="send_as_text_help" class="form-text">
+                    Do you want to send the text of the tweet as a message?
+                </div>
             </div>
+
             <div class="form-check form-switch">
                 <label class="form-check-label" for="send_as_text_username">Append username before text?</label>
                 <input class="form-check-input"
@@ -49,6 +53,9 @@
                        id="send_as_text_username"
                        {% if settings.send_as_text_username %}checked{% endif %}
                        value="True"/>
+                <div id="send_as_text_username_help" class="form-text">
+                    Add the username of the user who tweeted before the text of the tweet.
+                </div>
             </div>
         </div>
 
