@@ -344,6 +344,7 @@ async def settings_post(
         nitter_instance: The Nitter instance to use.
         deepl_auth_key: The DeepL auth key to use.
     """
+    # TODO: Run reader.change_feed_url() on all feeds if the Nitter instance has changed.
     app_settings = ApplicationSettings(
         nitter_instance=nitter_instance,
         deepl_auth_key=deepl_auth_key,
