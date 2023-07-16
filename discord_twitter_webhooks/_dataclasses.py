@@ -77,6 +77,24 @@ def get_group(reader: Reader, uuid: str) -> Group:
     """Get the group."""
     try:
         group = reader.get_tag((), uuid)
-        return Group(**group)
+        return Group(
+            uuid=group["uuid"],
+            name=group["name"],
+            usernames=group["usernames"],
+            webhooks=group["webhooks"],
+            rss_feeds=group["rss_feeds"],
+            send_retweets=group["send_retweets"],
+            send_replies=group["send_replies"],
+            send_as_embed=group["send_as_embed"],
+            send_as_link=group["send_as_link"],
+            send_as_text=group["send_as_text"],
+            send_as_text_username=group["send_as_text_username"],
+            translate=group["translate"],
+            translate_to=group["translate_to"],
+            translate_from=group["translate_from"],
+            unescape_html=group["unescape_html"],
+            remove_copyright=group["remove_copyright"],
+            created_at=group["created_at"],
+        )
     except TagNotFoundError:
         logger.info("Group {} not found.", uuid)
