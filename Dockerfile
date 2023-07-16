@@ -22,11 +22,14 @@ RUN pip install --no-cache-dir --disable-pip-version-check -r requirements.txt
 # Copy source code
 COPY discord_twitter_webhooks /app/discord_twitter_webhooks/
 
-# Expose the port that Uvicorn will listen on
-EXPOSE 8000
+# Create the directory for the database
+RUN mkdir -p /home/botuser/.local/share/discord_twitter_webhooks
 
 # Create a volume for the database
 VOLUME /home/botuser/.local/share/discord_twitter_webhooks
+
+# Expose the port that Uvicorn will listen on
+EXPOSE 8000
 
 # Start Uvicorn
 CMD [ "uvicorn", "discord_twitter_webhooks.main:app", "--host", "0.0.0.0", "--port", "8000" ]

@@ -54,8 +54,22 @@ def get_reader(db_location: Path | None = None) -> Reader:
     db_location = get_data_location() if db_location is None else db_location
     db_file: Path = db_location / "discord_twitter_webhooks.db"
 
-    # Create db_location if it doesn't exist
-    db_location.mkdir(parents=True, exist_ok=True)
+    # Check if directory exists
+    if not db_location.exists():
+        msg: str = f"Directory {db_location} does not exist"
+        raise FileNotFoundError(msg)
+
+    # Check if the user has write access to the database directory
+    if not os.access(db_location, os.W_OK):
+        msg: str = f"Write access denied to {db_location}"
+        raise PermissionError(msg)
+
+    if os.name == "posix":
+        logger.debug(
+            "Data directory is owned by {uid}:{gid}",
+            uid=Path.owner(db_location),
+            gid=Path.group(db_location),
+        )
 
     reader: Reader = make_reader(url=str(db_file))
     if reader is None:
