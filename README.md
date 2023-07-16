@@ -12,7 +12,11 @@ Theme is https://github.com/KillYoy/DiscordNight
 
 `discord-twitter-webhooks` is an automated tool that sends tweets from Twitter to Discord using webhooks.
 
-It is using RSS feeds from [Nitter](https://github.com/zedeus/nitter) to get the tweets.
+## Features
+
+- Send tweets from Twitter to Discord using webhooks.
+- Send the tweet as an embed, link or text.
+- Support for translations via [DeepL](https://www.deepl.com/translator).
 
 ## Installation
 
@@ -28,6 +32,7 @@ Docker Hub: [thelovinator/discord-twitter-webhooks](https://hub.docker.com/r/the
 - Data is stored in /home/botuser/.local/share/discord_twitter_webhooks in the container.
 - The container runs as the bot user with UID 1000 and GID 1000, this means your directory must be owned by UID 1000 and
   GID 1000.
+- The server runs on port 8000.
 
 ### Install directly on your computer
 
@@ -56,5 +61,8 @@ This is not recommended if you don't have an init system (e.g., systemd)
 - Start the bot:
     - Type `poetry run bot` into the PowerShell window.
         - You can stop the bot with <kbd>Ctrl</kbd> + <kbd>c</kbd>.
-
-Note: You will need to run `poetry install` again if [poetry.lock](poetry.lock) has been modified.
+- Go to [http://localhost:8000](http://localhost:8000) or the IP of your server.
+- You can change the Nitter instance in Settings.
+- Add a group under Add.
+    - A group is a collection of Twitter accounts and Discord webhooks that will be used to send tweets.
+    - Each group has its own settings. (e.g., If retweets should be sent, should be sent as an embed, etc.)
