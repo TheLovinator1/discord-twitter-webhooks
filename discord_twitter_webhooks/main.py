@@ -33,7 +33,7 @@ from discord_twitter_webhooks.send_to_discord import (
 from discord_twitter_webhooks.translate import languages_from, languages_to
 
 if TYPE_CHECKING:
-    from reader.types import EntryLike, FeedLike
+    from reader.types import Entry, EntryLike, FeedLike
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
@@ -267,21 +267,24 @@ async def mark_as_unread(uuid: str):  # noqa: ANN201, C901
         return HTMLResponse(f"Failed to mark feed {uuid} as unread. No entries found.")
 
     # Mark the entry as unread
-    entry: EntryLike
+    entry: EntryLike | Entry
     for entry in entries:
         reader.mark_entry_as_unread(entry)
 
     for entry in entries:
         if not group.send_retweets and entry.title.startswith("RT by "):
             logger.info(f"Skipping entry {entry} as it is a retweet")
+            reader.mark_entry_as_read(entry)
             continue
 
         if not group.send_replies and entry.title.startswith("R to "):
             logger.info(f"Skipping entry {entry} as it is a reply")
+            reader.mark_entry_as_read(entry)
             continue
 
         if group.only_send_if_media and not has_media(entry):
             logger.info(f"Skipping entry {entry} as it has no media attached")
+            reader.mark_entry_as_read(entry)
             continue
 
         if group.send_as_link:

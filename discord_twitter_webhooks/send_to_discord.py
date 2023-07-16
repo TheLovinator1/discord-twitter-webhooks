@@ -246,14 +246,17 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901
             for feeds in group.rss_feeds:
                 if not group.send_retweets and entry.title.startswith("RT by "):
                     logger.info(f"Skipping entry {entry} as it is a retweet")
+                    reader.mark_entry_as_read(entry)
                     continue
 
                 if not group.send_replies and entry.title.startswith("R to "):
                     logger.info(f"Skipping entry {entry} as it is a reply")
+                    reader.mark_entry_as_read(entry)
                     continue
 
                 if group.only_send_if_media and not has_media(entry):
                     logger.info(f"Skipping entry {entry} as it has no media attached")
+                    reader.mark_entry_as_read(entry)
                     continue
 
                 if entry.feed_url == feeds:
