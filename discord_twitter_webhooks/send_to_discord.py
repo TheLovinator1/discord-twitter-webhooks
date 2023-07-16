@@ -142,7 +142,7 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
     entry_author = entry.author
     author_avatar = get_avatar(entry.feed_url)
     embed.set_author(name=entry_author, url=entry.link, icon_url=author_avatar)
-    embed.set_timestamp()
+    embed.set_timestamp(timestamp=entry.published.timestamp())
     embed.set_color("1DA1F2")
 
     if embeds := create_image_embeds(entry):
