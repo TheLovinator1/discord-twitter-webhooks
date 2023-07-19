@@ -138,12 +138,14 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
     """
     tweet_text: str = get_tweet_text(entry, group)
     embed = DiscordEmbed(description=tweet_text, url=entry.link)
+    name_username = entry.feed.title.split(" / @")
 
-    entry_author = entry.author
+    entry_author = f"{name_username[0]} (@{name_username[1]})"
     author_avatar = get_avatar(entry.feed_url)
     embed.set_author(name=entry_author, url=entry.link, icon_url=author_avatar)
     embed.set_timestamp(timestamp=entry.published.timestamp())
     embed.set_color("1DA1F2")
+    embed.set_footer(text="Twitter", icon_url="https://abs.twimg.com/icons/apple-touch-icon-192x192.png")
 
     if embeds := create_image_embeds(entry):
         # Only do this if more than one image is found
