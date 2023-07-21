@@ -2,7 +2,7 @@ import functools
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated
+from typing import TYPE_CHECKING, Annotated, Literal
 from uuid import uuid4
 
 import uvicorn
@@ -82,6 +82,7 @@ async def add(request: Request) -> Response:
             "group_name": None,
             "languages_from": languages_from,
             "languages_to": languages_to,
+            "global_settings": get_app_settings(reader),
         },
     )
 
@@ -104,6 +105,7 @@ async def modify(request: Request, uuid: str) -> Response:
             "modifying": True,
             "languages_from": languages_from,
             "languages_to": languages_to,
+            "global_settings": get_app_settings(reader),
         },
     )
 
@@ -126,6 +128,7 @@ async def feed(  # noqa: PLR0913, ANN201
     translate: Annotated[bool, Form(title="Translate?")] = False,
     translate_from: Annotated[str, Form(title="Translate From")] = "auto",
     translate_to: Annotated[str, Form(title="Translate To")] = "en-GB",
+    link_destination: Annotated[Literal["Twitter", "Nitter"], Form(title="Link destination")] = "Twitter",
 ):
     """Create or modify a group."""
     if not uuid:
@@ -159,6 +162,7 @@ async def feed(  # noqa: PLR0913, ANN201
         translate=translate,
         translate_from=translate_from,
         translate_to=translate_to,
+        link_destination=link_destination,
     )
 
     # This will be used when adding group.rss_feeds

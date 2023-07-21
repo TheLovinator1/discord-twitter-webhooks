@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from typing import Literal
 
 from loguru import logger
 from reader import Reader, TagNotFoundError
@@ -9,7 +10,6 @@ from reader import Reader, TagNotFoundError
 class Group:
     """The user can add multiple groups, each group can have multiple usernames and webhooks."""
 
-    # TODO: Change username and hashtag URL.
     uuid: str = ""
     name: str = ""
     usernames: list[str] = field(default_factory=list)
@@ -21,13 +21,8 @@ class Group:
 
     # What to send
     send_as_embed: bool = True
-
-    # Send as a link to the tweet
     send_as_link: bool = False
-
-    # Send as the text of the tweet
     send_as_text: bool = False
-    # If we should append the username to the text
     send_as_text_username: bool = True
 
     # Translate settings
@@ -38,6 +33,9 @@ class Group:
     # Other settings
     unescape_html: bool = True
     remove_copyright: bool = True
+
+    # Where hyperlink should point to
+    link_destination: Literal["Twitter", "Nitter"] = "Twitter"
 
     created_at: str = field(default_factory=lambda: datetime.now(tz=timezone.utc).isoformat())
 
@@ -96,6 +94,7 @@ def get_group(reader: Reader, uuid: str) -> Group:
             translate_from=group.get("translate_from", Group.translate_from),
             unescape_html=group.get("unescape_html", Group.unescape_html),
             remove_copyright=group.get("remove_copyright", Group.remove_copyright),
+            link_destination=group.get("link_destination", Group.link_destination),
             created_at=group.get("created_at", datetime.now(tz=timezone.utc).isoformat()),
         )
     except TagNotFoundError:

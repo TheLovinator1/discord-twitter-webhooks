@@ -2,7 +2,8 @@
     <h3>Other</h3>
     {# Unescape HTML #}
     <div class="form-check form-switch">
-        <label class="form-check-label" for="unescape_html">Unescape HTML</label>
+        <label class="form-check-label" for="unescape_html">Replace escape sequence with the character that it
+            represents</label>
         <input class="form-check-input"
                type="checkbox"
                role="switch"
@@ -12,8 +13,7 @@
                {% if settings.unescape_html %}checked{% endif %}
         />
         <div id="unescape_html_help" class="form-text">
-            Whether or not you want to unescape HTML. For example, &amp;amp; becomes
-            &.
+            Convert &amp;amp; to &amp;, &amp;lt; to &lt;, &amp;gt; to &gt; etc.
         </div>
     </div>
 
@@ -30,6 +30,24 @@
         />
         <div id="remove_copyright_help" class="form-text">Whether or not you want to remove &copy;, &reg;, and
             &trade;.
+        </div>
+    </div>
+
+    {# Link destination #}
+    <div class="form-check form-switch">
+        <label class="form-check-label" for="link_destination">Link to Nitter instead of Twitter</label>
+        <input class="form-check-input"
+               type="checkbox"
+               role="switch"
+               id="link_destination"
+               name="link_destination"
+               value="Nitter"
+               {% if settings.link_destination == "Nitter" %}checked{% endif %}
+        />
+        <div id="link_destination_help" class="form-text">Replace links to Twitter with links to Nitter.
+            For example, <a class="text-muted" href="https://twitter.com/elonmusk/">https://twitter.com/elonmusk/</a>
+            will become <a class="text-muted"
+                           href="{{ global_settings.nitter_instance }}/elonmusk/">{{ global_settings.nitter_instance }}/elonmusk/</a>.
         </div>
     </div>
 </div>

@@ -14,7 +14,8 @@ from reader import Entry, Reader
 from reader.types import EntryLike
 from requests import request
 
-from discord_twitter_webhooks._dataclasses import Group, get_group
+from discord_twitter_webhooks._dataclasses import Group, get_app_settings, get_group
+from discord_twitter_webhooks.reader_settings import get_reader
 from discord_twitter_webhooks.tweet_text import get_tweet_text
 
 if TYPE_CHECKING:
@@ -50,15 +51,27 @@ def send_text(entry: Entry | EntryLike, group: Group) -> None:
         group: The settings to use.
     """
     # TODO: Append images to the end of the text
-    # TODO: Remove the Discord embeds to hashtags and @s
     webhook = DiscordWebhook(url="")
     tweet_text = get_tweet_text(entry, group)
     if not tweet_text:
         logger.debug("No text for {}", entry.link)
         tweet_text = "*Tweet has no text.*"
 
+    entry_link = entry.link
+    if group.link_destination == "Twitter":
+        entry_link = entry_link.replace(get_app_settings(get_reader()).nitter_instance, "https://twitter.com")
+        entry_link = entry_link.rstrip("#m")
+
+    action = "tweeted"
+    if entry.title.startswith("RT by "):
+        action = "retweeted"
+    elif entry.title.startswith("R to "):
+        # TODO: Add the username of the person they replied to
+        replied_to = re.search(r"R to @(\w+)", entry.title)
+        action = f"replied to {replied_to.group(1)}"
+
     if group.send_as_text_username:
-        tweet_text = f"[{entry.author}](<{entry.link}>):\n{tweet_text}"
+        tweet_text = f"[{entry.author}](<{entry_link}>) {action}:\n{tweet_text}"
 
     # Send the tweet text to Discord
     webhook.content = tweet_text
@@ -98,34 +111,33 @@ def get_avatar(rss_feed: str) -> str:
     return found.text or default_avatar if found is not None else default_avatar
 
 
-def create_image_embeds(entry: Entry | EntryLike) -> list[DiscordEmbed]:
+def create_image_embeds(entry_summary: str, entry_link: str) -> list[DiscordEmbed]:
     """Get the images from the entry and create embeds from them.
 
     We can unofficially have up to 4 images in an embed.
     https://github.com/lovvskillz/python-discord-webhook/issues/126
 
     Args:
-        entry: The entry to get the images from.
+        entry_summary: The tweet text from the RSS feed. This is HTML.
+        entry_link: The link to the entry.
 
     Returns:
         A list of embeds.
     """
+    if not entry_summary:
+        return []
+
     embeds: list[DiscordEmbed] = []
-    entry_summary: str = str(entry.summary) or ""
     urls = re.findall('src="(https?://[^"]+)"', entry_summary)
 
     if not urls:
-        logger.debug("No images found in {}", entry.link or "entry.link is None")
         return embeds
 
-    logger.debug("Found {} images in {}", len(urls), entry.link or "entry.link is None")
     for i in range(1, min(len(urls), 4) + 1):
-        embed = DiscordEmbed(url=entry.link)
+        embed = DiscordEmbed(url=entry_link)
         embed.set_image(url=urls[i - 1])
         embeds.append(embed)
-        logger.debug("Added image {} to embeds", i)
 
-    logger.debug("We have {} embeds", len(embeds))
     return embeds
 
 
@@ -142,24 +154,31 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
 
     entry_author = f"{name_username[0]} (@{name_username[1]})"
     author_avatar = get_avatar(entry.feed_url)
-    embed.set_author(name=entry_author, url=entry.link, icon_url=author_avatar)
+
+    # Replace Nitter links with Twitter links
+    entry_link = entry.link
+    if group.link_destination == "Twitter":
+        entry_link = entry_link.replace(get_app_settings(get_reader()).nitter_instance, "https://twitter.com")
+        entry_link = entry_link.rstrip("#m")
+
+    embed.set_author(name=entry_author, url=entry_link, icon_url=author_avatar)
     embed.set_timestamp(timestamp=entry.published.timestamp())
     embed.set_color("1DA1F2")
     embed.set_footer(text="Twitter", icon_url="https://abs.twimg.com/icons/apple-touch-icon-192x192.png")
 
-    if embeds := create_image_embeds(entry):
+    if embeds := create_image_embeds(entry.summary, entry_link):
         # Only do this if more than one image is found
         if len(embeds) > 1:
             embeds.insert(0, embed)
-            webhook = DiscordWebhook(url=entry.link, embeds=embeds, rate_limit_retry=True)  # type: ignore  # noqa: PGH003, E501
+            webhook = DiscordWebhook(url=entry_link, embeds=embeds, rate_limit_retry=True)  # type: ignore  # noqa: PGH003, E501
         else:
             if embeds[0].image:
                 image = embeds[0].image
                 embed.set_image(image["url"])
-            webhook = DiscordWebhook(url=entry.link, rate_limit_retry=True)
+            webhook = DiscordWebhook(url=entry_link, rate_limit_retry=True)
             webhook.add_embed(embed)
     else:
-        webhook = DiscordWebhook(url="", rate_limit_retry=True)
+        webhook = DiscordWebhook(url=entry_link, rate_limit_retry=True)
         webhook.add_embed(embed)
 
     # Send a link to the mp4 if it's a video or gif
@@ -198,9 +217,14 @@ def send_link(entry: Entry | EntryLike, group: Group) -> None:
     """
     # TODO: Change webhook username to the tweeter so we can see who posted it?
     # TODO: Append username and action (tweeted, retweeted, liked) to the webhook username or content?
-    # TODO: Add support for changing the Nitter link to the original Twitter link
 
-    send_webhook(DiscordWebhook(url="", content=f"{entry.link}"), entry, group)
+    # Replace Nitter links with Twitter links
+    entry_link = entry.link
+    if group.link_destination == "Twitter":
+        entry_link = entry_link.replace(get_app_settings(get_reader()).nitter_instance, "https://twitter.com")
+        entry_link = entry_link.rstrip("#m")
+
+    send_webhook(DiscordWebhook(url="", content=f"{entry_link}"), entry, group)
 
 
 def has_media(entry: Entry | EntryLike) -> bool:
@@ -213,8 +237,6 @@ def has_media(entry: Entry | EntryLike) -> bool:
         True if the entry has media, False otherwise.
     """
     soup: BeautifulSoup = BeautifulSoup(entry.summary, features="lxml")
-    logger.debug("Checking if {} has media", entry.link or "entry.link is None")
-    logger.debug("Soup: {}", soup)
     video_files = bool(soup.find("source", attrs={"type": "video/mp4"}))
     images = bool(soup.find("img"))
     return video_files or images

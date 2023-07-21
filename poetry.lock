@@ -255,12 +255,12 @@ files = [
 
 [[package]]
 name = "cssbeautifier"
-version = "1.14.8"
+version = "1.14.9"
 description = "CSS unobfuscator and beautifier."
 optional = false
 python-versions = "*"
 files = [
-    {file = "cssbeautifier-1.14.8.tar.gz", hash = "sha256:9ad4c5b2ffe0b439a4bed278bc440b6a89c40823c3f19db38f808d256216a592"},
+    {file = "cssbeautifier-1.14.9.tar.gz", hash = "sha256:2da432472f68170eb854aff97b16a24721f5090ee36af2e31199590a89e7f71f"},
 ]
 
 [package.dependencies]
@@ -337,13 +337,13 @@ files = [
 
 [[package]]
 name = "djlint"
-version = "1.32.0"
+version = "1.32.1"
 description = "HTML Template Linter and Formatter"
 optional = false
 python-versions = ">=3.8.0,<4.0.0"
 files = [
-    {file = "djlint-1.32.0-py3-none-any.whl", hash = "sha256:b1b14731a39c36be654712a930c6a8b41dd0eefddf83641d8d6e00cfa798644c"},
-    {file = "djlint-1.32.0.tar.gz", hash = "sha256:0f53692b9b9731966d955b805dc8c6d43c99b967a7c2222d112451cb96145bd2"},
+    {file = "djlint-1.32.1-py3-none-any.whl", hash = "sha256:8aaec6776376cfd41f3e742ed9f5e3c46dc7c6cd7646abf9e99860fb1ec9f19a"},
+    {file = "djlint-1.32.1.tar.gz", hash = "sha256:c1e2141acf1547d244af7ef8abd15fbbae2abcc7a03e2bf31f8a491de69a6c72"},
 ]
 
 [package.dependencies]
@@ -497,13 +497,13 @@ socks = ["socksio (==1.*)"]
 
 [[package]]
 name = "identify"
-version = "2.5.24"
+version = "2.5.25"
 description = "File identification library for Python"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "identify-2.5.24-py2.py3-none-any.whl", hash = "sha256:986dbfb38b1140e763e413e6feb44cd731faf72d1909543178aa79b0e258265d"},
-    {file = "identify-2.5.24.tar.gz", hash = "sha256:0aac67d5b4812498056d28a9a512a483f5085cc28640b02b258a59dac34301d4"},
+    {file = "identify-2.5.25-py2.py3-none-any.whl", hash = "sha256:9df2489842707d431b38ce3410ef8df40da5b10a3e28a3fcac1a42523e956409"},
+    {file = "identify-2.5.25.tar.gz", hash = "sha256:db4de0e758c0db8f81996816cd2f3f2f8c5c8d49a7fd02f3b4109aac6fd80e29"},
 ]
 
 [package.extras]
@@ -624,12 +624,12 @@ i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "jsbeautifier"
-version = "1.14.8"
+version = "1.14.9"
 description = "JavaScript unobfuscator and beautifier."
 optional = false
 python-versions = "*"
 files = [
-    {file = "jsbeautifier-1.14.8.tar.gz", hash = "sha256:d4c4e263a42dd6194afb9dbe54710be3c5604492cbec3e89c92dd98513f98b9f"},
+    {file = "jsbeautifier-1.14.9.tar.gz", hash = "sha256:c738ebc36b47bd94e4ca6dd17a9004c3cc74edad582ca1d60e0e5d5945a63cb9"},
 ]
 
 [package.dependencies]
@@ -1605,13 +1605,13 @@ devenv = ["black", "check-manifest", "flake8", "pyroma", "pytest (>=4.3)", "pyte
 
 [[package]]
 name = "urllib3"
-version = "2.0.3"
+version = "2.0.4"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "urllib3-2.0.3-py3-none-any.whl", hash = "sha256:48e7fafa40319d358848e1bc6809b208340fafe2096f1725d05d67443d0483d1"},
-    {file = "urllib3-2.0.3.tar.gz", hash = "sha256:bee28b5e56addb8226c96f7f13ac28cb4c301dd5ea8a6ca179c0b9835e032825"},
+    {file = "urllib3-2.0.4-py3-none-any.whl", hash = "sha256:de7df1803967d2c2a98e4b11bb7d6bd9210474c46e8a0401514e3a42a75ebde4"},
+    {file = "urllib3-2.0.4.tar.gz", hash = "sha256:8d22f86aae8ef5e410d4f539fde9ce6b2113a001bb4d189e0aed70642d602b11"},
 ]
 
 [package.extras]
@@ -1640,13 +1640,13 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 
 [[package]]
 name = "virtualenv"
-version = "20.24.0"
+version = "20.24.1"
 description = "Virtual Python Environment builder"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "virtualenv-20.24.0-py3-none-any.whl", hash = "sha256:18d1b37fc75cc2670625702d76849a91ebd383768b4e91382a8d51be3246049e"},
-    {file = "virtualenv-20.24.0.tar.gz", hash = "sha256:e2a7cef9da880d693b933db7654367754f14e20650dc60e8ee7385571f8593a3"},
+    {file = "virtualenv-20.24.1-py3-none-any.whl", hash = "sha256:01aacf8decd346cf9a865ae85c0cdc7f64c8caa07ff0d8b1dfc1733d10677442"},
+    {file = "virtualenv-20.24.1.tar.gz", hash = "sha256:2ef6a237c31629da6442b0bcaa3999748108c7166318d1f55cc9f8d7294e97bd"},
 ]
 
 [package.dependencies]

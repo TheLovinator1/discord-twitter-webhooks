@@ -1,38 +1,25 @@
-import re
 from html import unescape
 
 from bs4 import BeautifulSoup
-from loguru import logger
 from reader import Entry
 
 from discord_twitter_webhooks._dataclasses import Group
 from discord_twitter_webhooks.translate import translate_html
 
 
-def convert_html_to_md(html: str) -> str:  # noqa: C901
+def convert_html_to_md(html: str, group: Group) -> str:
     """Convert HTML to markdown.
 
     Args:
         html: The HTML to convert.
+        group: The group to get settings from.
 
     Returns:
         Our markdown.
     """
     soup: BeautifulSoup = BeautifulSoup(html, features="lxml")
-    logger.debug(f"Converting HTML to markdown: {soup}")
 
-    for bold in soup.find_all("b") + soup.find_all("strong"):
-        bold.replace_with(f"**{bold.text}**")
-
-    for italic in soup.find_all("i") + soup.find_all("em"):
-        italic.replace_with(f"*{italic.text}*")
-
-    for blockquote in soup.find_all("blockquote") + soup.find_all("q"):
-        blockquote.replace_with(f">>> {blockquote.text}")
-
-    for code in soup.find_all("code") + soup.find_all("pre"):
-        code.replace_with(f"`{code.text}`")
-
+    # Used for photos, videos, gifs and tweet cards
     for image in soup.find_all("img"):
         image.decompose()
 
@@ -40,24 +27,23 @@ def convert_html_to_md(html: str) -> str:  # noqa: C901
         if not link.get_text().strip():
             link.decompose()
         else:
-            link_text: str = link.text or link.get("href")
-            link.replace_with(f"[{link_text}](<{link.get('href')}>)")
             # TODO: This breaks for https://nitter.lovinator.space/Steam/status/1679694708761669634#m
             #  and https://nitter.lovinator.space/SteamDB/status/1677217359487021056#m
 
-    for strikethrough in soup.find_all("s") + soup.find_all("del") + soup.find_all("strike"):
-        strikethrough.replace_with(f"~~{strikethrough.text}~~")
+            # Replace Nitter links with Twitter links
+            if group.link_destination == "Twitter":
+                if link.text.startswith("#") and hasattr(link, "href"):
+                    link["href"] = f"https://twitter.com/hashtag/{link.text[1:]}"
+                elif link.text.startswith("@") and hasattr(link, "href"):
+                    link["href"] = f"https://twitter.com/{link.text[1:]}"
 
-    for br in soup.find_all("br"):
-        br.replace_with("\n")
-
-    # TODO: We are removing <video> tags, but we should send those to Discord as well.
+            # Remove the link preview
+            link.replace_with(f"[{link.text}](<{link.get('href')}>)")
 
     clean_soup: BeautifulSoup = BeautifulSoup(str(soup).replace("</p>", "</p>\n"), features="lxml")
 
     # Remove all other tags
     for tag in clean_soup.find_all(True):
-        logger.debug("Removing tag {}", tag)
         tag.replace_with(tag.text)
 
     return clean_soup.text.strip()
@@ -73,7 +59,6 @@ def get_tweet_text(entry: Entry, group: Group) -> str:
     Returns:
         The text to send in the embed.
     """
-    # TODO: Replace Nitter links with Twitter links, add group.use_nitter_links to the group settings or something.
     # TODO: We should replace "<p><a href="https://nitter.lovinator.space/User/status/1234#m">nitter.lovinator.space/User/status/1234#m</a></p>" # noqa: E501
     #  in entry.summary with the text from the tweet if it is a retweet or quote tweet.
 
@@ -85,10 +70,7 @@ def get_tweet_text(entry: Entry, group: Group) -> str:
         # TODO: Maybe send the original text as a field or something?
         tweet_text = translate_html(tweet_text, group.translate_from, group.translate_to)
 
-    tweet_text = convert_html_to_md(tweet_text)
-
-    # Only allow two newlines in a row
-    tweet_text = re.sub(r"\n{3,}", "\n\n", tweet_text)
+    tweet_text = convert_html_to_md(tweet_text, group)
 
     if group.remove_copyright:
         # Copyright symbols are bloat and adds nothing.
