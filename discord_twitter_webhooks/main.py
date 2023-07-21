@@ -389,6 +389,7 @@ def startup() -> None:
     scheduler: BackgroundScheduler = BackgroundScheduler()
 
     # Check for new entries every 15 minutes. They will be sent to Discord if they are new.
+    # TODO: Make minutes configurable in the settings as your Nitter instance might update more often.
     scheduler.add_job(sched_func, "interval", minutes=15, next_run_time=datetime.now(tz=timezone.utc))
     scheduler.start()
 

@@ -245,7 +245,7 @@ def has_media(entry: Entry | EntryLike) -> bool:
 def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
     """Send all new entries to Discord.
 
-    This is called by the scheduler every 5 minutes. It will check for new entries and send them to Discord.
+    This is called by the scheduler every 15 minutes. It will check for new entries and send them to Discord.
 
     Args:
         reader: The reader which contains the entries.
