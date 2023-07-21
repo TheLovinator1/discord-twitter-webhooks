@@ -242,7 +242,7 @@ def has_media(entry: Entry | EntryLike) -> bool:
     return video_files or images
 
 
-def send_to_discord(reader: Reader) -> None:  # noqa: C901
+def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
     """Send all new entries to Discord.
 
     This is called by the scheduler every 5 minutes. It will check for new entries and send them to Discord.
@@ -250,6 +250,10 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901
     Args:
         reader: The reader which contains the entries.
     """
+    if True:
+        logger.info("This bot has been temporarily disabled.")
+        return
+
     reader.update_feeds(workers=4)
 
     # Loop through the unread (unsent) entries.
