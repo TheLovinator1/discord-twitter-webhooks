@@ -250,10 +250,6 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
     Args:
         reader: The reader which contains the entries.
     """
-    if True:
-        logger.info("This bot has been temporarily disabled.")
-        return
-
     reader.update_feeds(workers=4)
 
     # Loop through the unread (unsent) entries.
@@ -265,6 +261,19 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
 
     entry: Entry | EntryLike
     for entry in entries:
+        # Don't send tweets that are older than the oldest tweet we have
+        the_oldest_tweet = reader.get_entries(read=True)
+
+        # Sort the tweets by date
+        the_oldest_tweet = sorted(the_oldest_tweet, key=lambda x: x.published)
+
+        # Check if the entry is older than the oldest tweet we have
+        if entry.published < the_oldest_tweet[-1].published:
+            # Related: https://github.com/TheLovinator1/discord-twitter-webhooks/issues/129#issuecomment-1646086754
+            logger.info("Skipping entry {} as it is older than the oldest tweet we have", entry)
+            reader.mark_entry_as_read(entry)
+            continue
+
         for _group in reader.get_tag((), "groups", []):
             group = get_group(reader, str(_group))
             if not group:
