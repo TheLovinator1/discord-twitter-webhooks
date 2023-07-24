@@ -294,13 +294,13 @@ files = [
 
 [[package]]
 name = "discord-webhook"
-version = "1.1.0"
-description = "execute discord webhooks"
+version = "1.2.0"
+description = "Easily send Discord webhooks with Python"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "discord-webhook-1.1.0.tar.gz", hash = "sha256:9ea24d124e3932c15afac6b7811849920299fca7ea0905c9d4c0ae07f72155b3"},
-    {file = "discord_webhook-1.1.0-py3-none-any.whl", hash = "sha256:e357966432be2dcf7e1fed01213b6f75be1df4d40c17269b8c24f8a6b5afc78a"},
+    {file = "discord-webhook-1.2.0.tar.gz", hash = "sha256:5c46ab3ad3f47f5f046c897078b16a5ba15b70e9b957707bf9d086d232642441"},
+    {file = "discord_webhook-1.2.0-py3-none-any.whl", hash = "sha256:135b2a0136b77d0b4aadbea29e9e2a481898e20064a3f47c041709ada25a0ee8"},
 ]
 
 [package.dependencies]
