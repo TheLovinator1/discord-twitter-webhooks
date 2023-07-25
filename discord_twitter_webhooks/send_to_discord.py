@@ -299,6 +299,11 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
         # Don't send tweets that are older than the oldest tweet we have
         the_oldest_tweet = reader.get_entries(read=True)
 
+        if not the_oldest_tweet:
+            # Fixes: https://github.com/TheLovinator1/discord-twitter-webhooks/issues/132
+            logger.error("the_oldest_tweet is empty, skipping entry {}", entry)
+            continue
+
         # Sort the tweets by date
         the_oldest_tweet = sorted(the_oldest_tweet, key=lambda x: x.published)
 
