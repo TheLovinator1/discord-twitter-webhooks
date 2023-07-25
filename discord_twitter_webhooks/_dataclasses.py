@@ -36,6 +36,8 @@ class Group:
 
     # Where hyperlink should point to
     link_destination: Literal["Twitter", "Nitter"] = "Twitter"
+    replace_youtube: bool = False
+    replace_reddit: bool = False
 
     # Whitelist/blacklist
     whitelist_enabled: bool = False
@@ -54,11 +56,23 @@ class ApplicationSettings:
 
     # TODO: Grab every instance from https://github.com/zedeus/nitter/wiki/Instances and use a different one each
     #  time we check for new tweets.
+    # The Nitter instance where we will get the RSS feed from
     nitter_instance: str = "https://nitter.lovinator.space"
+
+    # DeepL API key used for translating tweets
     deepl_auth_key: str = ""
 
+    # Piped/Invidious instance if the user wants to replace YouTube links
+    piped_instance: str = "https://piped.video"
+
+    # Teddit/Libreddit instance if the user wants to replace Reddit links
+    teddit_instance: str = "https://teddit.net"
+
     def __post_init__(self: "ApplicationSettings") -> None:
+        """Don't allow trailing slashes."""
         self.nitter_instance = self.nitter_instance.rstrip("/")
+        self.piped_instance = self.piped_instance.rstrip("/")
+        self.teddit_instance = self.teddit_instance.rstrip("/")
 
 
 def get_app_settings(reader: Reader) -> ApplicationSettings:
@@ -109,6 +123,8 @@ def get_group(reader: Reader, uuid: str) -> Group:
             blacklist_enabled=group.get("blacklist_enabled", Group.blacklist_enabled),
             blacklist=group.get("blacklist", []),
             blacklist_regex=group.get("blacklist_regex", []),
+            replace_reddit=group.get("replace_reddit", Group.replace_reddit),
+            replace_youtube=group.get("replace_youtube", Group.replace_youtube),
             created_at=group.get("created_at", datetime.now(tz=timezone.utc).isoformat()),
         )
     except TagNotFoundError:

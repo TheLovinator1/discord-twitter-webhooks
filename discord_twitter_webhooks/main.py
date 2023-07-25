@@ -137,6 +137,8 @@ async def feed(  # noqa: PLR0913, ANN201
     blacklist_enabled: Annotated[bool, Form(title="Blacklist enabled?")] = False,
     blacklist: Annotated[str, Form(title="Blacklist")] = "",
     blacklist_regex: Annotated[str, Form(title="Blacklist regex")] = "",
+    replace_youtube: Annotated[bool, Form(title="Replace YouTube links?")] = False,
+    replace_reddit: Annotated[bool, Form(title="Replace Reddit links?")] = False,
 ):
     """Create or modify a group."""
     if not uuid:
@@ -175,6 +177,8 @@ async def feed(  # noqa: PLR0913, ANN201
         blacklist=list(set(blacklist.splitlines())),
         blacklist_regex=list(set(blacklist_regex.splitlines())),
         link_destination=link_destination,
+        replace_reddit=replace_reddit,
+        replace_youtube=replace_youtube,
     )
 
     # This will be used when adding group.rss_feeds
@@ -366,6 +370,8 @@ async def settings_post(
     request: Request,
     nitter_instance: Annotated[str, Form(title="Nitter instance")] = "",
     deepl_auth_key: Annotated[str, Form(title="DeepL auth key")] = "",
+    piped_instance: Annotated[str, Form(title="Piped instance")] = "",
+    teddit_instance: Annotated[str, Form(title="Teddit instance")] = "",
 ) -> Response:
     """Save the settings.
 
@@ -373,11 +379,15 @@ async def settings_post(
         request: The request object.
         nitter_instance: The Nitter instance to use.
         deepl_auth_key: The DeepL auth key to use.
+        piped_instance: The Piped instance to use.
+        teddit_instance: The Teddit instance to use.
     """
     # TODO: Run reader.change_feed_url() on all feeds if the Nitter instance has changed.
     app_settings = ApplicationSettings(
         nitter_instance=nitter_instance,
         deepl_auth_key=deepl_auth_key,
+        piped_instance=piped_instance,
+        teddit_instance=teddit_instance,
     )
 
     set_app_settings(reader, app_settings)

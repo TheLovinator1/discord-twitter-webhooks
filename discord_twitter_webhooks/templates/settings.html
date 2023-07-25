@@ -52,6 +52,50 @@
                     </div>
                 </div>
             </div>
+
+            {# Piped/Invidious #}
+            <div class="row pb-2">
+                <label for="piped_instance" class="col-sm-2 col-form-label">Piped/Invidious instance</label>
+                <div class="col-sm-10">
+                    <input name="piped_instance"
+                           type="text"
+                           value="{%- if settings.piped_instance -%}{{ settings.piped_instance }}{%- endif -%}"
+                           class="form-control bg-dark border-dark text-muted"
+                           id="piped_instance"/>
+                    <div id="piped_instance_help" class="form-text">
+                        Piped/Invidious instance to use when replacing YouTube videos with an Piped or Invidious link.
+                        <br/>
+                        <br/>
+                        Instances can be found <a class="text-muted"
+                                                  href="https://github.com/TeamPiped/Piped/wiki/Instances/">here</a>
+                        or <a class="text-muted" href="https://docs.invidious.io/instances/">here</a>.
+                        <br/>
+                        You can enable "Use Piped/Invidious for YouTube videos" when modifying a group to use this.
+                    </div>
+                </div>
+            </div>
+
+            {# Teddit/Libreddit #}
+            <div class="row pb-2">
+                <label for="teddit_instance" class="col-sm-2 col-form-label">Teddit/Libreddit instance</label>
+                <div class="col-sm-10">
+                    <input name="teddit_instance"
+                           type="text"
+                           value="{%- if settings.teddit_instance -%}{{ settings.teddit_instance }}{%- endif -%}"
+                           class="form-control bg-dark border-dark text-muted"
+                           id="teddit_instance"/>
+                    <div id="teddit_instance_help" class="form-text">
+                        Teddit/Libreddit instance to use when replacing Reddit links with an Teddit or Libreddit link.
+                        <br/>
+                        <br/>
+                        Can be found <a class="text-muted" href="https://codeberg.org/teddit/teddit#instances">here</a>
+                        or <a class="text-muted"
+                              href="https://github.com/libreddit/libreddit-instances/blob/master/instances.md">here</a>.
+                        <br/>
+                        You can enable "Use Teddit/Libreddit for Reddit links" when modifying a group to use this.
+                    </div>
+                </div>
+            </div>
             <div class="d-md-flex">
                 <button class="btn btn-dark btn-sm">Update settings</button>
             </div>

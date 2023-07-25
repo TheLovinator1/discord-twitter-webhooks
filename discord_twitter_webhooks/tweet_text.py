@@ -3,7 +3,8 @@ from html import unescape
 from bs4 import BeautifulSoup
 from reader import Entry
 
-from discord_twitter_webhooks._dataclasses import Group
+from discord_twitter_webhooks._dataclasses import Group, get_app_settings
+from discord_twitter_webhooks.reader_settings import get_reader
 from discord_twitter_webhooks.translate import translate_html
 
 
@@ -72,13 +73,32 @@ def get_tweet_text(entry: Entry, group: Group) -> str:
 
     tweet_text = convert_html_to_md(tweet_text, group)
 
+    # Teddit/Libreddit
+    teddit_instance = get_app_settings(get_reader()).teddit_instance
+    if not group.replace_reddit:
+        tweet_text = tweet_text.replace("https://teddit.net", "https://reddit.com")
+        tweet_text = tweet_text.replace("[teddit.net", "[reddit.com")
+    if group.replace_reddit:
+        tweet_text = tweet_text.replace("https://reddit.com", teddit_instance)
+        tweet_text = tweet_text.replace("https://teddit.net", teddit_instance)
+
+    # Piped/Invidious
+    piped_instance = get_app_settings(get_reader()).piped_instance
+    if not group.replace_youtube:
+        tweet_text = tweet_text.replace("https://piped.video", "https://youtube.com")
+        tweet_text = tweet_text.replace("[piped.video", "[youtube.com")
+    if group.replace_youtube:
+        tweet_text = tweet_text.replace("https://youtube.com", piped_instance)
+        tweet_text = tweet_text.replace("https://piped.video", piped_instance)
+
+    # Copyright symbols are bloat and adds nothing.
     if group.remove_copyright:
-        # Copyright symbols are bloat and adds nothing.
         tweet_text = tweet_text.replace("©", "")
         tweet_text = tweet_text.replace("®", "")
         tweet_text = tweet_text.replace("™", "")
+
+    # Convert HTML entities to their corresponding characters. For example, "&amp;" becomes "&".
     if group.unescape_html:
-        # Convert HTML entities to their corresponding characters. For example, "&amp;" becomes "&".
         tweet_text = unescape(tweet_text)
 
     return tweet_text
