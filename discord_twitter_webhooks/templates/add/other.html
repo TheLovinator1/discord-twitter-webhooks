@@ -81,10 +81,10 @@
                value="True"
                {% if settings.replace_reddit %}checked{% endif %}
         />
-        <div id="replace_reddit_help" class="form-text">Replace links to Twitter with links to Nitter.
-            For example, <a class="text-muted" href="https://twitter.com/elonmusk/">https://twitter.com/elonmusk/</a>
+        <div id="replace_reddit_help" class="form-text">Replace links to Reddit with links to Teddit.
+            For example, <a class="text-muted" href="https://teddit.net/r/EnoughMuskSpam/">https://teddit.net/r/EnoughMuskSpam/</a>
             will become <a class="text-muted"
-                           href="{{ global_settings.nitter_instance }}/elonmusk/">{{ global_settings.nitter_instance }}/elonmusk/</a>.
+                           href="{{ global_settings.teddit_instance }}/r/EnoughMuskSpam/">{{ global_settings.teddit_instance }}/r/EnoughMuskSpam/</a>.
         </div>
     </div>
 </div>
