@@ -437,6 +437,7 @@ def sched_func() -> None:
 
 def start() -> None:
     """Start the server."""
+    logger.info("Starting server, you can access it at http://localhost:8000")
     uvicorn.run(app, port=8000)
 
 

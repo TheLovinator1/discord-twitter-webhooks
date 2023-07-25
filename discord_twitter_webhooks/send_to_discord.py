@@ -291,7 +291,6 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
     entries = list(reader.get_entries(read=False))
 
     if not entries:
-        logger.info("No new entries found.")
         return
 
     entry: Entry | EntryLike

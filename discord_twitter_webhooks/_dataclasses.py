@@ -83,8 +83,6 @@ def get_app_settings(reader: Reader) -> ApplicationSettings:
         logger.info("Applying default application settings. You can change these in the Settings menu.")
         set_app_settings(reader, ApplicationSettings())
         return ApplicationSettings()
-
-    logger.debug("Got application settings: {}", app_settings)
     return ApplicationSettings(**app_settings)
 
 
