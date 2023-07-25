@@ -17,6 +17,7 @@ from requests import request
 from discord_twitter_webhooks._dataclasses import Group, get_app_settings, get_group
 from discord_twitter_webhooks.reader_settings import get_reader
 from discord_twitter_webhooks.tweet_text import get_tweet_text
+from discord_twitter_webhooks.whitelist import check_word_in_string_regex
 
 if TYPE_CHECKING:
     from xml.etree.ElementTree import Element
@@ -242,6 +243,40 @@ def has_media(entry: Entry | EntryLike) -> bool:
     return video_files or images
 
 
+def whitelisted(group: Group, entry: Entry | EntryLike) -> bool:
+    """Check if the entry is whitelisted.
+
+    Args:
+        group: The group to check.
+        entry: The entry to check.
+
+    Returns:
+        True if the entry is whitelisted, False otherwise.
+    """
+    for word in group.whitelist:
+        if word.lower() in entry.title.lower():
+            return True
+
+    return any(check_word_in_string_regex(entry.title, regex_pattern) for regex_pattern in group.whitelist_regex)
+
+
+def blacklisted(group: Group, entry: Entry | EntryLike) -> bool:
+    """Check if the entry is blacklisted.
+
+    Args:
+        group: The group to check.
+        entry: The entry to check.
+
+    Returns:
+        True if the entry is blacklisted, False otherwise.
+    """
+    for word in group.blacklist:
+        if word.lower() in entry.title.lower():
+            return True
+
+    return any(check_word_in_string_regex(entry.title, regex_pattern) for regex_pattern in group.blacklist_regex)
+
+
 def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
     """Send all new entries to Discord.
 
@@ -281,6 +316,16 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
                 continue
 
             for feeds in group.rss_feeds:
+                if group.whitelist_enabled and not whitelisted(group, entry):
+                    logger.info(f"Skipping entry {entry} as it is not whitelisted")
+                    reader.mark_entry_as_read(entry)
+                    continue
+
+                if group.blacklist_enabled and blacklisted(group, entry):
+                    logger.info(f"Skipping entry {entry} as it is blacklisted")
+                    reader.mark_entry_as_read(entry)
+                    continue
+
                 if not group.send_retweets and entry.title.startswith("RT by "):
                     logger.info(f"Skipping entry {entry} as it is a retweet")
                     reader.mark_entry_as_read(entry)

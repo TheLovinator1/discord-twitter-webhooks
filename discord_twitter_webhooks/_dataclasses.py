@@ -37,6 +37,14 @@ class Group:
     # Where hyperlink should point to
     link_destination: Literal["Twitter", "Nitter"] = "Twitter"
 
+    # Whitelist/blacklist
+    whitelist_enabled: bool = False
+    whitelist: list[str] = field(default_factory=list)
+    whitelist_regex: list[str] = field(default_factory=list)
+    blacklist_enabled: bool = False
+    blacklist: list[str] = field(default_factory=list)
+    blacklist_regex: list[str] = field(default_factory=list)
+
     created_at: str = field(default_factory=lambda: datetime.now(tz=timezone.utc).isoformat())
 
 
@@ -95,6 +103,12 @@ def get_group(reader: Reader, uuid: str) -> Group:
             unescape_html=group.get("unescape_html", Group.unescape_html),
             remove_copyright=group.get("remove_copyright", Group.remove_copyright),
             link_destination=group.get("link_destination", Group.link_destination),
+            whitelist_enabled=group.get("whitelist_enabled", Group.whitelist_enabled),
+            whitelist=group.get("whitelist", []),
+            whitelist_regex=group.get("whitelist_regex", []),
+            blacklist_enabled=group.get("blacklist_enabled", Group.blacklist_enabled),
+            blacklist=group.get("blacklist", []),
+            blacklist_regex=group.get("blacklist_regex", []),
             created_at=group.get("created_at", datetime.now(tz=timezone.utc).isoformat()),
         )
     except TagNotFoundError:

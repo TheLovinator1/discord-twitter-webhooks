@@ -24,11 +24,13 @@ from discord_twitter_webhooks._dataclasses import (
 )
 from discord_twitter_webhooks.reader_settings import get_reader
 from discord_twitter_webhooks.send_to_discord import (
+    blacklisted,
     has_media,
     send_embed,
     send_link,
     send_text,
     send_to_discord,
+    whitelisted,
 )
 from discord_twitter_webhooks.translate import languages_from, languages_to
 
@@ -129,15 +131,19 @@ async def feed(  # noqa: PLR0913, ANN201
     translate_from: Annotated[str, Form(title="Translate From")] = "auto",
     translate_to: Annotated[str, Form(title="Translate To")] = "en-GB",
     link_destination: Annotated[Literal["Twitter", "Nitter"], Form(title="Link destination")] = "Twitter",
+    whitelist_enabled: Annotated[bool, Form(title="Whitelist enabled?")] = False,
+    whitelist: Annotated[str, Form(title="Whitelist")] = "",
+    whitelist_regex: Annotated[str, Form(title="Whitelist regex")] = "",
+    blacklist_enabled: Annotated[bool, Form(title="Blacklist enabled?")] = False,
+    blacklist: Annotated[str, Form(title="Blacklist")] = "",
+    blacklist_regex: Annotated[str, Form(title="Blacklist regex")] = "",
 ):
     """Create or modify a group."""
     if not uuid:
         logger.info(f"Creating new group {name}")
         uuid = str(uuid4())
 
-    # Webhooks and usernames are a single string with each item on a new line, so we split them to a real list
-    # We are removing duplicates with set()
-    webhooks_split = list(set(webhooks.splitlines()))
+    # Set is to remove duplicates
     usernames_split = list(set(usernames.splitlines()))
 
     # Get the RSS feeds for each username
@@ -147,7 +153,7 @@ async def feed(  # noqa: PLR0913, ANN201
     group = Group(
         uuid=uuid,
         name=name,
-        webhooks=webhooks_split,
+        webhooks=list(set(webhooks.splitlines())),
         usernames=usernames_split,
         rss_feeds=rss_feeds,
         send_retweets=send_retweets,
@@ -162,6 +168,12 @@ async def feed(  # noqa: PLR0913, ANN201
         translate=translate,
         translate_from=translate_from,
         translate_to=translate_to,
+        whitelist_enabled=whitelist_enabled,
+        whitelist=list(set(whitelist.splitlines())),
+        whitelist_regex=list(set(whitelist_regex.splitlines())),
+        blacklist_enabled=blacklist_enabled,
+        blacklist=list(set(blacklist.splitlines())),
+        blacklist_regex=list(set(blacklist_regex.splitlines())),
         link_destination=link_destination,
     )
 
@@ -280,6 +292,16 @@ async def mark_as_unread(uuid: str):  # noqa: ANN201, C901
         reader.mark_entry_as_unread(entry)
 
     for entry in entries:
+        if group.whitelist_enabled and not whitelisted(group, entry):
+            logger.info(f"Skipping entry {entry} as it is not whitelisted")
+            reader.mark_entry_as_read(entry)
+            continue
+
+        if group.blacklist_enabled and blacklisted(group, entry):
+            logger.info(f"Skipping entry {entry} as it is blacklisted")
+            reader.mark_entry_as_read(entry)
+            continue
+
         if not group.send_retweets and entry.title.startswith("RT by "):
             logger.info(f"Skipping entry {entry} as it is a retweet")
             reader.mark_entry_as_read(entry)

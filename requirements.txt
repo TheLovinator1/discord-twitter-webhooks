@@ -10,9 +10,9 @@ apscheduler==3.10.1 ; python_version >= "3.11" and python_version < "4.0" \
 beautifulsoup4==4.12.2 ; python_version >= "3.11" and python_version < "4.0" \
     --hash=sha256:492bbc69dca35d12daac71c4db1bfff0c876c00ef4a2ffacce226d4638eb72da \
     --hash=sha256:bd2520ca0d9d7d12694a53d44ac482d181b4ec1888909b035a3dbf40d0f57d4a
-certifi==2023.5.7 ; python_version >= "3.11" and python_version < "4.0" \
-    --hash=sha256:0f0d56dc5a6ad56fd4ba36484d6cc34451e1c6548c61daad8c320169f91eddc7 \
-    --hash=sha256:c6c2e98f5c7869efca1f8916fed228dd91539f9f1b444c314c06eef02980c716
+certifi==2023.7.22 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:539cc1d13202e33ca466e88b2807e29f4c13049d6d87031a3c110744495cb082 \
+    --hash=sha256:92d6037539857d8206b8f6ae472e8b77db8058fec5937a1ef3f54304089edbb9
 charset-normalizer==3.2.0 ; python_version >= "3.11" and python_version < "4.0" \
     --hash=sha256:04e57ab9fbf9607b77f7d057974694b4f6b142da9ed4a199859d9d4d5c63fe96 \
     --hash=sha256:09393e1b2a9461950b1c9a45d5fd251dc7c6f228acab64da1c9c0165d9c7765c \
@@ -104,9 +104,9 @@ deepl==1.15.0 ; python_version >= "3.11" and python_version < "4" \
 defusedxml==0.7.1 ; python_version >= "3.11" and python_version < "4.0" \
     --hash=sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69 \
     --hash=sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61
-discord-webhook==1.1.0 ; python_version >= "3.11" and python_version < "4.0" \
-    --hash=sha256:9ea24d124e3932c15afac6b7811849920299fca7ea0905c9d4c0ae07f72155b3 \
-    --hash=sha256:e357966432be2dcf7e1fed01213b6f75be1df4d40c17269b8c24f8a6b5afc78a
+discord-webhook==1.2.0 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:135b2a0136b77d0b4aadbea29e9e2a481898e20064a3f47c041709ada25a0ee8 \
+    --hash=sha256:5c46ab3ad3f47f5f046c897078b16a5ba15b70e9b957707bf9d086d232642441
 fastapi==0.100.0 ; python_version >= "3.11" and python_version < "4.0" \
     --hash=sha256:271662daf986da8fa98dc2b7c7f61c4abdfdccfb4786d79ed8b2878f172c6d5f \
     --hash=sha256:acb5f941ea8215663283c10018323ba7ea737c571b67fc7e88e9469c7eb1d12e

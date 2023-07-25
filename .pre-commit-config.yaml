@@ -112,7 +112,7 @@ repos:
   # Run Ruff on all Python files. We do this before Black so that Black can
   # format the code that Ruff changes.
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.0.278"
+    rev: "v0.0.280"
     hooks:
       - id: ruff
         name: Lint Python code with Ruff
