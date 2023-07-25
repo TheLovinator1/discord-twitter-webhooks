@@ -68,6 +68,9 @@ class ApplicationSettings:
     # Teddit/Libreddit instance if the user wants to replace Reddit links
     teddit_instance: str = "https://teddit.net"
 
+    # Delay between checking for new tweets in minutes
+    delay: int = 10
+
     def __post_init__(self: "ApplicationSettings") -> None:
         """Don't allow trailing slashes."""
         self.nitter_instance = self.nitter_instance.rstrip("/")

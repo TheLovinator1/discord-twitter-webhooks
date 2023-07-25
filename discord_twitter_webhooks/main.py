@@ -370,12 +370,13 @@ async def favicon():  # noqa: ANN201
 
 
 @app.post("/settings")
-async def settings_post(
+async def settings_post(  # noqa: PLR0913
     request: Request,
     nitter_instance: Annotated[str, Form(title="Nitter instance")] = "",
     deepl_auth_key: Annotated[str, Form(title="DeepL auth key")] = "",
     piped_instance: Annotated[str, Form(title="Piped instance")] = "",
     teddit_instance: Annotated[str, Form(title="Teddit instance")] = "",
+    delay: Annotated[int, Form(title="Delay between checking for new tweets")] = 15,
 ) -> Response:
     """Save the settings.
 
@@ -385,6 +386,7 @@ async def settings_post(
         deepl_auth_key: The DeepL auth key to use.
         piped_instance: The Piped instance to use.
         teddit_instance: The Teddit instance to use.
+        delay: The delay between checking for new tweets.
     """
     # TODO: Run reader.change_feed_url() on all feeds if the Nitter instance has changed.
     app_settings = ApplicationSettings(
@@ -392,6 +394,7 @@ async def settings_post(
         deepl_auth_key=deepl_auth_key,
         piped_instance=piped_instance,
         teddit_instance=teddit_instance,
+        delay=delay,
     )
 
     set_app_settings(reader, app_settings)
@@ -422,11 +425,15 @@ def startup() -> None:
         catch=True,
     )
 
+    # Get the delay from the settings
+    delay = get_app_settings(reader).delay or 10
+
+    logger.info("I will check for new tweets every {} minutes", delay)
+
     scheduler: BackgroundScheduler = BackgroundScheduler()
 
-    # Check for new entries every 15 minutes. They will be sent to Discord if they are new.
-    # TODO: Make minutes configurable in the settings as your Nitter instance might update more often.
-    scheduler.add_job(sched_func, "interval", minutes=15, next_run_time=datetime.now(tz=timezone.utc))
+    # Check for new entries every x minutes. They will be sent to Discord if they are new.
+    scheduler.add_job(sched_func, "interval", minutes=delay, next_run_time=datetime.now(tz=timezone.utc))
     scheduler.start()
 
 

@@ -96,6 +96,26 @@
                     </div>
                 </div>
             </div>
+
+            {# How long to wait between fetching new posts #}
+            <div class="row pb-2">
+                <label for="update_interval" class="col-sm-2 col-form-label">Update interval</label>
+                <div class="col-sm-10">
+                    <input name="delay"
+                           type="number"
+                           value="{%- if settings.delay -%}{{ settings.delay }}{%- endif -%}"
+                           class="form-control bg-dark border-dark text-muted"
+                           id="update_interval"/>
+                    <div id="update_interval_help" class="form-text">
+                        How long to wait between fetching new posts (in minutes).
+                        <br/>
+                        <br/>
+                        You will need to restart the bot for this to take effect.
+                    </div>
+                </div>
+            </div>
+
+
             <div class="d-md-flex">
                 <button class="btn btn-dark btn-sm">Update settings</button>
             </div>
