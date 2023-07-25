@@ -300,8 +300,11 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
         the_oldest_tweet = reader.get_entries(read=True)
 
         if not the_oldest_tweet:
-            # Fixes: https://github.com/TheLovinator1/discord-twitter-webhooks/issues/132
-            logger.error("the_oldest_tweet is empty, skipping entry {}", entry)
+            # Related: https://github.com/TheLovinator1/discord-twitter-webhooks/issues/132
+            # Get and mark every entry as read
+            _entry: Entry | EntryLike
+            for _entry in reader.get_entries(read=False):
+                reader.mark_entry_as_read(_entry)
             continue
 
         # Sort the tweets by date
