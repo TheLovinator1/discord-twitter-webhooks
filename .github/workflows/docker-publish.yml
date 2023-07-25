@@ -15,6 +15,12 @@ jobs:
       # Checkout the repository
       - uses: actions/checkout@v3
 
+      # Install ffmpeg
+      - name: Install ffmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install ffmpeg -y
+
       # We need to set up QEMU and Docker Buildx to build multi-architecture images
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
