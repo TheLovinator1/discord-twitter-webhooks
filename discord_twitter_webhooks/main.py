@@ -198,9 +198,13 @@ async def feed(  # noqa: PLR0913, ANN201
             logger.error(f"Got StorageError when adding {name_url}")
             continue
 
+        # Update the feed
+        reader.update_feeds(feed=name_url, workers=4)
+
         # Mark every entry as read
-        _entry: EntryLike
+        _entry: Entry | EntryLike
         for _entry in reader.get_entries(feed=name_url):
+            logger.debug(f"Marking entry {_entry} as read")
             reader.mark_entry_as_read(_entry)
 
         # Add what groups the feed is connected to

@@ -80,7 +80,7 @@ def get_app_settings(reader: Reader) -> ApplicationSettings:
     try:
         app_settings = reader.get_tag((), "app_settings")
     except TagNotFoundError:
-        logger.info("You should fill out the application settings.")
+        logger.info("Applying default application settings. You can change these in the Settings menu.")
         set_app_settings(reader, ApplicationSettings())
         return ApplicationSettings()
 
