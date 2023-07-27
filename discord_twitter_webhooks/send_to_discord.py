@@ -310,7 +310,7 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
         the_oldest_tweet = sorted(the_oldest_tweet, key=lambda x: x.published)
 
         # Check if the entry is older than the oldest tweet we have
-        if entry.published < the_oldest_tweet[-1].published:
+        if entry.published < the_oldest_tweet[0].published:
             # Related: https://github.com/TheLovinator1/discord-twitter-webhooks/issues/129#issuecomment-1646086754
             logger.info("Skipping entry {} as it is older than the oldest tweet we have", entry)
             reader.mark_entry_as_read(entry)
