@@ -1,6 +1,7 @@
 from html import unescape
 
 from bs4 import BeautifulSoup
+from loguru import logger
 from reader import Entry
 
 from discord_twitter_webhooks._dataclasses import Group, get_app_settings
@@ -66,11 +67,17 @@ def get_tweet_text(entry: Entry, group: Group) -> str:
     # entry.summary has text and HTML tags, entry.title has only text
     tweet_text: str = entry.summary or entry.title or f"Failed to get tweet text for <{entry.link}>"
 
+    # You can tweet without text if you have an image or video attached
+    if not tweet_text:
+        logger.warning("Tweet has no text: {}", entry.link)
+        return "*Tweet has no text.*"
+
     # Translate the tweet text
     if group.translate:
         # TODO: Maybe send the original text as a field or something?
         tweet_text = translate_html(tweet_text, group.translate_from, group.translate_to)
 
+    # Convert HTML to markdown
     tweet_text = convert_html_to_md(tweet_text, group)
 
     # Teddit/Libreddit

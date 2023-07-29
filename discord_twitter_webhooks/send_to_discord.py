@@ -25,14 +25,18 @@ if TYPE_CHECKING:
     from requests import Response
 
 
-def send_webhook(webhook: DiscordWebhook, entry: Entry | EntryLike, group: Group) -> None:
+def send_webhook(webhook: DiscordWebhook, entry: Entry | EntryLike, group: Group):
     """Send a webhook to Discord.
 
     Args:
         webhook: The webhook to send.
         entry: The entry to send.
         group: The settings to use.
+
+    Returns:
+        The response from Discord. Used for testing.
     """
+    logger.debug("Webhook: {}", webhook)
     for _webhook in group.webhooks:
         logger.debug("Webhook URL: {}", _webhook)
         webhook.url = _webhook
@@ -42,36 +46,32 @@ def send_webhook(webhook: DiscordWebhook, entry: Entry | EntryLike, group: Group
             logger.info("Webhook posted for {}", entry.link)
         else:
             logger.error(f"Got {response.status_code} from {webhook}. Response: {response.text}")
+    return webhook.content
 
 
-def send_text(entry: Entry | EntryLike, group: Group) -> None:
+def send_text(entry: Entry | EntryLike, group: Group) -> str:
     """Send text to Discord.
 
     Args:
         entry: The entry to send.
         group: The settings to use.
+
+    Returns:
+        The text sent to Discord. Used for testing.
     """
     # TODO: Append images to the end of the text
     webhook = DiscordWebhook(url="")
-    tweet_text = get_tweet_text(entry, group)
-    if not tweet_text:
-        logger.debug("No text for {}", entry.link)
-        tweet_text = "*Tweet has no text.*"
 
     entry_link = entry.link
     if group.link_destination == "Twitter":
         entry_link = entry_link.replace(get_app_settings(get_reader()).nitter_instance, "https://twitter.com")
         entry_link = entry_link.rstrip("#m")
 
-    action = "tweeted"
-    if entry.title.startswith("RT by "):
-        action = "retweeted"
-    elif entry.title.startswith("R to "):
-        # TODO: Add the username of the person they replied to
-        replied_to = re.search(r"R to @(\w+)", entry.title)
-        action = f"replied to {replied_to.group(1)}"
-
+    tweet_text = get_tweet_text(entry, group)
     if group.send_as_text_username:
+        # Append the username to the start of the tweet text
+        # action is either tweeted, retweeted or replied to
+        action = get_action(entry)
         tweet_text = f"[{entry.author}](<{entry_link}>) {action}:\n{tweet_text}"
 
     # Send the tweet text to Discord
@@ -79,13 +79,35 @@ def send_text(entry: Entry | EntryLike, group: Group) -> None:
 
     send_webhook(webhook, entry, group)
 
+    return tweet_text
+
+
+def get_action(entry):
+    """Get the action the user did.
+
+    This is either tweeted, retweeted or replied to.
+
+    Args:
+        entry: The entry to send.
+
+    Returns:
+        The action the user did.
+    """
+    action = "tweeted"
+    if entry.title.startswith("RT by "):
+        action = "retweeted"
+    elif entry.title.startswith("R to "):
+        replied_to = re.search(r"R to @(\w+)", entry.title)
+        action = f"replied to {replied_to.group(1)}"
+    return action
+
 
 @lru_cache(maxsize=128)
 def get_avatar(rss_feed: str) -> str:
     """Get the avatar of the embed.
 
     Returns:
-        The avatar of the embed as an int.
+        The avatar of the embed as an image URL.
     """
     default_avatar: str = "https://pbs.twimg.com/profile_images/1354479643882004483/Btnfm47p_400x400.jpg"
     # Go to the RSS feed and get the avatar
