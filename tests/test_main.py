@@ -60,7 +60,7 @@ def test_add_page() -> None:
     assert "p-2 border border-dark" in response.text
 
     # Check that the page contains the add feed button.
-    assert '<button class="btn btn-dark btn-sm">Add feed</button>' in response.text
+    assert '<button class="btn btn-dark btn-sm">Add</button>' in response.text
 
 
 def test_settings_page() -> None:

@@ -185,7 +185,7 @@ async def feed(  # noqa: PLR0913, ANN201
     # Add the group to the reader
     reader.set_tag((), uuid, group.__dict__)
     for _name in usernames_split:
-        name_url = f"{get_app_settings(reader).nitter_instance}/{_name}/rss"  # TODO: Check if URL is valid
+        name_url: str = f"{get_app_settings(reader).nitter_instance}/{_name}/rss"  # TODO: Check if URL is valid
         # Add the rss feed to the reader
         try:
             reader.add_feed(name_url, exist_ok=True)

@@ -63,7 +63,13 @@
         {% include "add/other.html" %}
         <br />
         <div class="d-md-flex">
-            <button class="btn btn-dark btn-sm">Add feed</button>
+            <button class="btn btn-dark btn-sm">
+                {%- if settings.uuid -%}
+                    Modify
+                {%- else -%}
+                    Add
+                {%- endif -%}
+            </button>
         </div>
     </form>
 {% endblock content %}
