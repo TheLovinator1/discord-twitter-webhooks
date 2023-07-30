@@ -18,7 +18,7 @@ random_uuid: str = str(uuid4())
 
 def test_index_page() -> None:
     """Test that the index page loads."""
-    response: Response = client.get("/")
+    response: Response = client.get("/", timeout=5)
 
     # Check that the page loaded successfully.
     assert response.status_code == 200  # noqa: PLR2004
@@ -45,7 +45,7 @@ def test_index_page() -> None:
 
 def test_add_page() -> None:
     """Test that the add page loads."""
-    response: Response = client.get("/add")
+    response: Response = client.get("/add", timeout=5)
 
     # Check that the page loaded successfully.
     assert response.status_code == 200  # noqa: PLR2004
@@ -83,7 +83,7 @@ def test_settings_page() -> None:
 def test_add_new_group() -> None:
     """Test if we can add a new group."""
     # Get the old index page.
-    old_index_page: Response = client.get("/")
+    old_index_page: Response = client.get("/", timeout=5)
 
     response: Response = client.post(
         "/feed",
@@ -113,7 +113,7 @@ def test_add_new_group() -> None:
 def test_remove_group() -> None:
     """Test if we can remove a group."""
     # Get the old index page.
-    old_index_page: Response = client.get("/")
+    old_index_page: Response = client.get("/", timeout=5)
 
     # Add a group to remove.
     client.post(

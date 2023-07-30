@@ -7,7 +7,15 @@ license = "GPL-3.0-or-later"
 readme = "README.md"
 homepage = "https://github.com/TheLovinator1/discord-twitter-webhooks"
 repository = "https://github.com/TheLovinator1/discord-twitter-webhooks"
-keywords = ["bot", "discord", "discord-twitter-webhooks", "tweepy"]
+keywords = [
+    "bot",
+    "discord",
+    "discord-twitter-webhooks",
+    "nitter",
+    "twitter",
+    "webhook",
+    "webhooks",
+]
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/TheLovinator1/discord-twitter-webhooks/issues"
@@ -101,19 +109,11 @@ select = [
     "TRY",
     "RUF",
 ]
+
 ignore = [
-    "D100",    # pydocstyle - missing docstring in public module
-    "D101",    # pydocstyle - missing docstring in public class
-    "D102",    # pydocstyle - missing docstring in public method
-    "D103",    # pydocstyle - missing docstring in public function
-    "D104",    # pydocstyle - missing docstring in public package
-    "D105",    # pydocstyle - missing docstring in magic method
-    "D106",    # pydocstyle - missing docstring in public nested class
-    "D107",    # pydocstyle - missing docstring in __init__
-    "PLE1205", # https://github.com/charliermarsh/ruff/issues/3351
-    "FBT001",  # Boolean positional arg in function definition
-    "FBT002",  # Boolean default value in function definition
-    "FBT003",  # Allow positional boolean values in function calls
+    "D100",   # We don't use docstrings in public modules
+    "D104",   # We don't use docstrings in __init__ files
+    "FBT002", # This would warn when we use False in feed()
 ]
 
 [tool.ruff.pydocstyle]

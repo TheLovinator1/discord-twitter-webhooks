@@ -13,6 +13,10 @@ test_url: str | None = os.environ.get("TEST_WEBHOOK_URL", None)
 
 @pytest.mark.skipif(not test_url, reason="TEST_WEBHOOK_URL not set")
 def test_send_webhook() -> None:
+    """Test sending a plain webhook to Discord.
+
+    This test requires the environment variable TEST_WEBHOOK_URL to be set.
+    """
     if not test_url:
         pytest.skip("TEST_WEBHOOK_URL was not set")
 
@@ -33,6 +37,10 @@ def test_send_webhook() -> None:
 
 @pytest.mark.skipif(not test_url, reason="TEST_WEBHOOK_URL not set")
 def test_send_text() -> None:
+    """Test sending the tweet as text to Discord.
+
+    This test requires the environment variable TEST_WEBHOOK_URL to be set.
+    """
     if not test_url:
         pytest.skip("TEST_WEBHOOK_URL was not set")
 
@@ -55,6 +63,10 @@ def test_send_text() -> None:
 
 @pytest.mark.skipif(not test_url, reason="TEST_WEBHOOK_URL not set")
 def test_send_text_without_username() -> None:
+    """Test sending the tweet as text to Discord without the username.
+
+    This test requires the environment variable TEST_WEBHOOK_URL to be set.
+    """
     if not test_url:
         pytest.skip("TEST_WEBHOOK_URL was not set")
 

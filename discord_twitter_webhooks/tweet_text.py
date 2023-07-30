@@ -48,7 +48,7 @@ def convert_html_to_md(html: str, group: Group) -> str:
 
     # Remove all other tags
     tag: BeautifulSoup
-    for tag in clean_soup.find_all(True):
+    for tag in clean_soup.find_all():
         tag.replace_with(tag.text)
 
     return clean_soup.text.strip()
