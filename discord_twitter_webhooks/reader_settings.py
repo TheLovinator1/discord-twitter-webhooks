@@ -24,10 +24,7 @@ def get_data_location() -> Path:
         default_data_dir: Path = Path.home() / ".local" / "share"
         data_dir: Path = Path(os.environ.get("XDG_DATA_HOME", default_data_dir)) / "discord_twitter_webhooks"
     else:
-        msg: str = (
-            f"Unsupported OS: {os.name}, please open an issue on GitHub, email me at tlovinator@gmail.com or DM me on"
-            " Discord at TheLovinator#9276"
-        )
+        msg: str = f"Unsupported OS: {os.name}, please open an issue on GitHub"
         raise NotImplementedError(msg)
 
     # Create the data directory if it doesn't exist

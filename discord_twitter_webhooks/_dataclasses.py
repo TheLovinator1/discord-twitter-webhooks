@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Literal
+from typing import Any, Literal, cast
 
 from loguru import logger
 from reader import Reader, TagNotFoundError
@@ -71,6 +71,9 @@ class ApplicationSettings:
     # Delay between checking for new tweets in minutes
     delay: int = 10
 
+    # How old can a tweet be before we don't send it to Discord. In hours.
+    max_age_hours: int = 24
+
     def __post_init__(self: "ApplicationSettings") -> None:
         """Don't allow trailing slashes."""
         self.nitter_instance = self.nitter_instance.rstrip("/")
@@ -79,14 +82,27 @@ class ApplicationSettings:
 
 
 def get_app_settings(reader: Reader) -> ApplicationSettings:
-    """Get the application settings."""
+    """Get the application settings.
+
+    If the settings don't exist, create them with the default values.
+    """
     try:
         app_settings = reader.get_tag((), "app_settings")
     except TagNotFoundError:
         logger.info("Applying default application settings. You can change these in the Settings menu.")
         set_app_settings(reader, ApplicationSettings())
         return ApplicationSettings()
-    return ApplicationSettings(**app_settings)
+
+    # Convert the dictionary to an ApplicationSettings object
+    app_settings = cast(dict[str, Any], app_settings)
+    return ApplicationSettings(
+        nitter_instance=str(app_settings.get("nitter_instance", ApplicationSettings.nitter_instance)),
+        deepl_auth_key=app_settings.get("deepl_auth_key", ApplicationSettings.deepl_auth_key),
+        piped_instance=app_settings.get("piped_instance", ApplicationSettings.piped_instance),
+        teddit_instance=app_settings.get("teddit_instance", ApplicationSettings.teddit_instance),
+        delay=app_settings.get("delay", ApplicationSettings.delay),
+        max_age_hours=app_settings.get("max_age_hours", ApplicationSettings.max_age_hours),
+    )
 
 
 def set_app_settings(reader: Reader, app_settings: ApplicationSettings) -> None:
@@ -99,6 +115,7 @@ def get_group(reader: Reader, uuid: str) -> Group:
     """Get the group."""
     try:
         group = reader.get_tag((), uuid)
+        group = cast(dict[str, Any], group)
         return Group(
             uuid=group.get("uuid", uuid),
             name=group.get("name", Group.name),
@@ -129,4 +146,5 @@ def get_group(reader: Reader, uuid: str) -> Group:
             created_at=group.get("created_at", datetime.now(tz=timezone.utc).isoformat()),
         )
     except TagNotFoundError:
-        logger.info("Group {} not found.", uuid)
+        logger.error("Failed to find group {}. Returning default group with that UUID.", uuid)
+        return Group(uuid=uuid)

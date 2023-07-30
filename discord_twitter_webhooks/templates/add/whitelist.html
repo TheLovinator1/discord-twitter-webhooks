@@ -1,9 +1,7 @@
 <div class="p-2 border border-dark" id="other_settings">
     <h3>Filter tweets</h3>
     {# Note about the whitelist and blacklist #}
-    <p>
-        The whitelist and blacklist are case-insensitive.
-    </p>
+    <p>The whitelist and blacklist are case-insensitive.</p>
     {# Whitelist enabled #}
     <div class="form-check form-switch">
         <label class="form-check-label" for="whitelist_enabled">Whitelist enabled</label>
@@ -13,20 +11,13 @@
                id="whitelist_enabled"
                name="whitelist_enabled"
                value="True"
-               {% if settings.whitelist_enabled %}checked{% endif %}
-        />
-
+               {% if settings.whitelist_enabled %}checked{% endif %} />
     </div>
     {# Whitelist words #}
     <div class="row pb-2">
         <label for="whitelist" class="col-sm-2 col-form-label">Whitelist</label>
         <div class="col-sm-10">
-      <textarea
-              name="whitelist"
-              class="form-control bg-dark border-dark text-muted"
-              id="whitelist"
-              rows="3"
-      >{% for white in settings.whitelist %}{{ white }}{% if not loop.last %}&#10;{% endif %}{% endfor %}</textarea>
+            <textarea name="whitelist" class="form-control bg-dark border-dark text-muted" id="whitelist" rows="3">{% for white in settings.whitelist %}{{ white }}{% if not loop.last %}&#10;{% endif %}{% endfor %}</textarea>
             <div id="whitelist_help" class="form-text">
                 Only send tweets that contain one of these words/sentences. One word/sentence per line.
             </div>
@@ -36,35 +27,25 @@
     <div class="row pb-2">
         <label for="whitelist_regex" class="col-sm-2 col-form-label">Whitelist - regex</label>
         <div class="col-sm-10">
-      <textarea
-              name="whitelist_regex"
-              class="form-control bg-dark border-dark text-muted"
-              id="whitelist_regex"
-              rows="3"
-      >{% for i in settings.whitelist_regex %}{{ i }}{% if not loop.last %}&#10;{% endif %}{% endfor %}</textarea>
+            <textarea name="whitelist_regex" class="form-control bg-dark border-dark text-muted" id="whitelist_regex" rows="3">{% for i in settings.whitelist_regex %}{{ i }}{% if not loop.last %}&#10;{% endif %}{% endfor %}</textarea>
             <div id="whitelist_regex_help" class="form-text">
                 A more advanced way of whitelisting tweets. Use
                 <a class="text-muted" href="https://en.wikipedia.org/wiki/Regular_expression">regular expressions</a> to
                 decide which tweets to send. One pattern per line.
-                <br/>
-                Pro-tip: You can use ChatGPT or similar to generate these patterns. For <a
-                    class="text-muted"
-                    href="https://chat.openai.com/share/53e71a5f-1ca7-4f0f-9542-a75b93adb9ab">example</a>,
+                <br />
+                Pro-tip: You can use ChatGPT or similar to generate these patterns. For <a class="text-muted" href="https://chat.openai.com/share/53e71a5f-1ca7-4f0f-9542-a75b93adb9ab">example</a>,
                 in this case the pattern is <code>8[0-9](?:\.[0-9]*)?%|90(?:\.0*)?%</code>.
-
-                <br/>
-                <br/>
+                <br />
+                <br />
                 The whitelist and blacklist are case-insensitive. The whitelist is checked first, then the blacklist.
-
-                <br/>
-                <br/>
+                <br />
+                <br />
                 <a class="text-muted" href="https://regex101.com/">Regex101</a> is a great tool for testing your regex
                 patterns.
             </div>
         </div>
     </div>
-    <hr/>
-
+    <hr />
     {# Blacklist enabled #}
     <div class="form-check form-switch">
         <label class="form-check-label" for="blacklist_enabled">Blacklist enabled</label>
@@ -74,45 +55,30 @@
                id="blacklist_enabled"
                name="blacklist_enabled"
                value="True"
-               {% if settings.blacklist_enabled %}checked{% endif %}
-        />
+               {% if settings.blacklist_enabled %}checked{% endif %} />
     </div>
-
     {# Blacklist words #}
     <div class="row pb-2">
         <label for="blacklist" class="col-sm-2 col-form-label">Blacklist</label>
         <div class="col-sm-10">
-      <textarea
-              name="blacklist"
-              class="form-control bg-dark border-dark text-muted"
-              id="blacklist"
-              rows="3"
-      >{% for i in settings.blacklist %}{{ i }}{% if not loop.last %}&#10;{% endif %}{% endfor %}</textarea>
+            <textarea name="blacklist" class="form-control bg-dark border-dark text-muted" id="blacklist" rows="3">{% for i in settings.blacklist %}{{ i }}{% if not loop.last %}&#10;{% endif %}{% endfor %}</textarea>
             <div id="blacklist_help" class="form-text">
                 Don't send tweets that contain one these words/sentences. One word/sentence per line. You can use both
                 the normal blacklist and the regex blacklist at the same time.
             </div>
         </div>
     </div>
-
     {# Blacklist words - regex #}
     <div class="row pb-2">
         <label for="blacklist_regex" class="col-sm-2 col-form-label">Blacklist - regex</label>
         <div class="col-sm-10">
-      <textarea
-              name="blacklist_regex"
-              class="form-control bg-dark border-dark text-muted"
-              id="whitelist_regex"
-              rows="3"
-      >{% for b in settings.blacklist_regex %}{{ b }}{% if not loop.last %}&#10;{% endif %}{% endfor %}</textarea>
+            <textarea name="blacklist_regex" class="form-control bg-dark border-dark text-muted" id="whitelist_regex" rows="3">{% for b in settings.blacklist_regex %}{{ b }}{% if not loop.last %}&#10;{% endif %}{% endfor %}</textarea>
             <div id="blacklist_regex_help" class="form-text">
                 A more advanced way of blacklisting tweets. Use
                 <a class="text-muted" href="https://en.wikipedia.org/wiki/Regular_expression">regular expressions</a> to
                 ignore tweets that match one of these patterns. One pattern per line.
-                <br/>
-                Pro-tip: You can use ChatGPT or similar to generate these patterns. For <a
-                    class="text-muted"
-                    href="https://chat.openai.com/share/53e71a5f-1ca7-4f0f-9542-a75b93adb9ab">example</a>,
+                <br />
+                Pro-tip: You can use ChatGPT or similar to generate these patterns. For <a class="text-muted" href="https://chat.openai.com/share/53e71a5f-1ca7-4f0f-9542-a75b93adb9ab">example</a>,
                 in this case the pattern is <code>8[0-9](?:\.[0-9]*)?%|90(?:\.0*)?%</code>.
             </div>
         </div>

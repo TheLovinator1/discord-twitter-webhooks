@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 {% block header %}
     <h1>
-        {% block title %}Feeds{% endblock title %}
+        {% block title %}
+            Feeds
+        {% endblock title %}
     </h1>
 {% endblock header %}
 {% block content %}
     {% if groups|length == 0 %}
         <div class="p-2 mb-2 border border-dark">
-            No groups found. You can add one <a href="{{ url_for('add') }}">here</a>.
+            No groups found. You can add one <a href='{{ url_for("add") }}'>here</a>.
         </div>
     {% endif %}
     <ul class="list-group">
@@ -15,17 +17,13 @@
             <div class="p-2 mb-2 border border-dark">
                 <div class="feed">
                     <h2>{{ group.name }}</h2>
-                    <a class="text-muted" href="{{ url_for('mark_as_unread', uuid=group.uuid ) }}">Debug - Mark as
-                        unread</a>
-                    <br/>
-
+                    <br />
                     {# Twitter usernames to follow #}
                     Usernames:
                     <ul>
                         {% for name in group.usernames %}
                             <li>
-                                <a class="text-muted"
-                                   href="{{ app_settings.nitter_instance }}/{{ name }} ">{{ name }}</a>
+                                <a class="text-muted" href="{{ app_settings.nitter_instance }}/{{ name }}">{{ name }}</a>
                             </li>
                         {% endfor %}
                     </ul>
@@ -38,16 +36,14 @@
                             </li>
                         {% endfor %}
                     </ul>
-                    <br/>
+                    <br />
                     {# Button to remove #}
-                    <form action="{{ url_for('remove_group_post') }}" method="post">
-                        <input type="hidden" name="uuid" value="{{ group.uuid }}"/>
-                        <input type="submit" value="Delete" class="btn btn-danger btn-sm"/>
+                    <form action='{{ url_for("remove_group_post") }}' method="post">
+                        <input type="hidden" name="uuid" value="{{ group.uuid }}" />
+                        <input type="submit" value="Delete" class="btn btn-danger btn-sm" />
                     </form>
-
                     {# Button to edit group #}
                     <a class="btn btn-primary btn-sm" href="{{ url_for('modify', uuid=group.uuid) }}">Edit</a>
-
                 </div>
             </div>
         {% endfor %}

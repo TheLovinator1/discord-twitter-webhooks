@@ -12,7 +12,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
-from reader import InvalidFeedURLError, Reader, StorageError
+from reader import Feed, InvalidFeedURLError, Reader, StorageError
 from starlette import status
 
 from discord_twitter_webhooks._dataclasses import (
@@ -23,19 +23,11 @@ from discord_twitter_webhooks._dataclasses import (
     set_app_settings,
 )
 from discord_twitter_webhooks.reader_settings import get_reader
-from discord_twitter_webhooks.send_to_discord import (
-    blacklisted,
-    has_media,
-    send_embed,
-    send_link,
-    send_text,
-    send_to_discord,
-    whitelisted,
-)
+from discord_twitter_webhooks.send_to_discord import send_to_discord
 from discord_twitter_webhooks.translate import languages_from, languages_to
 
 if TYPE_CHECKING:
-    from reader.types import Entry, EntryLike, FeedLike
+    from reader.types import Entry, EntryLike
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
@@ -54,9 +46,14 @@ async def index(request: Request) -> Response:
     Returns:
         The index page.
     """
-    groups = reader.get_tag((), "groups", [])
-    list_of_groups = [get_group(reader, group) for group in groups]
-    list_of_groups = [group for group in list_of_groups if group]  # Remove None values
+    # Get the uuids of all the groups
+    groups = list(reader.get_tag((), "groups", []))
+
+    # Convert the uuids to groups
+    list_of_groups: list[Group] = [get_group(reader, str(group)) for group in groups]
+
+    # Remove empty groups
+    list_of_groups = [group for group in list_of_groups if group]
 
     return templates.TemplateResponse(
         "index.html",
@@ -96,20 +93,21 @@ async def modify(request: Request, uuid: str) -> Response:
     Returns:
         The add page.
     """
-    # Get the old settings
-    group: Group = get_group(reader, uuid)
+    if group := get_group(reader, uuid):
+        return templates.TemplateResponse(
+            "feed.html",
+            {
+                "request": request,
+                "settings": group,
+                "modifying": True,
+                "languages_from": languages_from,
+                "languages_to": languages_to,
+                "global_settings": get_app_settings(reader),
+            },
+        )
 
-    return templates.TemplateResponse(
-        "feed.html",
-        {
-            "request": request,
-            "settings": group,
-            "modifying": True,
-            "languages_from": languages_from,
-            "languages_to": languages_to,
-            "global_settings": get_app_settings(reader),
-        },
-    )
+    # Return JSON error
+    return Response(status_code=status.HTTP_404_NOT_FOUND, content=f"Group {uuid} not found")
 
 
 @app.post("/feed")
@@ -150,7 +148,7 @@ async def feed(  # noqa: PLR0913, ANN201
 
     # Get the RSS feeds for each username
     # TODO: Check if the RSS feed is valid
-    rss_feeds = [f"{get_app_settings(reader).nitter_instance}/{_feed}/rss" for _feed in usernames_split]
+    rss_feeds: list[str] = [f"{get_app_settings(reader).nitter_instance}/{_feed}/rss" for _feed in usernames_split]
 
     group = Group(
         uuid=uuid,
@@ -203,21 +201,21 @@ async def feed(  # noqa: PLR0913, ANN201
 
         # Mark every entry as read
         _entry: Entry | EntryLike
-        for _entry in reader.get_entries(feed=name_url):
-            logger.debug(f"Marking entry {_entry} as read")
+        for _entry in reader.get_entries(feed=name_url, read=False):
+            logger.debug(f"Marking entry {_entry.link} as read")
             reader.mark_entry_as_read(_entry)
 
         # Add what groups the feed is connected to
-        our_feed = reader.get_feed(name_url)
-        groups = reader.get_tag(our_feed, "groups", [])  # type: ignore  # noqa: PGH003
+        our_feed: Feed = reader.get_feed(name_url)
+        groups = list(reader.get_tag(our_feed, "groups", []))
         groups.append(uuid)
-        reader.set_tag(our_feed, "groups", list(set(groups)))  # type: ignore  # noqa: PGH003
+        reader.set_tag(our_feed, "groups", list(set(groups)))
         logger.info(f"Added group {group.uuid} to feed {name_url}")
 
         rss_feeds.append(name_url)
 
     # Add the group to the groups list
-    groups = reader.get_tag((), "groups", [])
+    groups = list(reader.get_tag((), "groups", []))
     groups.append(uuid)
     reader.set_tag((), "groups", list(set(groups)))
     logger.info(f"Added group {group.uuid} to groups list")
@@ -239,15 +237,14 @@ async def remove_group_post(uuid: Annotated[str, Form()]) -> RedirectResponse:
 
     reader.delete_tag((), uuid)
 
-    groups = reader.get_tag((), "groups", [])
+    groups = list(reader.get_tag((), "groups", []))
     groups.remove(uuid)
     reader.set_tag((), "groups", groups)
 
     # Remove the group tag from every RSS feed that has it
-    _feed: FeedLike
     for _feed in reader.get_feeds():
-        if uuid in reader.get_tag(_feed, "groups", []):
-            groups = reader.get_tag(_feed, "groups", [])
+        if uuid in list(reader.get_tag(_feed, "groups", [])):
+            groups = list(reader.get_tag(_feed, "groups", []))
             groups.remove(uuid)
             reader.set_tag(_feed, "groups", groups)
 
@@ -256,84 +253,6 @@ async def remove_group_post(uuid: Annotated[str, Form()]) -> RedirectResponse:
         if not reader.get_tag(_feed, "groups", []):
             reader.delete_feed(_feed)
             logger.info(f"Removed feed {_feed} due to no groups using it")
-
-    # Redirect to the index page.
-    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-
-
-@app.get("/mark_as_unread/{uuid}")
-async def mark_as_unread(uuid: str):  # noqa: ANN201, C901
-    """Mark a feed as unread.
-
-    Args:
-        uuid: The uuid of the feed to mark as unread.
-
-    Returns:
-        The index page. Or an error page if the feed could not be marked as unread.
-    """
-    logger.info(f"Marking feed {uuid} as unread")
-
-    # Get the group
-    group: Group = get_group(reader, uuid)
-
-    if not group.rss_feeds:
-        return HTMLResponse(f"No RSS feeds found for group {uuid}")
-
-    # Get the feed
-    _feed = reader.get_feed(group.rss_feeds[0], None)
-    logger.info(f"Feed is {_feed}")
-
-    # Update the feed
-    reader.update_feeds(feed=_feed, workers=4)
-
-    # Get the entries
-    entries = reader.get_entries(feed=_feed)
-    entries = list(entries)
-
-    if not entries:
-        # TODO: Return a proper error page
-        return HTMLResponse(f"Failed to mark feed {uuid} as unread. No entries found.")
-
-    # Mark the entry as unread
-    entry: EntryLike | Entry
-    for entry in entries:
-        reader.mark_entry_as_unread(entry)
-
-    for entry in entries:
-        if group.whitelist_enabled and not whitelisted(group, entry):
-            logger.info(f"Skipping entry {entry} as it is not whitelisted")
-            reader.mark_entry_as_read(entry)
-            continue
-
-        if group.blacklist_enabled and blacklisted(group, entry):
-            logger.info(f"Skipping entry {entry} as it is blacklisted")
-            reader.mark_entry_as_read(entry)
-            continue
-
-        if not group.send_retweets and entry.title.startswith("RT by "):
-            logger.info(f"Skipping entry {entry} as it is a retweet")
-            reader.mark_entry_as_read(entry)
-            continue
-
-        if not group.send_replies and entry.title.startswith("R to "):
-            logger.info(f"Skipping entry {entry} as it is a reply")
-            reader.mark_entry_as_read(entry)
-            continue
-
-        if group.only_send_if_media and not has_media(entry):
-            logger.info(f"Skipping entry {entry} as it has no media attached")
-            reader.mark_entry_as_read(entry)
-            continue
-
-        if group.send_as_link:
-            send_link(entry=entry, group=group)
-        if group.send_as_text:
-            send_text(entry=entry, group=group)
-        if group.send_as_embed:
-            send_embed(entry=entry, group=group)
-
-        # Mark the entry as read
-        reader.mark_entry_as_read(entry)
 
     # Redirect to the index page.
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -377,6 +296,7 @@ async def settings_post(  # noqa: PLR0913
     piped_instance: Annotated[str, Form(title="Piped instance")] = "",
     teddit_instance: Annotated[str, Form(title="Teddit instance")] = "",
     delay: Annotated[int, Form(title="Delay between checking for new tweets")] = 15,
+    max_age_hours: Annotated[int, Form(title="Max age of tweets")] = 24,
 ) -> Response:
     """Save the settings.
 
@@ -387,6 +307,7 @@ async def settings_post(  # noqa: PLR0913
         piped_instance: The Piped instance to use.
         teddit_instance: The Teddit instance to use.
         delay: The delay between checking for new tweets.
+        max_age_hours: The max age of tweets.
     """
     # TODO: Run reader.change_feed_url() on all feeds if the Nitter instance has changed.
     app_settings = ApplicationSettings(
@@ -395,6 +316,7 @@ async def settings_post(  # noqa: PLR0913
         piped_instance=piped_instance,
         teddit_instance=teddit_instance,
         delay=delay,
+        max_age_hours=max_age_hours,
     )
 
     set_app_settings(reader, app_settings)

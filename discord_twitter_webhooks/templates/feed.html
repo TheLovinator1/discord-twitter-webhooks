@@ -5,12 +5,12 @@
     {% endblock title %}
 {% endblock header %}
 {% block content %}
-    <form name="add" action="{{ url_for('feed') }}" method="post">
-        <input type="hidden" id="uuid" name="uuid" value="{{ settings.uuid }}"/>
+    <form name="add" action="{{ url_for("feed") }}" method="post">
+        <input type="hidden" id="uuid" name="uuid" value="{{ settings.uuid }}" />
         {% include "add/feed_details.html" %}
-        <br/>
+        <br />
         {% include "add/what_to_send.html" %}
-        <br/>
+        <br />
         <div class="p-2 border border-dark" id="embed_settings">
             <h3>Send embed</h3>
             <div class="form-check form-switch">
@@ -21,12 +21,12 @@
                        name="send_as_embed"
                        id="send_as_embed"
                        {% if settings.send_as_embed %}checked{% endif %}
-                       value="True"/>
+                       value="True" />
             </div>
         </div>
-        <br/>
+        <br />
         {% include "add/send_link.html" %}
-        <br/>
+        <br />
         <div class="p-2 border border-dark" id="link_settings">
             <h3>Send as text</h3>
             {# Send text #}
@@ -38,12 +38,9 @@
                        name="send_as_text"
                        id="send_as_text"
                        {% if settings.send_as_text %}checked{% endif %}
-                       value="True"/>
-                <div id="send_as_text_help" class="form-text">
-                    Do you want to send the text of the tweet as a message?
-                </div>
+                       value="True" />
+                <div id="send_as_text_help" class="form-text">Do you want to send the text of the tweet as a message?</div>
             </div>
-
             <div class="form-check form-switch">
                 <label class="form-check-label" for="send_as_text_username">Append username before text?</label>
                 <input class="form-check-input"
@@ -52,20 +49,19 @@
                        name="send_as_text_username"
                        id="send_as_text_username"
                        {% if settings.send_as_text_username %}checked{% endif %}
-                       value="True"/>
+                       value="True" />
                 <div id="send_as_text_username_help" class="form-text">
                     Add the username of the user who tweeted before the text of the tweet.
                 </div>
             </div>
         </div>
-
-        <br/>
+        <br />
         {% include "add/translate.html" %}
-        <br/>
+        <br />
         {% include "add/whitelist.html" %}
-        <br/>
+        <br />
         {% include "add/other.html" %}
-        <br/>
+        <br />
         <div class="d-md-flex">
             <button class="btn btn-dark btn-sm">Add feed</button>
         </div>

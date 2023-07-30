@@ -1,11 +1,13 @@
 import re
 import tempfile
+import time
+from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString, Tag
 from defusedxml import ElementTree
 from discord_webhook import DiscordEmbed, DiscordWebhook
 from loguru import logger
@@ -25,7 +27,7 @@ if TYPE_CHECKING:
     from requests import Response
 
 
-def send_webhook(webhook: DiscordWebhook, entry: Entry | EntryLike, group: Group):
+def send_webhook(webhook: DiscordWebhook, entry: Entry, group: Group) -> str:
     """Send a webhook to Discord.
 
     Args:
@@ -43,13 +45,13 @@ def send_webhook(webhook: DiscordWebhook, entry: Entry | EntryLike, group: Group
         response: Response = webhook.execute()
 
         if response.ok:
-            logger.info("Webhook posted for {}", entry.link)
+            logger.info("Webhook posted for {}", entry.title)
         else:
             logger.error(f"Got {response.status_code} from {webhook}. Response: {response.text}")
-    return webhook.content
+    return str(webhook.content)
 
 
-def send_text(entry: Entry | EntryLike, group: Group) -> str:
+def send_text(entry: Entry, group: Group) -> str:
     """Send text to Discord.
 
     Args:
@@ -62,16 +64,16 @@ def send_text(entry: Entry | EntryLike, group: Group) -> str:
     # TODO: Append images to the end of the text
     webhook = DiscordWebhook(url="")
 
-    entry_link = entry.link
+    entry_link: str = entry.link or "#"
     if group.link_destination == "Twitter":
         entry_link = entry_link.replace(get_app_settings(get_reader()).nitter_instance, "https://twitter.com")
         entry_link = entry_link.rstrip("#m")
 
-    tweet_text = get_tweet_text(entry, group)
+    tweet_text: str = get_tweet_text(entry, group)
     if group.send_as_text_username:
         # Append the username to the start of the tweet text
         # action is either tweeted, retweeted or replied to
-        action = get_action(entry)
+        action: str = get_action(entry)
         tweet_text = f"[{entry.author}](<{entry_link}>) {action}:\n{tweet_text}"
 
     # Send the tweet text to Discord
@@ -82,7 +84,7 @@ def send_text(entry: Entry | EntryLike, group: Group) -> str:
     return tweet_text
 
 
-def get_action(entry):
+def get_action(entry: Entry) -> str:
     """Get the action the user did.
 
     This is either tweeted, retweeted or replied to.
@@ -93,12 +95,18 @@ def get_action(entry):
     Returns:
         The action the user did.
     """
-    action = "tweeted"
+    action: str = "tweeted"
+
+    if not hasattr(entry, "title"):
+        return action
+
+    if not entry.title:
+        return action
+
     if entry.title.startswith("RT by "):
         action = "retweeted"
-    elif entry.title.startswith("R to "):
-        replied_to = re.search(r"R to @(\w+)", entry.title)
-        action = f"replied to {replied_to.group(1)}"
+    elif entry.title.startswith("R to ") and (replied_to := re.search(r"R to @(\w+)", entry.title)):
+        action = f"replied to {replied_to[1]}"
     return action
 
 
@@ -164,7 +172,7 @@ def create_image_embeds(entry_summary: str, entry_link: str) -> list[DiscordEmbe
     return embeds
 
 
-def send_embed(entry: Entry | EntryLike, group: Group) -> None:
+def send_embed(entry: Entry, group: Group) -> None:  # noqa: C901, PLR0915, PLR0912
     """Send an embed to Discord.
 
     Args:
@@ -172,22 +180,34 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
         group: The settings to use.
     """
     # Replace Nitter links with Twitter links
-    entry_link = entry.link
+    entry_link: str = entry.link or "#"
     if group.link_destination == "Twitter":
         entry_link = entry_link.replace(get_app_settings(get_reader()).nitter_instance, "https://twitter.com")
         entry_link = entry_link.rstrip("#m")
 
     tweet_text: str = get_tweet_text(entry, group)
     embed = DiscordEmbed(description=tweet_text, url=entry_link)
-    name_username = entry.feed.title.split(" / @")
 
-    entry_author = f"{name_username[0]} (@{name_username[1]})"
-    author_avatar = get_avatar(entry.feed_url)
+    name_username: list[str] = ["Failed to", " get username"]
+    if entry.feed.title:
+        name_username: list[str] = entry.feed.title.split(" / @")
+
+    entry_author: str = f"{name_username[0]} (@{name_username[1]})"
+    author_avatar: str = get_avatar(entry.feed_url)
 
     embed.set_author(name=entry_author, url=entry_link, icon_url=author_avatar)
-    embed.set_timestamp(timestamp=entry.published.timestamp())
+
+    # Set the timestamp to when the tweet was tweeted
+    if entry.published:
+        timestamp: float = entry.published.timestamp() or datetime.now(tz=timezone.utc).timestamp()
+        embed.set_timestamp(timestamp=timestamp)
+
     embed.set_color("1DA1F2")
     embed.set_footer(text="Twitter", icon_url="https://abs.twimg.com/icons/apple-touch-icon-192x192.png")
+
+    if not entry.summary:
+        logger.error("No summary found for {}. Entry: {}", entry.feed_url, entry)
+        return
 
     if embeds := create_image_embeds(entry.summary, entry_link):
         # Only do this if more than one image is found
@@ -197,7 +217,7 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
         else:
             if embeds[0].image:
                 image = embeds[0].image
-                embed.set_image(image["url"])
+                embed.set_image(str(image["url"]))
             webhook = DiscordWebhook(url=entry_link, rate_limit_retry=True)
             webhook.add_embed(embed)
     else:
@@ -206,11 +226,16 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
 
     # Send a link to the mp4 if it's a video or gif
     soup: BeautifulSoup = BeautifulSoup(entry.summary, features="lxml")
-    source = soup.find("source", attrs={"type": "video/mp4"})
+    source: Tag | NavigableString | None = soup.find("source", attrs={"type": "video/mp4"})
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
     if source:
         # Download the mp4
-        response: Response = request("GET", source["src"], timeout=5)
+        if not hasattr(source, "src"):
+            logger.error("No src found for {}. Entry: {}", entry.feed_url, entry)
+            return
+
+        source = cast(Tag, source)
+        response: Response = request("GET", str(source), timeout=5)
         if response.ok:
             with Path.open(Path(temp_file.name), "wb") as f:
                 f.write(response.content)
@@ -234,17 +259,23 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
 def send_link(entry: Entry | EntryLike, group: Group) -> None:
     """Send a link to Discord.
 
+    Todo:
+        TODO: Change webhook username to the tweeter so we can see who posted it?
+        TODO: Append username and action (tweeted, retweeted, liked) to the webhook username or content?
+
     Args:
         entry: The entry to send.
         group: The settings to use.
     """
-    # TODO: Change webhook username to the tweeter so we can see who posted it?
-    # TODO: Append username and action (tweeted, retweeted, liked) to the webhook username or content?
+    # entry is a EntryLike but Pylance would complain if it wasn't a Entry
+    entry = cast(Entry, entry)
 
     # Replace Nitter links with Twitter links
-    entry_link = entry.link
+    entry_link: str = entry.link or "#"
     if group.link_destination == "Twitter":
         entry_link = entry_link.replace(get_app_settings(get_reader()).nitter_instance, "https://twitter.com")
+
+        # Nitter URLs end with #m, remove it
         entry_link = entry_link.rstrip("#m")
 
     send_webhook(DiscordWebhook(url="", content=f"{entry_link}"), entry, group)
@@ -259,7 +290,15 @@ def has_media(entry: Entry | EntryLike) -> bool:
     Returns:
         True if the entry has media, False otherwise.
     """
-    soup: BeautifulSoup = BeautifulSoup(entry.summary, features="lxml")
+    # entry is a EntryLike but Pylance would complain if it wasn't a Entry
+    entry = cast(Entry, entry)
+
+    if not hasattr(entry, "summary"):
+        logger.error("No summary found for {}. Entry: {}", entry.feed_url, entry)
+        return False
+
+    entry_summary: str = entry.summary or ""
+    soup: BeautifulSoup = BeautifulSoup(entry_summary, features="lxml")
     video_files = bool(soup.find("source", attrs={"type": "video/mp4"}))
     images = bool(soup.find("img"))
     return video_files or images
@@ -275,11 +314,21 @@ def whitelisted(group: Group, entry: Entry | EntryLike) -> bool:
     Returns:
         True if the entry is whitelisted, False otherwise.
     """
+    # entry is a EntryLike but Pylance would complain if it wasn't a Entry
+    entry = cast(Entry, entry)
+
+    if not hasattr(entry, "title"):
+        logger.error("No title found for {}. Entry: {}", entry.feed_url, entry)
+        return False
+
+    # Check if the entry title contains any of the whitelisted words
+    entry_title: str = entry.title or ""
     for word in group.whitelist:
-        if word.lower() in entry.title.lower():
+        if word.lower() in entry_title.lower():
             return True
 
-    return any(check_word_in_string_regex(entry.title, regex_pattern) for regex_pattern in group.whitelist_regex)
+    # Check if the entry title matches any of the whitelisted regex patterns
+    return any(check_word_in_string_regex(entry_title, regex_pattern) for regex_pattern in group.whitelist_regex)
 
 
 def blacklisted(group: Group, entry: Entry | EntryLike) -> bool:
@@ -292,11 +341,56 @@ def blacklisted(group: Group, entry: Entry | EntryLike) -> bool:
     Returns:
         True if the entry is blacklisted, False otherwise.
     """
+    # entry is a EntryLike but Pylance would complain if it wasn't a Entry
+    entry = cast(Entry, entry)
+
+    if not hasattr(entry, "title"):
+        logger.error("No title found for {}. Entry: {}", entry.feed_url, entry)
+        return False
+
+    # Check if the entry title contains any of the blacklisted words
+    entry_title: str = entry.title or ""
     for word in group.blacklist:
-        if word.lower() in entry.title.lower():
+        if word.lower() in entry_title.lower():
             return True
 
-    return any(check_word_in_string_regex(entry.title, regex_pattern) for regex_pattern in group.blacklist_regex)
+    # Check if the entry title matches any of the blacklisted regex patterns
+    return any(check_word_in_string_regex(entry_title, regex_pattern) for regex_pattern in group.blacklist_regex)
+
+
+def too_old(entry: Entry | EntryLike, reader: Reader) -> bool:
+    """Check if the entry is too old.
+
+    Args:
+        entry: The entry to check.
+        reader: The reader which contains the entries.
+
+    Returns:
+        True if the entry is too old, False otherwise.
+    """
+    # entry is a EntryLike but Pylance would complain if it wasn't a Entry
+    entry = cast(Entry, entry)
+    entry_title: str = entry.title or ""
+
+    if not hasattr(entry, "published") or not entry.published or not entry_title:
+        logger.error("No published date or title found for {}. Entry: {}", entry.feed_url, entry)
+        reader.mark_entry_as_read(entry)
+        return False
+
+    if entry_title.startswith("RT by "):
+        # Retweets have the original tweet date, so if somebody retweets
+        # something old, it will be older than the max age.
+        return False
+
+    # Check if the entry is older than the max age
+    tweet_age_in_hours: float = (time.time() - entry.published.timestamp()) / 3600
+    if entry.published and tweet_age_in_hours > get_app_settings(reader).max_age_hours:
+        logger.info(f"Entry {entry.title} is older than {get_app_settings(reader).max_age_hours} hours")
+        reader.mark_entry_as_read(entry)
+        return True
+
+    reader.mark_entry_as_read(entry)
+    return False
 
 
 def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
@@ -310,67 +404,65 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
     reader.update_feeds(workers=4)
 
     # Loop through the unread (unsent) entries.
-    entries = list(reader.get_entries(read=False))
+    unread_entries = list(reader.get_entries(read=False))
 
-    if not entries:
+    if not unread_entries:
+        logger.info("No new entries found")
         return
 
     entry: Entry | EntryLike
-    for entry in entries:
-        # Don't send tweets that are older than the oldest tweet we have
-        the_oldest_tweet = reader.get_entries(read=True)
-
-        if not the_oldest_tweet:
-            # Related: https://github.com/TheLovinator1/discord-twitter-webhooks/issues/132
-            # Get and mark every entry as read
-            _entry: Entry | EntryLike
-            for _entry in reader.get_entries(read=False):
-                reader.mark_entry_as_read(_entry)
+    for entry in unread_entries:
+        if not hasattr(entry, "published"):
+            logger.error("No published date found for {}. Entry: {}", entry.feed_url, entry)
             continue
 
-        # Sort the tweets by date
-        the_oldest_tweet = sorted(the_oldest_tweet, key=lambda x: x.published)
+        if not entry.published:
+            logger.error("No published date found for {}. Entry: {}", entry.feed_url, entry)
+            continue
 
-        # Check if the entry is older than the oldest tweet we have
-        if entry.published < the_oldest_tweet[0].published:
-            # Related: https://github.com/TheLovinator1/discord-twitter-webhooks/issues/129#issuecomment-1646086754
-            logger.info("Skipping entry {} as it is older than the oldest tweet we have", entry)
-            reader.mark_entry_as_read(entry)
+        if too_old(entry, reader):
             continue
 
         for _group in reader.get_tag((), "groups", []):
-            group = get_group(reader, str(_group))
+            group: Group = get_group(reader, str(_group))
             if not group:
                 logger.error("Group {} not found", _group)
                 continue
 
-            for feeds in group.rss_feeds:
-                if group.whitelist_enabled and not whitelisted(group, entry):
-                    logger.info(f"Skipping entry {entry} as it is not whitelisted")
-                    reader.mark_entry_as_read(entry)
-                    continue
+            for feed in group.rss_feeds:
+                # Loop through the RSS feeds that the group has and check if the entry is from one of them.
+                if entry.feed_url == feed:
+                    entry_title: str = entry.title or ""
 
-                if group.blacklist_enabled and blacklisted(group, entry):
-                    logger.info(f"Skipping entry {entry} as it is blacklisted")
-                    reader.mark_entry_as_read(entry)
-                    continue
+                    if not entry_title:
+                        logger.error("No title found for {}. Entry: {}", entry.feed_url, entry)
+                        continue
 
-                if not group.send_retweets and entry.title.startswith("RT by "):
-                    logger.info(f"Skipping entry {entry} as it is a retweet")
-                    reader.mark_entry_as_read(entry)
-                    continue
+                    if group.whitelist_enabled and not whitelisted(group, entry):
+                        logger.info(f"Skipping entry {entry.link} as it is not whitelisted")
+                        reader.mark_entry_as_read(entry)
+                        continue
 
-                if not group.send_replies and entry.title.startswith("R to "):
-                    logger.info(f"Skipping entry {entry} as it is a reply")
-                    reader.mark_entry_as_read(entry)
-                    continue
+                    if group.blacklist_enabled and blacklisted(group, entry):
+                        logger.info(f"Skipping entry {entry.link} as it is blacklisted")
+                        reader.mark_entry_as_read(entry)
+                        continue
 
-                if group.only_send_if_media and not has_media(entry):
-                    logger.info(f"Skipping entry {entry} as it has no media attached")
-                    reader.mark_entry_as_read(entry)
-                    continue
+                    if not group.send_retweets and entry_title.startswith("RT by "):
+                        logger.info(f"Skipping entry {entry.link} as it is a retweet")
+                        reader.mark_entry_as_read(entry)
+                        continue
 
-                if entry.feed_url == feeds:
+                    if not group.send_replies and entry_title.startswith("R to "):
+                        logger.info(f"Skipping entry {entry.link} as it is a reply")
+                        reader.mark_entry_as_read(entry)
+                        continue
+
+                    if group.only_send_if_media and not has_media(entry):
+                        logger.info(f"Skipping entry {entry.link} as it has no media attached")
+                        reader.mark_entry_as_read(entry)
+                        continue
+
                     if group.send_as_link:
                         send_link(entry=entry, group=group)
                     if group.send_as_text:

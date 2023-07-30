@@ -2,21 +2,21 @@
     <h3>Other</h3>
     {# Unescape HTML #}
     <div class="form-check form-switch">
-        <label class="form-check-label" for="unescape_html">Replace escape sequence with the character that it
-            represents</label>
+        <label class="form-check-label" for="unescape_html">
+            Replace escape sequence with the character that it
+            represents
+        </label>
         <input class="form-check-input"
                type="checkbox"
                role="switch"
                id="unescape_html"
                name="unescape_html"
                value="True"
-               {% if settings.unescape_html %}checked{% endif %}
-        />
+               {% if settings.unescape_html %}checked{% endif %} />
         <div id="unescape_html_help" class="form-text">
             Convert &amp;amp; to &amp;, &amp;lt; to &lt;, &amp;gt; to &gt; etc.
         </div>
     </div>
-
     {# Remove copyright symbols #}
     <div class="form-check form-switch">
         <label class="form-check-label" for="remove_copyright">Remove &copy;, &reg;, and &trade;</label>
@@ -26,13 +26,9 @@
                id="remove_copyright"
                name="remove_copyright"
                value="True"
-               {% if settings.remove_copyright %}checked{% endif %}
-        />
-        <div id="remove_copyright_help" class="form-text">Whether or not you want to remove &copy;, &reg;, and
-            &trade;.
-        </div>
+               {% if settings.remove_copyright %}checked{% endif %} />
+        <div id="remove_copyright_help" class="form-text">Whether or not you want to remove &copy;, &reg;, and &trade;.</div>
     </div>
-
     {# Link destination #}
     <div class="form-check form-switch">
         <label class="form-check-label" for="link_destination">Link to Nitter instead of Twitter</label>
@@ -42,15 +38,13 @@
                id="link_destination"
                name="link_destination"
                value="Nitter"
-               {% if settings.link_destination == "Nitter" %}checked{% endif %}
-        />
-        <div id="link_destination_help" class="form-text">Replace links to Twitter with links to Nitter.
+               {% if settings.link_destination=="Nitter" %}checked{% endif %} />
+        <div id="link_destination_help" class="form-text">
+            Replace links to Twitter with links to Nitter.
             For example, <a class="text-muted" href="https://twitter.com/elonmusk/">https://twitter.com/elonmusk/</a>
-            will become <a class="text-muted"
-                           href="{{ global_settings.nitter_instance }}/elonmusk/">{{ global_settings.nitter_instance }}/elonmusk/</a>.
+            will become <a class="text-muted" href="{{ global_settings.nitter_instance }}/elonmusk/">{{ global_settings.nitter_instance }}/elonmusk/</a>.
         </div>
     </div>
-
     {# Use Piped/Invidious for YouTube videos #}
     <div class="form-check form-switch">
         <label class="form-check-label" for="replace_youtube">Use Piped/Invidious for YouTube videos</label>
@@ -60,16 +54,13 @@
                id="replace_youtube"
                name="replace_youtube"
                value="True"
-               {% if settings.replace_youtube %}checked{% endif %}
-        />
-        <div id="replace_youtube_help" class="form-text">Replace YouTube links with links
-            to {{ global_settings.piped_instance }}.
+               {% if settings.replace_youtube %}checked{% endif %} />
+        <div id="replace_youtube_help" class="form-text">
+            Replace YouTube links with links to {{ global_settings.piped_instance }}.
             For example, <a class="text-muted" href="https://www.youtube.com/watch?v=whPh_PasI58">https://www.youtube.com/watch?v=whPh_PasI58</a>
-            will become <a class="text-muted"
-                           href="{{ global_settings.piped_instance }}/watch?v=whPh_PasI58">{{ global_settings.piped_instance }}/watch?v=whPh_PasI58</a>.
+            will become <a class="text-muted" href="{{ global_settings.piped_instance }}/watch?v=whPh_PasI58">{{ global_settings.piped_instance }}/watch?v=whPh_PasI58</a>.
         </div>
     </div>
-
     {# Use Teddit/Libreddit for Reddit links #}
     <div class="form-check form-switch">
         <label class="form-check-label" for="replace_reddit">Use Teddit/Libreddit for Reddit links</label>
@@ -79,12 +70,11 @@
                id="replace_reddit"
                name="replace_reddit"
                value="True"
-               {% if settings.replace_reddit %}checked{% endif %}
-        />
-        <div id="replace_reddit_help" class="form-text">Replace links to Reddit with links to Teddit.
+               {% if settings.replace_reddit %}checked{% endif %} />
+        <div id="replace_reddit_help" class="form-text">
+            Replace links to Reddit with links to Teddit.
             For example, <a class="text-muted" href="https://teddit.net/r/EnoughMuskSpam/">https://teddit.net/r/EnoughMuskSpam/</a>
-            will become <a class="text-muted"
-                           href="{{ global_settings.teddit_instance }}/r/EnoughMuskSpam/">{{ global_settings.teddit_instance }}/r/EnoughMuskSpam/</a>.
+            will become <a class="text-muted" href="{{ global_settings.teddit_instance }}/r/EnoughMuskSpam/">{{ global_settings.teddit_instance }}/r/EnoughMuskSpam/</a>.
         </div>
     </div>
 </div>

@@ -7,7 +7,7 @@
     </h1>
 {% endblock header %}
 {% block content %}
-    <form name="add" action="{{ url_for('settings_post') }}" method="post">
+    <form name="add" action='{{ url_for("settings_post") }}' method="post">
         <div class="p-2 border border-dark">
             <h3>Feed Details</h3>
             {# Nitter instance #}
@@ -16,24 +16,20 @@
                 <div class="col-sm-10">
                     <input name="nitter_instance"
                            type="text"
-                           value="{%- if settings.nitter_instance -%}{{ settings.nitter_instance }}{%- endif -%}"
+                           {% if settings.nitter_instance %}value="{{ settings.nitter_instance }}"{% endif %}
                            class="form-control bg-dark border-dark text-muted"
-                           id="nitter_instance"/>
+                           id="nitter_instance" />
                     <div id="nitter_help" class="form-text">
                         The URL of the Nitter instance you want to use.
-                        <br/>
+                        <br />
                         You can find a list of instances
-                        <a class="text-muted"
-                           href="https://github.com/zedeus/nitter/wiki/Instances">here</a>.
-                        <br/>
-                        <br/>
-                        I highly recommend using your own instance, it is very easy to set up
-                        and you can find instructions <a class="text-muted"
-                                                         href="https://github.com/zedeus/nitter">here</a>.
-                        <br/>
-                        It will be faster, more private, and you won't clog down the public
-                        instance.
-                        <br/>
+                        <a class="text-muted" href="https://github.com/zedeus/nitter/wiki/Instances">here</a>.
+                        <br />
+                        <br />
+                        I highly recommend using your own instance, it is very easy to set up and you can find instructions <a class="text-muted" href="https://github.com/zedeus/nitter">here</a>.
+                        <br />
+                        It will be faster, more private, and you won't clog down the public instance.
+                        <br />
                     </div>
                 </div>
             </div>
@@ -43,79 +39,83 @@
                 <div class="col-sm-10">
                     <input name="deepl_auth_key"
                            type="text"
-                           value="{%- if settings.deepl_auth_key -%}{{ settings.deepl_auth_key }}{%- endif -%}"
+                           {% if settings.deepl_auth_key %}value="{{ settings.deepl_auth_key }}"{% endif %}
                            class="form-control bg-dark border-dark text-muted"
-                           id="deepl_auth_key"/>
+                           id="deepl_auth_key" />
                     <div id="deepl_auth_key_help" class="form-text">
-                        DeepL Auth Key to use for translations. Can be found <a class="text-muted"
-                                                                                href="https://www.deepl.com/account/summary">here</a>.
+                        DeepL Auth Key to use for translations. Can be found <a class="text-muted" href="https://www.deepl.com/account/summary">here</a>.
                     </div>
                 </div>
             </div>
-
             {# Piped/Invidious #}
             <div class="row pb-2">
                 <label for="piped_instance" class="col-sm-2 col-form-label">Piped/Invidious instance</label>
                 <div class="col-sm-10">
                     <input name="piped_instance"
                            type="text"
-                           value="{%- if settings.piped_instance -%}{{ settings.piped_instance }}{%- endif -%}"
+                           {% if settings.piped_instance %}value="{{ settings.piped_instance }}"{% endif %}
                            class="form-control bg-dark border-dark text-muted"
-                           id="piped_instance"/>
+                           id="piped_instance" />
                     <div id="piped_instance_help" class="form-text">
                         Piped/Invidious instance to use when replacing YouTube videos with an Piped or Invidious link.
-                        <br/>
-                        <br/>
-                        Instances can be found <a class="text-muted"
-                                                  href="https://github.com/TeamPiped/Piped/wiki/Instances/">here</a>
+                        <br />
+                        <br />
+                        Instances can be found <a class="text-muted" href="https://github.com/TeamPiped/Piped/wiki/Instances/">here</a>
                         or <a class="text-muted" href="https://docs.invidious.io/instances/">here</a>.
-                        <br/>
+                        <br />
                         You can enable "Use Piped/Invidious for YouTube videos" when modifying a group to use this.
                     </div>
                 </div>
             </div>
-
             {# Teddit/Libreddit #}
             <div class="row pb-2">
                 <label for="teddit_instance" class="col-sm-2 col-form-label">Teddit/Libreddit instance</label>
                 <div class="col-sm-10">
                     <input name="teddit_instance"
                            type="text"
-                           value="{%- if settings.teddit_instance -%}{{ settings.teddit_instance }}{%- endif -%}"
+                           {% if settings.teddit_instance %}value="{{ settings.teddit_instance }}"{% endif %}
                            class="form-control bg-dark border-dark text-muted"
-                           id="teddit_instance"/>
+                           id="teddit_instance" />
                     <div id="teddit_instance_help" class="form-text">
                         Teddit/Libreddit instance to use when replacing Reddit links with an Teddit or Libreddit link.
-                        <br/>
-                        <br/>
+                        <br />
+                        <br />
                         Can be found <a class="text-muted" href="https://codeberg.org/teddit/teddit#instances">here</a>
-                        or <a class="text-muted"
-                              href="https://github.com/libreddit/libreddit-instances/blob/master/instances.md">here</a>.
-                        <br/>
+                        or <a class="text-muted" href="https://github.com/libreddit/libreddit-instances/blob/master/instances.md">here</a>.
+                        <br />
                         You can enable "Use Teddit/Libreddit for Reddit links" when modifying a group to use this.
                     </div>
                 </div>
             </div>
-
             {# How long to wait between fetching new posts #}
             <div class="row pb-2">
                 <label for="update_interval" class="col-sm-2 col-form-label">Update interval</label>
                 <div class="col-sm-10">
                     <input name="delay"
                            type="number"
-                           value="{%- if settings.delay -%}{{ settings.delay }}{%- endif -%}"
+                           {% if settings.update_interval %}value="{{ settings.update_interval }}"{% endif %}
                            class="form-control bg-dark border-dark text-muted"
-                           id="update_interval"/>
+                           id="update_interval" />
                     <div id="update_interval_help" class="form-text">
                         How long to wait between fetching new posts (in minutes).
-                        <br/>
-                        <br/>
+                        <br />
+                        <br />
                         You will need to restart the bot for this to take effect.
                     </div>
                 </div>
             </div>
-
-
+            {# How old posts should be before they are ignored #}
+            <div class="row pb-2">
+                <label for="max_age_hours" class="col-sm-2 col-form-label">Max age</label>
+                <div class="col-sm-10">
+                    <input name="max_age_hours"
+                           type="number"
+                           {% if settings.max_age_hours %}value="{{ settings.max_age_hours }}"{% endif %}
+                           class="form-control bg-dark border-dark text-muted"
+                           id="max_age_hours" />
+                    <div id="max_age_hours_help" class="form-text">Tweets older than this will be ignored (in hours).</div>
+                </div>
+            </div>
             <div class="d-md-flex">
                 <button class="btn btn-dark btn-sm">Update settings</button>
             </div>

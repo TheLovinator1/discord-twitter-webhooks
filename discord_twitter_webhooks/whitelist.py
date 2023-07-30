@@ -26,10 +26,10 @@ def check_word_in_string_regex(input_string: str, regex_pattern: str) -> bool:
         bool: True if the word matching the pattern is found, False otherwise.
     """
     # Compile the regex pattern
-    pattern = re.compile(regex_pattern, flags=re.IGNORECASE)
+    pattern: re.Pattern[str] = re.compile(regex_pattern, flags=re.IGNORECASE)
 
     # Search for the pattern in the input string
-    match = pattern.search(input_string)
+    match: re.Match[str] | None = pattern.search(input_string)
 
     # If the pattern is found, return True, otherwise, return False
     return match is not None

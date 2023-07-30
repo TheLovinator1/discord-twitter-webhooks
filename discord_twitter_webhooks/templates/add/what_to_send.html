@@ -9,13 +9,9 @@
                name="send_retweets"
                id="send_retweets"
                {% if settings.send_retweets %}checked{% endif %}
-               value="True"
-        />
-        <div id="send_retweets_help" class="form-text">
-            Whether or not you want retweets to be sent to Discord.
-        </div>
+               value="True" />
+        <div id="send_retweets_help" class="form-text">Whether or not you want retweets to be sent to Discord.</div>
     </div>
-
     {# Include replies? #}
     <div class="form-check form-switch">
         <label class="form-check-label" for="send_replies">Send replies?</label>
@@ -25,12 +21,9 @@
                id="send_replies"
                name="send_replies"
                {% if settings.send_replies %}checked{% endif %}
-               value="True"/>
-        <div id="send_replies_help" class="form-text">
-            Whether or not you want replies to be sent to Discord.
-        </div>
+               value="True" />
+        <div id="send_replies_help" class="form-text">Whether or not you want replies to be sent to Discord.</div>
     </div>
-
     {# Only send if tweet has media #}
     <div class="form-check form-switch">
         <label class="form-check-label" for="only_send_if_media">Only send if tweet has media?</label>
@@ -40,7 +33,7 @@
                id="only_send_if_media"
                name="only_send_if_media"
                {% if settings.only_send_if_media %}checked{% endif %}
-               value="True"/>
+               value="True" />
         <div id="only_send_if_media_help" class="form-text">
             Only send tweets if they have media (images, videos, etc) attached.
         </div>

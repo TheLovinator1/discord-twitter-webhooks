@@ -22,10 +22,12 @@ def convert_html_to_md(html: str, group: Group) -> str:
     soup: BeautifulSoup = BeautifulSoup(html, features="lxml")
 
     # Used for photos, videos, gifs and tweet cards
+    image: BeautifulSoup
     for image in soup.find_all("img"):
         image.decompose()
 
     for link in soup.find_all("a") + soup.find_all("link"):
+        link: BeautifulSoup
         if not link.get_text().strip():
             link.decompose()
         else:
@@ -45,6 +47,7 @@ def convert_html_to_md(html: str, group: Group) -> str:
     clean_soup: BeautifulSoup = BeautifulSoup(str(soup).replace("</p>", "</p>\n"), features="lxml")
 
     # Remove all other tags
+    tag: BeautifulSoup
     for tag in clean_soup.find_all(True):
         tag.replace_with(tag.text)
 
@@ -81,7 +84,7 @@ def get_tweet_text(entry: Entry, group: Group) -> str:
     tweet_text = convert_html_to_md(tweet_text, group)
 
     # Teddit/Libreddit
-    teddit_instance = get_app_settings(get_reader()).teddit_instance
+    teddit_instance: str = get_app_settings(get_reader()).teddit_instance
     if not group.replace_reddit:
         tweet_text = tweet_text.replace("https://teddit.net", "https://reddit.com")
         tweet_text = tweet_text.replace("[teddit.net", "[reddit.com")
@@ -90,7 +93,7 @@ def get_tweet_text(entry: Entry, group: Group) -> str:
         tweet_text = tweet_text.replace("https://teddit.net", teddit_instance)
 
     # Piped/Invidious
-    piped_instance = get_app_settings(get_reader()).piped_instance
+    piped_instance: str = get_app_settings(get_reader()).piped_instance
     if not group.replace_youtube:
         tweet_text = tweet_text.replace("https://piped.video", "https://youtube.com")
         tweet_text = tweet_text.replace("[piped.video", "[youtube.com")
