@@ -423,7 +423,7 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
         if too_old(entry, reader):
             continue
 
-        for _group in reader.get_tag((), "groups", []):
+        for _group in list(reader.get_tag((), "groups", [])):
             group: Group = get_group(reader, str(_group))
             if not group:
                 logger.error("Group {} not found", _group)

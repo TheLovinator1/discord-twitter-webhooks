@@ -27,6 +27,8 @@ from discord_twitter_webhooks.send_to_discord import send_to_discord
 from discord_twitter_webhooks.translate import languages_from, languages_to
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from reader.types import Entry, EntryLike
 
 app = FastAPI()
@@ -329,6 +331,37 @@ async def settings_post(  # noqa: PLR0913
     )
 
 
+def remove_unused_feeds() -> None:
+    """Remove feeds that are not used by any groups.
+
+    We didn't remove the old feed in the past, so this function removes them.
+
+    Args:
+        reader: The reader object.
+    """
+    list_of_feeds: Iterable[Feed] = list(reader.get_feeds())
+    feeds_in_use: list[Feed] = []
+
+    for _group in list(reader.get_tag((), "groups", [])):
+        group: Group = get_group(reader, str(_group))
+        if not group:
+            logger.error("Group {} not found", _group)
+            continue
+
+        # Add the list of feeds to the list of feeds in use
+        feeds_in_use.extend([reader.get_feed(_feed) for _feed in group.rss_feeds])
+
+    # Check if the feed is in use by any groups
+    for _feed in list_of_feeds:
+        if _feed not in feeds_in_use:
+            reader.delete_feed(_feed)
+            msg: str = (
+                f"Removed feed {_feed} due to no groups using it. This was accidentally left behind when you modified"
+                f" the Nitter instance to {get_app_settings(reader).nitter_instance}."
+            )
+            logger.info(msg)
+
+
 @app.on_event("startup")
 def startup() -> None:
     """This is called when the server starts.
@@ -347,15 +380,23 @@ def startup() -> None:
         catch=True,
     )
 
+    remove_unused_feeds()
+
     # Get the delay from the settings
-    delay = get_app_settings(reader).delay or 10
+    logger.info("I will check for new tweets every {} minutes", get_app_settings(reader).delay or 10)
 
-    logger.info("I will check for new tweets every {} minutes", delay)
-
+    # Run the scheduler in the background on a separate thread
     scheduler: BackgroundScheduler = BackgroundScheduler()
 
     # Check for new entries every x minutes. They will be sent to Discord if they are new.
-    scheduler.add_job(sched_func, "interval", minutes=delay, next_run_time=datetime.now(tz=timezone.utc))
+    scheduler.add_job(
+        sched_func,
+        "interval",
+        minutes=get_app_settings(reader).delay or 10,
+        next_run_time=datetime.now(tz=timezone.utc),
+    )
+
+    # Start the scheduler
     scheduler.start()
 
 
