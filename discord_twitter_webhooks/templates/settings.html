@@ -89,14 +89,14 @@
             </div>
             {# How long to wait between fetching new posts #}
             <div class="row pb-2">
-                <label for="update_interval" class="col-sm-2 col-form-label">Update interval</label>
+                <label for="delay" class="col-sm-2 col-form-label">Update interval</label>
                 <div class="col-sm-10">
                     <input name="delay"
                            type="number"
-                           {% if settings.update_interval %}value="{{ settings.update_interval }}"{% endif %}
+                           {% if settings.delay %}value="{{ settings.delay }}"{% endif %}
                            class="form-control bg-dark border-dark text-muted"
-                           id="update_interval" />
-                    <div id="update_interval_help" class="form-text">
+                           id="delay" />
+                    <div id="delay_help" class="form-text">
                         How long to wait between fetching new posts (in minutes).
                         <br />
                         <br />
