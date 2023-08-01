@@ -235,7 +235,12 @@ def send_embed(entry: Entry, group: Group) -> None:  # noqa: C901, PLR0915, PLR0
             return
 
         source = cast(Tag, source)
-        response: Response = request("GET", str(source), timeout=5)
+        video_url: str | list[str] = source["src"]
+
+        if isinstance(video_url, list):
+            video_url = video_url[0]
+
+        response: Response = request("GET", video_url, timeout=5)
         if response.ok:
             with Path.open(Path(temp_file.name), "wb") as f:
                 f.write(response.content)
