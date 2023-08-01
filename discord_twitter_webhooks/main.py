@@ -385,11 +385,7 @@ def remove_unused_feeds() -> None:
     for _feed in list_of_feed_urls:
         if _feed not in feeds_in_use:
             reader.delete_feed(_feed)
-            msg: str = (
-                f"Removed feed {_feed} due to no groups using it. This was accidentally left behind when you modified"
-                f" the Nitter instance to {get_app_settings(reader).nitter_instance}."
-            )
-            logger.info(msg)
+            logger.info(f"Removed feed {_feed} due to no groups using it.")
 
 
 @app.on_event("startup")
