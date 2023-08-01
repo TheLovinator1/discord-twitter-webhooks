@@ -8,11 +8,11 @@ from uuid import uuid4
 import uvicorn
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, Form, Request, Response
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
-from reader import Feed, InvalidFeedURLError, Reader, StorageError
+from reader import Feed, FeedNotFoundError, InvalidFeedURLError, Reader, StorageError
 from starlette import status
 
 from discord_twitter_webhooks._dataclasses import (
@@ -23,6 +23,7 @@ from discord_twitter_webhooks._dataclasses import (
     set_app_settings,
 )
 from discord_twitter_webhooks.reader_settings import get_reader
+from discord_twitter_webhooks.replace_nitter_instance import replace_nitter_instance
 from discord_twitter_webhooks.send_to_discord import send_to_discord
 from discord_twitter_webhooks.translate import languages_from, languages_to
 
@@ -309,9 +310,28 @@ async def settings_post(  # noqa: PLR0913
         piped_instance: The Piped instance to use.
         teddit_instance: The Teddit instance to use.
         delay: The delay between checking for new tweets.
-        max_age_hours: The max age of tweets.
+        max_age_hours: How old tweets can be before they are not sent.
     """
-    # TODO: Run reader.change_feed_url() on all feeds if the Nitter instance has changed.
+    # Remove trailing slashes from the URLs
+    nitter_instance = nitter_instance.rstrip("/")
+    piped_instance = piped_instance.rstrip("/")
+    teddit_instance = teddit_instance.rstrip("/")
+
+    if msg := replace_nitter_instance(nitter_instance):
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "message": "ERROR: Nitter instance is invalid",
+                "msg": msg,
+                "nitter_instance": nitter_instance,
+                "deepl_auth_key": deepl_auth_key,
+                "piped_instance": piped_instance,
+                "teddit_instance": teddit_instance,
+                "delay": delay,
+                "max_age_hours": max_age_hours,
+            },
+        )
+
     app_settings = ApplicationSettings(
         nitter_instance=nitter_instance,
         deepl_auth_key=deepl_auth_key,
@@ -340,7 +360,8 @@ def remove_unused_feeds() -> None:
         reader: The reader object.
     """
     list_of_feeds: Iterable[Feed] = list(reader.get_feeds())
-    feeds_in_use: list[Feed] = []
+    list_of_feed_urls: list[str] = [str(_feed.url) for _feed in list_of_feeds]
+    feeds_in_use: list[str] = []
 
     for _group in list(reader.get_tag((), "groups", [])):
         group: Group = get_group(reader, str(_group))
@@ -349,10 +370,18 @@ def remove_unused_feeds() -> None:
             continue
 
         # Add the list of feeds to the list of feeds in use
-        feeds_in_use.extend([reader.get_feed(_feed) for _feed in group.rss_feeds])
+        try:
+            for _feed in group.rss_feeds:
+                if not _feed:
+                    logger.warning("Group {} has an empty feed", _group)
+                    continue
 
-    # Check if the feed is in use by any groups
-    for _feed in list_of_feeds:
+                feeds_in_use.append(_feed)
+        except FeedNotFoundError:
+            logger.error("Failed to find feed for group {}", _group)
+            continue
+
+    for _feed in list_of_feed_urls:
         if _feed not in feeds_in_use:
             reader.delete_feed(_feed)
             msg: str = (
