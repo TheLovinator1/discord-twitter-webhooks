@@ -12,6 +12,32 @@
             No groups found. You can add one <a href='{{ url_for("add") }}'>here</a>.
         </div>
     {% endif %}
+    {# Show errors #}
+    {% for feed in feeds %}
+        {% if feed.last_exception %}
+            <div class="alert alert-danger" role="alert">
+                <p>
+                    <a class="text-muted" href="{{ feed.url }}">{{ feed.url }}</a> -
+                    <a class="text-muted"
+                       href="https://github.com/thelovinator1/discord-twitter-webhooks/issues/new?assignees=&labels=bug&template=bug_report.md&title=Bug%3A+{{ feed.url }}+{{ feed.last_exception.type_name }}&body=**URL%3A**+{{ feed.url }}%0D%0A**Error%3A**+{{ feed.last_exception.type_name }}%0D%0A**Message%3A**+{{ feed.last_exception.value_str }}%0D%0A**Traceback%3A**%0D%0A%60%60%60%0D%0A{{ feed.last_exception.traceback_str }}%0D%0A%60%60%60">Create  a GitHub issue</a>
+                    <br />
+                    {{ feed.last_exception.type_name }} - {{ feed.last_exception.value_str }}
+                    <br />
+                    <a class="btn btn-primary"
+                       data-bs-toggle="collapse"
+                       href="#full_traceback_{{ loop.index0 }}"
+                       role="button"
+                       aria-expanded="false"
+                       aria-controls="full_traceback_{{ loop.index0 }}">Full traceback</a>
+                    <div class="collapse" id="full_traceback_{{ loop.index0 }}">
+                        <div class="card card-body">{{ feed.last_exception.traceback_str }}</div>
+                    </div>
+                </p>
+            </div>
+        {% endif %}
+    {% endfor %}
+    {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+    {# Show groups #}
     <ul class="list-group">
         {% for group in groups %}
             <div class="p-2 mb-2 border border-dark">

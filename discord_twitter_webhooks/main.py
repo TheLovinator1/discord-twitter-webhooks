@@ -7,7 +7,7 @@ from uuid import uuid4
 
 import uvicorn
 from apscheduler.schedulers.background import BackgroundScheduler
-from fastapi import FastAPI, Form, Request, Response
+from fastapi import FastAPI, Form, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -63,6 +63,7 @@ async def index(request: Request) -> Response:
         {
             "request": request,
             "groups": list_of_groups,
+            "feeds": list(reader.get_feeds()),
             "app_settings": get_app_settings(reader),
         },
     )
@@ -96,6 +97,7 @@ async def modify(request: Request, uuid: str) -> Response:
     Returns:
         The add page.
     """
+    # Redirect to the index page with an error if the group doesn't exist
     if group := get_group(reader, uuid):
         return templates.TemplateResponse(
             "feed.html",
@@ -109,8 +111,7 @@ async def modify(request: Request, uuid: str) -> Response:
             },
         )
 
-    # Return JSON error
-    return Response(status_code=status.HTTP_404_NOT_FOUND, content=f"Group {uuid} not found")
+    raise HTTPException(status_code=404, detail=f"Group with UUID '{uuid}' not found")
 
 
 @app.post("/feed")
