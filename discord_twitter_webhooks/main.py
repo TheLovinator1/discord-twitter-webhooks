@@ -13,7 +13,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from loguru import logger
-from reader import Feed, FeedNotFoundError, InvalidFeedURLError, Reader, StorageError
+from reader import Feed, FeedNotFoundError, Reader
 from starlette import status
 
 from discord_twitter_webhooks._dataclasses import (
@@ -30,8 +30,6 @@ from discord_twitter_webhooks.translate import languages_from, languages_to
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-
-    from reader.types import Entry, EntryLike
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
@@ -115,6 +113,39 @@ async def modify(request: Request, uuid: str) -> Response:
     raise HTTPException(status_code=404, detail=f"Group with UUID '{uuid}' not found")
 
 
+def add_feed_to_feed_groups(name_url: str, group_uuid: str) -> None:
+    """Add or modify the groups tag of a feed.
+
+    Args:
+        name_url: The feed URL.
+        group_uuid: The UUID of the group where we add the group tag.
+
+    Raises:
+        HTTPException: If the feed doesn't exist.
+    """
+    our_feed: Feed = reader.get_feed(name_url)
+    if not our_feed:
+        raise HTTPException(status_code=404, detail=f"Feed with name or URL '{name_url}' not found")
+
+    groups = list(reader.get_tag(our_feed, "groups", []))
+    groups.append(group_uuid)
+    reader.set_tag(our_feed, "groups", list(set(groups)))
+    logger.info(f"Added group {group_uuid} to feed {name_url}")
+
+
+def add_feed_to_global_groups(uuid: str) -> None:
+    """Add or modify the groups tag of a feed.
+
+    Args:
+        uuid: The UUID of the feed where we add the group tag.
+    """
+    groups = list(reader.get_tag((), "groups", []))
+    groups.append(uuid)
+    reader.set_tag((), "groups", list(set(groups)))
+    logger.info(f"Added group {uuid} to groups list")
+    logger.info(f"Group list is now {set(groups)}")
+
+
 @app.post("/feed")
 async def feed(  # noqa: PLR0913, ANN201
     name: Annotated[str, Form(title="Group Name")],
@@ -148,7 +179,7 @@ async def feed(  # noqa: PLR0913, ANN201
         logger.info(f"Creating new group {name}")
         uuid = str(uuid4())
 
-    # Set is to remove duplicates
+    # set() is to remove duplicates
     usernames_split = list(set(usernames.splitlines()))
 
     # Get the RSS feeds for each username
@@ -186,48 +217,19 @@ async def feed(  # noqa: PLR0913, ANN201
         replace_youtube=replace_youtube,
     )
 
-    # This will be used when adding group.rss_feeds
-    rss_feeds = []
-
     # Add the group to the reader
     reader.set_tag((), uuid, group.__dict__)
-    for _name in usernames_split:
-        name_url: str = f"{get_app_settings(reader).nitter_instance}/{_name}/with_replies/rss"
-        # TODO: Check if feed URL is valid
+
+    # Add the RSS feeds to the reader
+    for rss_feed_url in rss_feeds:
         # Add the rss feed to the reader
-        try:
-            reader.add_feed(name_url, exist_ok=True)
-        except InvalidFeedURLError:
-            logger.error(f"Invalid URL {name_url}")
-            continue
-        except StorageError:
-            logger.error(f"Got StorageError when adding {name_url}")
-            continue
+        reader.add_feed(rss_feed_url, exist_ok=True, allow_invalid_url=True)
 
-        # Update the feed
-        reader.update_feeds(feed=name_url, workers=4)
+        # Each RSS feed will have a tag with the groups it belongs to
+        add_feed_to_feed_groups(name_url=rss_feed_url, group_uuid=uuid)
 
-        # Mark every entry as read
-        _entry: Entry | EntryLike
-        for _entry in reader.get_entries(feed=name_url, read=False):
-            logger.debug(f"Marking entry {_entry.link} as read")
-            reader.mark_entry_as_read(_entry)
-
-        # Add what groups the feed is connected to
-        our_feed: Feed = reader.get_feed(name_url)
-        groups = list(reader.get_tag(our_feed, "groups", []))
-        groups.append(uuid)
-        reader.set_tag(our_feed, "groups", list(set(groups)))
-        logger.info(f"Added group {group.uuid} to feed {name_url}")
-
-        rss_feeds.append(name_url)
-
-    # Add the group to the groups list
-    groups = list(reader.get_tag((), "groups", []))
-    groups.append(uuid)
-    reader.set_tag((), "groups", list(set(groups)))
-    logger.info(f"Added group {group.uuid} to groups list")
-    logger.info(f"Group list is now {set(groups)}")
+    # There is a global tag with all the group UUIDs
+    add_feed_to_global_groups(uuid=uuid)
 
     # Redirect to the index page.
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)

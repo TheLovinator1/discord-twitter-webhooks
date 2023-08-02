@@ -398,6 +398,21 @@ def too_old(entry: Entry | EntryLike, reader: Reader) -> bool:
     return False
 
 
+def mark_new_feed_as_read(reader: Reader) -> None:
+    """Mark all entries from new feeds as read.
+
+    Args:
+        reader: The reader which contains the entries.
+    """
+    # Loop through the new feeds and mark all entries as read
+    for feed in reader.get_feeds(new=True):
+        reader.update_feed(feed)
+        logger.info(f"Found a new feed: {feed.title}")
+        for entry in reader.get_entries(feed=feed):
+            reader.mark_entry_as_read(entry)
+            logger.info(f"Marked {entry.link} as unread because it's from a new feed")
+
+
 def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
     """Send all new entries to Discord.
 
@@ -406,11 +421,11 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
     Args:
         reader: The reader which contains the entries.
     """
+    mark_new_feed_as_read(reader)
     reader.update_feeds(workers=4)
 
     # Loop through the unread (unsent) entries.
     unread_entries = list(reader.get_entries(read=False))
-
     if not unread_entries:
         logger.info("No new entries found")
         return
@@ -430,10 +445,6 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
 
         for _group in list(reader.get_tag((), "groups", [])):
             group: Group = get_group(reader, str(_group))
-            if not group:
-                logger.error("Group {} not found", _group)
-                continue
-
             for feed in group.rss_feeds:
                 # Loop through the RSS feeds that the group has and check if the entry is from one of them.
                 if entry.feed_url == feed:
