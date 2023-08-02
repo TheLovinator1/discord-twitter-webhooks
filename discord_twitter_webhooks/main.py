@@ -1,3 +1,4 @@
+import contextlib
 import functools
 import sys
 from datetime import datetime, timezone
@@ -152,7 +153,9 @@ async def feed(  # noqa: PLR0913, ANN201
 
     # Get the RSS feeds for each username
     # TODO: Check if the RSS feed is valid
-    rss_feeds: list[str] = [f"{get_app_settings(reader).nitter_instance}/{_feed}/rss" for _feed in usernames_split]
+    rss_feeds: list[str] = [
+        f"{get_app_settings(reader).nitter_instance}/{_feed}/with_replies/rss" for _feed in usernames_split
+    ]
 
     group = Group(
         uuid=uuid,
@@ -189,7 +192,8 @@ async def feed(  # noqa: PLR0913, ANN201
     # Add the group to the reader
     reader.set_tag((), uuid, group.__dict__)
     for _name in usernames_split:
-        name_url: str = f"{get_app_settings(reader).nitter_instance}/{_name}/rss"  # TODO: Check if URL is valid
+        name_url: str = f"{get_app_settings(reader).nitter_instance}/{_name}/with_replies/rss"
+        # TODO: Check if feed URL is valid
         # Add the rss feed to the reader
         try:
             reader.add_feed(name_url, exist_ok=True)
@@ -388,13 +392,69 @@ def remove_unused_feeds() -> None:
             logger.info(f"Removed feed {_feed} due to no groups using it.")
 
 
+def update_tweet_url() -> None:
+    """Replace the RSS feed with the one that includes replies.
+
+    This is needed because we used the RSS feed that doesn't include
+    replies in the past, so we need to replace it with the one that
+    includes replies.
+    """
+    # Run send_to_discord() to send the that are already in the RSS feed
+    # because we will mark them as read in this function
+    send_to_discord(reader)
+
+    # Loop through all the groups and change the RSS feed
+    for _group in list(reader.get_tag((), "groups", [])):
+        group: Group = get_group(reader, str(_group))
+        if not group:
+            logger.error("Group {} not found", _group)
+            continue
+
+        # Copy the list of RSS feeds so we can modify it
+        rss_feeds: list[str] = group.rss_feeds.copy()
+
+        for rss_feed in group.rss_feeds:
+            if not rss_feed:
+                logger.warning("Group {} has an empty feed", _group)
+                continue
+
+            # Only replace the feed if it doesn't already have been replaced
+            if "/with_replies/rss" not in rss_feed:
+                with contextlib.suppress(FeedNotFoundError):
+                    reader.change_feed_url(rss_feed, rss_feed.replace("/rss", "/with_replies/rss"))
+                    logger.info("{} is now using /with_replies/rss", rss_feed)
+
+                # Modify the feed in the group settings
+                rss_feeds.remove(rss_feed)
+                rss_feeds.append(rss_feed.replace("/rss", "/with_replies/rss"))
+
+                _feed: Feed = reader.get_feed(rss_feed.replace("/rss", "/with_replies/rss"))
+                if not _feed:
+                    msg: str = f"Failed to find feed {rss_feed} when marking every entry as read"
+                    logger.error(msg)
+                    continue
+
+                # Update the feed so we can mark every entry as read
+                reader.update_feeds(workers=4)
+
+                # Mark every entry as read
+                for _entry in list(reader.get_entries(feed=_feed)):
+                    reader.mark_entry_as_read(_entry)
+
+        # Modify the group
+        group.rss_feeds = rss_feeds
+
+        # Save the group if it has changed
+        reader.set_tag((), group.uuid, group.__dict__)
+
+
 @app.on_event("startup")
 def startup() -> None:
     """This is called when the server starts.
 
     It adds missing tags and starts the scheduler.
     """
-    log_format: str = "<green>{time:YYYY-MM-DD at HH:mm:ss}</green> <level>{level: <5}</level> <white>{message}</white>"
+    log_format: str = "<green>{time:YYYY-MM-DD at HH:mm:ss}</green> <level>{level: <5}</level> <cyan>{function}():</cyan> <white>{message}</white>"  # noqa: E501
     logger.remove()
     logger.add(
         sys.stderr,
@@ -407,6 +467,7 @@ def startup() -> None:
     )
 
     remove_unused_feeds()
+    update_tweet_url()
 
     # Get the delay from the settings
     logger.info("I will check for new tweets every {} minutes", get_app_settings(reader).delay or 10)
