@@ -107,9 +107,9 @@ defusedxml==0.7.1 ; python_version >= "3.11" and python_version < "4.0" \
 discord-webhook==1.2.1 ; python_version >= "3.11" and python_version < "4.0" \
     --hash=sha256:08e077bf3298370bf232c52f1aaae987f27a59b4d12dd0da680f397f937bdd95 \
     --hash=sha256:6913bee1f8bfb1399f035451367471e707b190f1e6d733c426a28515a2f38033
-fastapi==0.100.1 ; python_version >= "3.11" and python_version < "4.0" \
-    --hash=sha256:522700d7a469e4a973d92321ab93312448fbe20fca9c8da97effc7e7bc56df23 \
-    --hash=sha256:ec6dd52bfc4eff3063cfcd0713b43c87640fefb2687bbbe3d8a08d94049cdf32
+fastapi==0.101.0 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:494eb3494d89e8079c20859d7ca695f66eaccc40f46fe8c75ab6186d15f05ffd \
+    --hash=sha256:ca2ae65fe42f6a34b5cf6c994337149154b1b400c39809d7b2dccdceb5ae77af
 feedparser==6.0.10 ; python_version >= "3.11" and python_version < "4.0" \
     --hash=sha256:27da485f4637ce7163cdeab13a80312b93b7d0c1b775bef4a47629a3110bca51 \
     --hash=sha256:79c257d526d13b944e965f6095700587f27388e50ea16fd245babe4dfae7024f
