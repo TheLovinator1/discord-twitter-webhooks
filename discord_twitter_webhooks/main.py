@@ -39,6 +39,7 @@ reader: Reader = get_reader()
 
 # TODO: Add /debug page to show all the database fields
 # TODO: Add backup/restore functionality
+# TODO: Add welcome screen and remove lovinator.space as the default nitter instance
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -347,6 +348,13 @@ async def settings_post(  # noqa: PLR0913
         delay=delay,
         max_age_hours=max_age_hours,
     )
+
+    # TODO: Validate the Nitter instance
+    # TODO: Validate the DeepL auth key
+    # TODO: Check that the Piped instance is valid
+    # TODO: Check that the Teddit instance is valid
+    # TODO: Return an error if any of the above fail
+    # TODO: Warn user that he needs to restart the app if the delay changes
 
     set_app_settings(reader, app_settings)
     return templates.TemplateResponse(

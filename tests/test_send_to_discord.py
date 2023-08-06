@@ -6,7 +6,12 @@ from discord_webhook import DiscordWebhook
 from reader import Entry
 
 from discord_twitter_webhooks._dataclasses import Group
-from discord_twitter_webhooks.send_to_discord import send_text, send_webhook
+from discord_twitter_webhooks.send_to_discord import (
+    ReplyTweet,
+    get_reply_from_nitter,
+    send_text,
+    send_webhook,
+)
 
 test_url: str | None = os.environ.get("TEST_WEBHOOK_URL", None)
 
@@ -82,3 +87,22 @@ def test_send_text_without_username() -> None:
     group = Group(webhooks=[test_url], send_as_text_username=False)
 
     assert send_text(entry=entry, group=group) == "Testing test_send_text_without_username"
+
+
+def test_get_reply_from_nitter() -> None:
+    """Test getting the reply from nitter."""
+    entry = Entry(
+        id="123456789",
+        link="https://nitter.lovinator.space/SteamDB/status/1679422124375547905#m",
+    )
+
+    response: ReplyTweet | None = get_reply_from_nitter(entry=entry)
+    assert response is not None
+    assert (
+        response.text
+        == "Summer update for @TeamFortress is out, and the game has broken its concurrent player count record,"
+        " currently at 226K"
+    )
+    assert response.username == "@SteamDB"
+    assert response.fullname == "SteamDB"
+    assert response.avatar == "https://pbs.twimg.com/profile_images/1327295992585195522/QG27pNFb.jpg"

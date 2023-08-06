@@ -1,13 +1,15 @@
 import re
 import tempfile
 import time
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
+from urllib.parse import unquote
 
 import requests
-from bs4 import BeautifulSoup, NavigableString, Tag
+from bs4 import BeautifulSoup, Tag
 from defusedxml import ElementTree
 from discord_webhook import DiscordEmbed, DiscordWebhook
 from loguru import logger
@@ -172,23 +174,84 @@ def create_image_embeds(entry_summary: str, entry_link: str) -> list[DiscordEmbe
     return embeds
 
 
-def send_embed(entry: Entry, group: Group) -> None:  # noqa: C901, PLR0915, PLR0912
+def get_entry_link(entry: Entry, group: Group) -> str:
+    """Get the link to the entry.
+
+    Args:
+        entry (Entry): The entry to get the link for.
+        group (Group): The settings to use. We use this to know if the link is to Twitter or Nitter.
+
+    Returns:
+        str: The link to the entry.
+    """
+    entry_link: str = entry.link or "#"
+    if group.link_destination == "Twitter":
+        entry_link = entry_link.replace(get_app_settings(get_reader()).nitter_instance, "https://twitter.com")
+        entry_link = entry_link.rstrip("#m")
+    return entry_link
+
+
+def apply_video_to_embed(entry: Entry, embed: DiscordEmbed, webhook: DiscordWebhook):  # noqa: ANN201
+    """Download and convert the video to a gif and add it to the embed.
+
+    Only images and gifs are supported by Discord embeds.
+
+    Args:
+        entry (Entry): Get the HTML from the RSS feed.
+        embed (DiscordEmbed): The embed to add the video to.
+        webhook (DiscordWebhook): The webhook to add the video to.
+
+    Returns:
+        tempfile.NamedTemporaryFile: The temporary file the video was
+        downloaded to. This is used to delete the file after it's uploaded.
+    """
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
+    entry_summary: str = entry.summary or ""
+    if not entry_summary:
+        return temp_file
+
+    # Download and convert the video to a gif and add it to the embed
+    soup: BeautifulSoup = BeautifulSoup(entry_summary, features="lxml")
+    if source := soup.find("source", attrs={"type": "video/mp4"}):
+        # Download the mp4
+        if not hasattr(source, "src"):
+            logger.error("No src found for {}. Entry: {}", entry.feed_url, entry)
+            return temp_file
+
+        source = cast(Tag, source)
+        video_url: str | list[str] = source["src"]
+
+        if isinstance(video_url, list):
+            video_url = video_url[0]
+
+        response: Response = request("GET", video_url, timeout=5)
+        if response.ok:
+            with Path.open(Path(temp_file.name), "wb") as f:
+                f.write(response.content)
+
+                # Convert the mp4 to a gif
+                VideoFileClip(temp_file.name).write_gif(temp_file.name.replace(".mp4", ".gif"))
+
+                # Add the gif to the webhook
+                with Path.open(Path(temp_file.name.replace(".mp4", ".gif")), "rb") as g:
+                    webhook.add_file(file=g.read(), filename="video.gif")
+                embed.set_image(url="attachment://video.gif")
+
+    return temp_file
+
+
+def send_embed(entry: Entry, group: Group) -> None:
     """Send an embed to Discord.
 
     Args:
         entry: The entry to send.
         group: The settings to use.
     """
-    # Replace Nitter links with Twitter links
-    entry_link: str = entry.link or "#"
-    if group.link_destination == "Twitter":
-        entry_link = entry_link.replace(get_app_settings(get_reader()).nitter_instance, "https://twitter.com")
-        entry_link = entry_link.rstrip("#m")
-
+    entry_link: str = get_entry_link(entry, group)
     tweet_text: str = get_tweet_text(entry, group)
     embed = DiscordEmbed(description=tweet_text, url=entry_link)
 
-    name_username: list[str] = ["Failed to", " get username"]
+    name_username: list[str] = ["Failed to", "get username"]
     if entry.feed.title:
         name_username: list[str] = entry.feed.title.split(" / @")
 
@@ -224,39 +287,78 @@ def send_embed(entry: Entry, group: Group) -> None:  # noqa: C901, PLR0915, PLR0
         webhook = DiscordWebhook(url=entry_link, rate_limit_retry=True)
         webhook.add_embed(embed)
 
-    # Send a link to the mp4 if it's a video or gif
-    soup: BeautifulSoup = BeautifulSoup(entry.summary, features="lxml")
-    source: Tag | NavigableString | None = soup.find("source", attrs={"type": "video/mp4"})
-    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
-    if source:
-        # Download the mp4
-        if not hasattr(source, "src"):
-            logger.error("No src found for {}. Entry: {}", entry.feed_url, entry)
-            return
-
-        source = cast(Tag, source)
-        video_url: str | list[str] = source["src"]
-
-        if isinstance(video_url, list):
-            video_url = video_url[0]
-
-        response: Response = request("GET", video_url, timeout=5)
-        if response.ok:
-            with Path.open(Path(temp_file.name), "wb") as f:
-                f.write(response.content)
-
-                # Convert the mp4 to a gif
-                VideoFileClip(temp_file.name).write_gif(temp_file.name.replace(".mp4", ".gif"))
-
-                # Add the gif to the webhook
-                with Path.open(Path(temp_file.name.replace(".mp4", ".gif")), "rb") as g:
-                    webhook.add_file(file=g.read(), filename="video.gif")
-                embed.set_image(url="attachment://video.gif")
-
+    temp_file = apply_video_to_embed(entry, embed, webhook)
     send_webhook(webhook, entry, group)
 
     # Remove our temporary files
-    if Path.exists(Path(temp_file.name)):
+    if temp_file and Path.exists(Path(temp_file.name)):
+        temp_file.close()
+        Path.unlink(Path(temp_file.name))
+
+
+def send_embed_reply(entry: Entry, group: Group) -> None:
+    """Send an embed to Discord.
+
+    Args:
+        entry: The entry to send.
+        group: The settings to use.
+    """
+    # Check if tweet is a reply
+    reply = None
+    if entry.title and entry.title.startswith("R to "):
+        reply: ReplyTweet | None = get_reply_from_nitter(entry)
+
+    entry_link: str = get_entry_link(entry, group)
+    tweet_text: str = get_tweet_text(entry, group)
+    embed = DiscordEmbed(url=entry_link)
+
+    name_username: list[str] = ["Failed to", "get username"]
+    if entry.feed.title:
+        name_username: list[str] = entry.feed.title.split(" / @")
+
+    # Set the timestamp to when the tweet was tweeted
+    if entry.published:
+        timestamp: float = entry.published.timestamp() or datetime.now(tz=timezone.utc).timestamp()
+        embed.set_timestamp(timestamp=timestamp)
+
+    embed.set_color("1DA1F2")
+    embed.set_footer(text="Twitter", icon_url="https://abs.twimg.com/icons/apple-touch-icon-192x192.png")
+
+    if not reply:
+        logger.error("No reply found for {}. Entry: {}", entry.feed_url, entry)
+        send_embed(entry, group)
+        reader: Reader = get_reader()
+        reader.mark_entry_as_read(entry)
+        return
+
+    embed.set_author(name=reply.username, url=entry_link, icon_url=reply.avatar)
+    embed.set_description(reply.text)
+    embed.add_embed_field(name=f"Reply from @{name_username[1]}", value=tweet_text, inline=False)
+
+    if not entry.summary:
+        logger.error("No summary found for {}. Entry: {}", entry.feed_url, entry)
+        return
+
+    if embeds := create_image_embeds(entry.summary, entry_link):
+        # Only do this if more than one image is found
+        if len(embeds) > 1:
+            embeds.insert(0, embed)
+            webhook = DiscordWebhook(url=entry_link, embeds=embeds, rate_limit_retry=True)
+        else:
+            if embeds[0].image:
+                image = embeds[0].image
+                embed.set_image(str(image["url"]))
+            webhook = DiscordWebhook(url=entry_link, rate_limit_retry=True)
+            webhook.add_embed(embed)
+    else:
+        webhook = DiscordWebhook(url=entry_link, rate_limit_retry=True)
+        webhook.add_embed(embed)
+
+    temp_file = apply_video_to_embed(entry, embed, webhook)
+    send_webhook(webhook, entry, group)
+
+    # Remove our temporary files
+    if temp_file and Path.exists(Path(temp_file.name)):
         temp_file.close()
         Path.unlink(Path(temp_file.name))
 
@@ -407,10 +509,71 @@ def mark_new_feed_as_read(reader: Reader) -> None:
     # Loop through the new feeds and mark all entries as read
     for feed in reader.get_feeds(new=True):
         reader.update_feed(feed)
-        logger.info(f"Found a new feed: {feed.title}")
+        logger.info(f"Found a new feed: {feed.link}")
         for entry in reader.get_entries(feed=feed):
             reader.mark_entry_as_read(entry)
             logger.info(f"Marked {entry.link} as unread because it's from a new feed")
+
+
+@dataclass
+class ReplyTweet:
+    """A reply tweet."""
+
+    text: str
+    username: str
+    fullname: str
+    avatar: str
+
+
+def get_reply_from_nitter(entry: Entry) -> ReplyTweet | None:
+    """Get the reply from Nitter.
+
+    Args:
+        entry: The entry to check.
+        group: The settings to use.
+
+    Returns:
+        The reply if found, an empty string otherwise.
+    """
+    entry_link: str = entry.link or ""
+    if not entry_link:
+        logger.error("No link found for {}. Entry: {}", entry.feed_url, entry)
+        return None
+
+    response: Response = requests.get(entry_link, timeout=10)
+    if not response.ok:
+        logger.error("Could not get {} from Nitter. Status code: {}", entry_link, response.status_code)
+        return None
+
+    soup = BeautifulSoup(response.text, features="lxml")
+
+    tweet_text = ""
+    if tweet_content := soup.find("div", class_="tweet-content"):
+        tweet_text: str = tweet_content.get_text()
+
+    avatar_url = ""
+    if avatar_tag := soup.find("img", class_="avatar"):
+        avatar_tag = cast(Tag, avatar_tag)
+        avatar_url: str = avatar_tag.attrs["src"]
+
+        # Replace /pic/ with https://pbs.twimg.com/
+        avatar_url = avatar_url.replace("/pic/", "https://pbs.twimg.com/")
+
+        # Decode the URL
+        avatar_url = unquote(avatar_url)
+
+        # Replace _bigger.jpg with .jpg
+        avatar_url = avatar_url.replace("_bigger.jpg", ".jpg")
+
+    username = ""
+    if username_tag := soup.find("a", class_="username"):
+        username: str = username_tag.get_text(strip=True)
+
+    fullname = ""
+    if fullname_tag := soup.find("a", class_="fullname"):
+        fullname: str = fullname_tag.get_text(strip=True)
+
+    return ReplyTweet(text=tweet_text, username=username, fullname=fullname, avatar=avatar_url)
 
 
 def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
@@ -421,7 +584,10 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
     Args:
         reader: The reader which contains the entries.
     """
+    # Mark newly added feeds as read so we don't send old entries
     mark_new_feed_as_read(reader)
+
+    # Get the new entries from the RSS feeds
     reader.update_feeds(workers=4)
 
     # Loop through the unread (unsent) entries.
@@ -432,14 +598,6 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
 
     entry: Entry | EntryLike
     for entry in unread_entries:
-        if not hasattr(entry, "published"):
-            logger.error("No published date found for {}. Entry: {}", entry.feed_url, entry)
-            continue
-
-        if not entry.published:
-            logger.error("No published date found for {}. Entry: {}", entry.feed_url, entry)
-            continue
-
         if too_old(entry, reader):
             continue
 
@@ -448,11 +606,7 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
             for feed in group.rss_feeds:
                 # Loop through the RSS feeds that the group has and check if the entry is from one of them.
                 if entry.feed_url == feed:
-                    entry_title: str = entry.title or ""
-
-                    if not entry_title:
-                        logger.error("No title found for {}. Entry: {}", entry.feed_url, entry)
-                        continue
+                    tweet_text: str = entry.title or ""
 
                     if group.whitelist_enabled and not whitelisted(group, entry):
                         logger.info(f"Skipping entry {entry.link} as it is not whitelisted")
@@ -464,12 +618,12 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
                         reader.mark_entry_as_read(entry)
                         continue
 
-                    if not group.send_retweets and entry_title.startswith("RT by "):
+                    if not group.send_retweets and tweet_text.startswith("RT by "):
                         logger.info(f"Skipping entry {entry.link} as it is a retweet")
                         reader.mark_entry_as_read(entry)
                         continue
 
-                    if not group.send_replies and entry_title.startswith("R to "):
+                    if not group.send_replies and tweet_text.startswith("R to "):
                         logger.info(f"Skipping entry {entry.link} as it is a reply")
                         reader.mark_entry_as_read(entry)
                         continue
@@ -484,7 +638,10 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
                     if group.send_as_text:
                         send_text(entry=entry, group=group)
                     if group.send_as_embed:
-                        send_embed(entry=entry, group=group)
+                        if tweet_text.startswith("R to "):
+                            send_embed_reply(entry=entry, group=group)
+                        else:
+                            send_embed(entry=entry, group=group)
 
                     # Mark the entry as read (sent)
                     reader.mark_entry_as_read(entry)
