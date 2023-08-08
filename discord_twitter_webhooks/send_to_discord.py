@@ -20,7 +20,7 @@ from requests import request
 
 from discord_twitter_webhooks._dataclasses import Group, get_app_settings, get_group
 from discord_twitter_webhooks.reader_settings import get_reader
-from discord_twitter_webhooks.tweet_text import get_tweet_text
+from discord_twitter_webhooks.tweet_text import convert_html_to_md, get_tweet_text
 from discord_twitter_webhooks.whitelist import check_word_in_string_regex
 
 if TYPE_CHECKING:
@@ -576,6 +576,185 @@ def get_reply_from_nitter(entry: Entry) -> ReplyTweet | None:
     return ReplyTweet(text=tweet_text, username=username, fullname=fullname, avatar=avatar_url)
 
 
+def check_if_quoted_tweet(entry: Entry) -> bool:
+    """Check if the entry is a quoted tweet.
+
+    Args:
+        entry: The entry to check.
+
+    Returns:
+        True if the entry is a quoted tweet, False otherwise.
+    """
+    # Check if tweet ends with a link to the original tweet
+    entry_summary: str = entry.summary or ""
+    group = Group(link_destination="Nitter")
+    entry_summary = convert_html_to_md(entry_summary, group)
+
+    entry_link: str = entry.link or ""
+
+    if not entry_summary:
+        return False
+
+    lines: list[str] = entry_summary.splitlines()
+    if not lines:
+        logger.error("No lines found for {}. Entry: {}", entry.feed_url, entry)
+        return False
+
+    last_line: str = lines[-1]
+
+    # Check if last_line starts with our Nitter instance and ends with #m
+    reader: Reader = get_reader()
+    nitter_instance: str = get_app_settings(reader).nitter_instance
+    nitter_instance = nitter_instance.replace("https://", "[")
+
+    if not last_line.startswith(nitter_instance) or not last_line.endswith("#m>)"):
+        return False
+
+    if not entry_link:
+        logger.error("No link found for {}. Entry: {}", entry.feed_url, entry)
+        return False
+
+    response: Response = requests.get(entry_link, timeout=10)
+    if not response.ok:
+        logger.error("Could not get {} from Nitter. Status code: {}", entry_link, response.status_code)
+        return False
+
+    soup = BeautifulSoup(response.text, features="lxml")
+
+    # Check if the entry is a quoted tweet
+    return bool(soup.find("div", class_="quote"))
+
+
+@dataclass
+class QuotedTweet:
+    """A quoted tweet."""
+
+    text: str
+    username: str
+    fullname: str
+    avatar: str
+
+
+def get_quoted_tweet(entry: Entry) -> QuotedTweet | None:
+    """Get the quoted tweet.
+
+    Args:
+        entry: The entry to check.
+
+    Returns:
+        The quoted tweet if found, None otherwise.
+    """
+    entry_link: str = entry.link or ""
+    if not entry_link:
+        logger.error("No link found for {}. Entry: {}", entry.feed_url, entry)
+        return None
+
+    response: Response = requests.get(entry_link, timeout=10)
+    if not response.ok:
+        logger.error("Could not get {} from Nitter. Status code: {}", entry_link, response.status_code)
+        return None
+
+    soup = BeautifulSoup(response.text, features="lxml")
+
+    tweet_text = ""
+    if quote_text := soup.find("div", class_="quote-text"):
+        tweet_text: str = quote_text.get_text()
+
+    avatar_url = ""
+    if avatar_tag := soup.find("img", class_="avatar"):
+        avatar_tag = cast(Tag, avatar_tag)
+        avatar_url: str = avatar_tag.attrs["src"]
+
+        # Replace /pic/ with https://pbs.twimg.com/
+        avatar_url = avatar_url.replace("/pic/", "https://pbs.twimg.com/")
+
+        # Decode the URL
+        avatar_url = unquote(avatar_url)
+
+        # Replace _bigger.jpg with .jpg
+        avatar_url = avatar_url.replace("_bigger.jpg", ".jpg")
+
+    username = ""
+    if username_tag := soup.find("a", class_="username"):
+        username: str = username_tag.get_text(strip=True)
+
+    fullname = ""
+    if fullname_tag := soup.find("a", class_="fullname"):
+        fullname: str = fullname_tag.get_text(strip=True)
+
+    return QuotedTweet(text=tweet_text, username=username, fullname=fullname, avatar=avatar_url)
+
+
+def send_embed_quoted_tweet(entry: Entry, group: Group) -> None:
+    """Send an embed for a quoted tweet.
+
+    Args:
+        entry: The entry to send.
+        group: The group to send the entry to.
+    """
+    # Check if tweet is a reply
+    quote = None
+    if entry.title:
+        quote: QuotedTweet | None = get_quoted_tweet(entry)
+
+    entry_link: str = get_entry_link(entry, group)
+    tweet_text: str = get_tweet_text(entry, group)
+    # Remove the last line from the tweet text
+    tweet_text = "\n".join(tweet_text.splitlines()[:-1])
+
+    embed = DiscordEmbed(url=entry_link)
+
+    name_username: list[str] = ["Failed to", "get username"]
+    if entry.feed.title:
+        name_username: list[str] = entry.feed.title.split(" / @")
+
+    # Set the timestamp to when the tweet was tweeted
+    if entry.published:
+        timestamp: float = entry.published.timestamp() or datetime.now(tz=timezone.utc).timestamp()
+        embed.set_timestamp(timestamp=timestamp)
+
+    embed.set_color("1DA1F2")
+    embed.set_footer(text="Twitter", icon_url="https://abs.twimg.com/icons/apple-touch-icon-192x192.png")
+
+    if not quote:
+        logger.error("No quote found for {}. Entry: {}", entry.feed_url, entry)
+        send_embed(entry, group)
+        reader: Reader = get_reader()
+        reader.mark_entry_as_read(entry)
+        return
+
+    embed.set_author(name=quote.username, url=entry_link, icon_url=quote.avatar)
+    embed.set_description(quote.text)
+    embed.add_embed_field(name=f"Reply from @{name_username[1]}", value=tweet_text, inline=False)
+
+    if not entry.summary:
+        logger.error("No summary found for {}. Entry: {}", entry.feed_url, entry)
+        return
+
+    if embeds := create_image_embeds(entry.summary, entry_link):
+        # Only do this if more than one image is found
+        if len(embeds) > 1:
+            embeds.insert(0, embed)
+            webhook = DiscordWebhook(url=entry_link, embeds=embeds, rate_limit_retry=True)
+        else:
+            if embeds[0].image:
+                image = embeds[0].image
+                embed.set_image(str(image["url"]))
+            webhook = DiscordWebhook(url=entry_link, rate_limit_retry=True)
+            webhook.add_embed(embed)
+    else:
+        webhook = DiscordWebhook(url=entry_link, rate_limit_retry=True)
+        webhook.add_embed(embed)
+
+    temp_file = apply_video_to_embed(entry, embed, webhook)
+    send_webhook(webhook, entry, group)
+
+    # Remove our temporary files
+    if temp_file and Path.exists(Path(temp_file.name)):
+        temp_file.close()
+        Path.unlink(Path(temp_file.name))
+
+
 def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
     """Send all new entries to Discord.
 
@@ -640,6 +819,8 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
                     if group.send_as_embed:
                         if tweet_text.startswith("R to "):
                             send_embed_reply(entry=entry, group=group)
+                        elif check_if_quoted_tweet(entry):
+                            send_embed_quoted_tweet(entry=entry, group=group)
                         else:
                             send_embed(entry=entry, group=group)
 
