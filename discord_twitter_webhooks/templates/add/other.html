@@ -41,8 +41,8 @@
                {% if settings.link_destination=="Nitter" %}checked{% endif %} />
         <div id="link_destination_help" class="form-text">
             Replace links to Twitter with links to Nitter.
-            For example, <a class="text-muted" href="https://twitter.com/elonmusk/">https://twitter.com/elonmusk/</a>
-            will become <a class="text-muted" href="{{ global_settings.nitter_instance }}/elonmusk/">{{ global_settings.nitter_instance }}/elonmusk/</a>.
+            For example, <a class="text-muted" href="https://twitter.com/steam/">https://twitter.com/steam/</a>
+            will become <a class="text-muted" href="{{ global_settings.nitter_instance }}/steam/">{{ global_settings.nitter_instance }}/steam/</a>.
         </div>
     </div>
     {# Use Piped/Invidious for YouTube videos #}
@@ -59,22 +59,6 @@
             Replace YouTube links with links to {{ global_settings.piped_instance }}.
             For example, <a class="text-muted" href="https://www.youtube.com/watch?v=whPh_PasI58">https://www.youtube.com/watch?v=whPh_PasI58</a>
             will become <a class="text-muted" href="{{ global_settings.piped_instance }}/watch?v=whPh_PasI58">{{ global_settings.piped_instance }}/watch?v=whPh_PasI58</a>.
-        </div>
-    </div>
-    {# Use Teddit/Libreddit for Reddit links #}
-    <div class="form-check form-switch">
-        <label class="form-check-label" for="replace_reddit">Use Teddit/Libreddit for Reddit links</label>
-        <input class="form-check-input"
-               type="checkbox"
-               role="switch"
-               id="replace_reddit"
-               name="replace_reddit"
-               value="True"
-               {% if settings.replace_reddit %}checked{% endif %} />
-        <div id="replace_reddit_help" class="form-text">
-            Replace links to Reddit with links to Teddit.
-            For example, <a class="text-muted" href="https://teddit.net/r/EnoughMuskSpam/">https://teddit.net/r/EnoughMuskSpam/</a>
-            will become <a class="text-muted" href="{{ global_settings.teddit_instance }}/r/EnoughMuskSpam/">{{ global_settings.teddit_instance }}/r/EnoughMuskSpam/</a>.
         </div>
     </div>
 </div>
