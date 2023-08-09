@@ -9,7 +9,7 @@
 {% block content %}
     {% if groups|length == 0 %}
         <div class="p-2 mb-2 border border-dark">
-            No groups found. You can add one <a href='{{ url_for("add") }}'>here</a>.
+            No groups found. You can add one <a href="/add">here</a>.
         </div>
     {% endif %}
     {# Show errors #}
@@ -64,12 +64,12 @@
                     </ul>
                     <br />
                     {# Button to remove #}
-                    <form action='{{ url_for("remove_group_post") }}' method="post">
+                    <form action="/remove_group" method="post">
                         <input type="hidden" name="uuid" value="{{ group.uuid }}" />
                         <input type="submit" value="Delete" class="btn btn-danger btn-sm" />
                     </form>
                     {# Button to edit group #}
-                    <a class="btn btn-primary btn-sm" href="{{ url_for('modify', uuid=group.uuid) }}">Edit</a>
+                    <a class="btn btn-primary btn-sm" href="/modify/{{ group.uuid }}">Edit</a>
                 </div>
             </div>
         {% endfor %}

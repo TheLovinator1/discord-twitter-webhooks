@@ -5,7 +5,7 @@
     {% endblock title %}
 {% endblock header %}
 {% block content %}
-    <form name="add" action="{{ url_for("feed") }}" method="post">
+    <form name="add" action="/feed" method="post">
         <input type="hidden" id="uuid" name="uuid" value="{{ settings.uuid }}" />
         {% include "add/feed_details.html" %}
         <br />

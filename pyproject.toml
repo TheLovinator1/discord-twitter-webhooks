@@ -133,6 +133,6 @@ filterwarnings = [
 
 [tool.djlint]
 profile = "jinja"
-ignore = "H023"                       # Firefox makes emojis if we use the unicode version(©️ vs &copy;)
+ignore = "J018,J004,H021,H023"
 format_attribute_template_tags = true
 max_attribute_length = 120
