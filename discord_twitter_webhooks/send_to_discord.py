@@ -465,6 +465,92 @@ def blacklisted(group: Group, entry: Entry | EntryLike) -> bool:
     return any(check_word_in_string_regex(entry_title, regex_pattern) for regex_pattern in group.blacklist_regex)
 
 
+def if_entry_above_is_too_old(entry: Entry | EntryLike, reader: Reader) -> bool:
+    """Check if the entry above is too old.
+
+    Args:
+        entry: The entry to check.
+        reader: The reader which contains the entries.
+
+    Returns:
+        True if the entry above is too old, False otherwise.
+    """
+    # Cast entry to Entry instead of EntryLike
+    entry = cast(Entry, entry)
+
+    # Get the entries for that feed
+    entries = list(reader.get_entries(feed=entry.feed))
+
+    # Get our entry index
+    entry_index: int = entries.index(entry)
+    logger.debug(f"Entry {entry.id} is at index {entry_index}.")
+
+    # Check if the entry is the first entry
+    if entry_index == 0:
+        logger.debug(f"Entry {entry.id} is the first entry, checking it the next entry is too old.")
+        return False
+
+    # The tweet above
+    tweet_above: Entry = entries[entry_index - 1]
+
+    # Check if the entry above has a published date
+    if not hasattr(tweet_above, "published") or not tweet_above.published:
+        logger.error("No published date or title found for {}. Entry: {}", tweet_above.feed_url, tweet_above)
+        return True
+
+    # Check if the entry above is too old
+    tweet_age_in_hours: float = (time.time() - tweet_above.published.timestamp()) / 3600
+    if tweet_age_in_hours > get_app_settings(reader).max_age_hours:
+        logger.debug("The tweet above is older than the max age so our retweet is also too old.")
+        return True
+
+    logger.debug(f"The entry above {entry.id} is not too old, so we need to check the entry below")
+    return False
+
+
+def if_below_is_young(entry: Entry | EntryLike, reader: Reader) -> bool:
+    """If the entry below is young enough.
+
+    Args:
+        entry: The entry to check.
+        reader: The reader which contains the entries.
+
+    Returns:
+        True if the entry below is young enough, False otherwise.
+    """
+    # Cast entry to Entry instead of EntryLike
+    entry = cast(Entry, entry)
+
+    # Get the entries for that feed
+    entries = list(reader.get_entries(feed=entry.feed))
+
+    # Get our entry index
+    try:
+        entry_index: int = entries.index(entry)
+    except ValueError:
+        logger.error("Entry {} not found in entries.", entry.id)
+        return False
+
+    # The tweet below
+    tweet_below: Entry = entries[entry_index + 1]
+
+    # Check if the entry below has a published date
+    if not hasattr(tweet_below, "published") or not tweet_below.published:
+        logger.error("No published date or title found for {}. Entry: {}", tweet_below.feed_url, tweet_below)
+        return False
+
+    # Check if the entry below is younger than the max age
+    tweet_age_in_hours: float = (time.time() - tweet_below.published.timestamp()) / 3600
+    if tweet_age_in_hours < get_app_settings(reader).max_age_hours:
+        logger.debug(
+            "Entry below is younger than the max age, so the entry above is probably younger than the max age too.",
+        )
+        reader.mark_entry_as_read(tweet_below)
+        return True
+
+    return False
+
+
 def too_old(entry: Entry | EntryLike, reader: Reader) -> bool:
     """Check if the entry is too old.
 
@@ -475,7 +561,6 @@ def too_old(entry: Entry | EntryLike, reader: Reader) -> bool:
     Returns:
         True if the entry is too old, False otherwise.
     """
-    # entry is a EntryLike but Pylance would complain if it wasn't a Entry
     entry = cast(Entry, entry)
     entry_title: str = entry.title or ""
 
@@ -485,18 +570,42 @@ def too_old(entry: Entry | EntryLike, reader: Reader) -> bool:
         return False
 
     if entry_title.startswith("RT by "):
-        # Retweets have the original tweet date, so if somebody retweets
-        # something old, it will be older than the max age.
-        return False
+        return check_if_retweet_is_too_old(reader, entry)
 
     # Check if the entry is older than the max age
     tweet_age_in_hours: float = (time.time() - entry.published.timestamp()) / 3600
     if entry.published and tweet_age_in_hours > get_app_settings(reader).max_age_hours:
-        logger.info(f"Entry {entry.title} is older than {get_app_settings(reader).max_age_hours} hours")
+        logger.info(f"Entry {entry.id} is older than {get_app_settings(reader).max_age_hours} hours")
         reader.mark_entry_as_read(entry)
         return True
 
     reader.mark_entry_as_read(entry)
+    return False
+
+
+def check_if_retweet_is_too_old(reader: Reader, entry: Entry) -> bool:
+    """Check if the retweet is too old.
+
+    Args:
+        reader: The reader which contains the entries.
+        entry: The entry to check.
+
+    Returns:
+        True if the retweet is too old, False otherwise.
+    """
+    above_too_old: bool = if_entry_above_is_too_old(entry, reader)
+    if above_too_old:
+        # The tweet above is too old, so this tweet is probably too old too
+        reader.mark_entry_as_read(entry)
+        return True
+
+    below_is_young: bool = if_below_is_young(entry, reader)
+    if below_is_young:
+        # If the tweet before this one is not too old, then this tweet is probably not too old either
+        reader.mark_entry_as_read(entry)
+        return False
+
+    logger.debug("Entry {} is a retweet, but the tweet above and below are not too old.", entry.id)
     return False
 
 
@@ -777,7 +886,10 @@ def send_to_discord(reader: Reader) -> None:  # noqa: C901, PLR0912
 
     entry: Entry | EntryLike
     for entry in unread_entries:
+        # Check if the tweet is too old
         if too_old(entry, reader):
+            logger.info(f"Skipping entry {entry.link} as it is too old, it was published {entry.published}")
+            reader.mark_entry_as_read(entry)
             continue
 
         for _group in list(reader.get_tag((), "groups", [])):
