@@ -481,6 +481,19 @@ def if_entry_above_is_too_old(entry: Entry | EntryLike, reader: Reader) -> bool:
     # Get the entries for that feed
     entries = list(reader.get_entries(feed=entry.feed))
 
+    # Remove every retweet that is not the original tweet
+    for _entry in entries:
+        # If it is our entry, skip it
+        if _entry.id == entry.id:
+            continue
+
+        if not hasattr(_entry, "title") or not _entry.title:
+            logger.error("No title found for {}. Entry: {}", _entry.feed_url, _entry)
+            continue
+
+        if _entry.title.startswith("RT by "):
+            entries.remove(_entry)
+
     # Get our entry index
     entry_index: int = entries.index(entry)
     logger.debug(f"Entry {entry.id} is at index {entry_index}.")
@@ -618,7 +631,7 @@ def mark_new_feed_as_read(reader: Reader) -> None:
     # Loop through the new feeds and mark all entries as read
     for feed in reader.get_feeds(new=True):
         reader.update_feed(feed)
-        logger.info(f"Found a new feed: {feed.link}")
+        logger.info(f"Found a new feed: {feed.url}, added {feed.added}")
         for entry in reader.get_entries(feed=feed):
             reader.mark_entry_as_read(entry)
             logger.info(f"Marked {entry.link} as unread because it's from a new feed")

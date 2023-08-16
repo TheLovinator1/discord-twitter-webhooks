@@ -409,10 +409,6 @@ def update_tweet_url() -> None:
     replies in the past, so we need to replace it with the one that
     includes replies.
     """
-    # Run send_to_discord() to send the that are already in the RSS feed
-    # because we will mark them as read in this function
-    send_to_discord(reader)
-
     # Loop through all the groups and change the RSS feed
     for _group in list(reader.get_tag((), "groups", [])):
         group: Group = get_group(reader, str(_group))
