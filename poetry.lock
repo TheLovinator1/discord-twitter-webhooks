@@ -1188,13 +1188,13 @@ files = [
 
 [[package]]
 name = "reader"
-version = "3.7"
+version = "3.8"
 description = "A Python feed reader library."
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 files = [
-    {file = "reader-3.7-py3-none-any.whl", hash = "sha256:341744982f92fc15439606b4fb1097672d00aafc312fa62bc4cf000ceccb09ab"},
-    {file = "reader-3.7.tar.gz", hash = "sha256:464494aedf9caacbfa0fb3a4cb6242f3dbc7f95edfa3bb6dd0bc27be634ceee3"},
+    {file = "reader-3.8-py3-none-any.whl", hash = "sha256:925eb433b58a71205e29390d1571cb4220ffd65020eec6ce4b69f6fd10599d65"},
+    {file = "reader-3.8.tar.gz", hash = "sha256:6aa7ca2e586e698b0ca3f9552f471b63f34daa8d904a92839c93859a4c8d5bdd"},
 ]
 
 [package.dependencies]
@@ -1203,14 +1203,15 @@ feedparser = ">=6"
 iso8601 = ">=1"
 requests = ">=2.18"
 typing-extensions = ">=4"
+werkzeug = ">2"
 
 [package.extras]
 app = ["PyYAML", "flask (>=0.10)", "humanize (>=4,!=4.7.*)"]
 cli = ["PyYAML", "click (>=7)"]
 dev = ["build", "pre-commit", "reader[app,cli,docs,tests,unstable-plugins]", "tox", "twine"]
-docs = ["click (>=7)", "setuptools", "sphinx", "sphinx-click", "sphinx-hoverxref", "sphinx-issues", "sphinx-rtd-theme", "sphinxcontrib-log-cabinet"]
-tests = ["coverage", "flaky", "html5lib", "lxml", "mechanicalsoup", "mypy", "pytest (>=4)", "pytest-cov", "pytest-randomly", "pytest-subtests", "requests-mock", "requests-wsgi-adapter", "types-requests", "werkzeug"]
-unstable-plugins = ["Jinja2 (>=3)", "beautifulsoup4", "blinker (>=1.4)", "mutagen", "requests", "tweepy"]
+docs = ["click (>=7)", "setuptools", "sphinx", "sphinx-click", "sphinx-hoverxref", "sphinx-issues", "sphinx-rtd-theme (>=1.3.0rc1)", "sphinxcontrib-log-cabinet"]
+tests = ["coverage", "flaky", "html5lib", "lxml", "mechanicalsoup", "mypy", "pytest (>=4)", "pytest-cov", "pytest-randomly", "pytest-subtests", "requests-mock", "requests-wsgi-adapter", "types-beautifulsoup4", "types-requests"]
+unstable-plugins = ["beautifulsoup4", "blinker (>=1.4)", "mutagen", "requests"]
 
 [[package]]
 name = "requests"
@@ -1422,6 +1423,23 @@ platformdirs = ">=3.9.1,<4"
 [package.extras]
 docs = ["furo (>=2023.5.20)", "proselint (>=0.13)", "sphinx (>=7.0.1)", "sphinx-argparse (>=0.4)", "sphinxcontrib-towncrier (>=0.2.1a0)", "towncrier (>=23.6)"]
 test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7)", "packaging (>=23.1)", "pytest (>=7.4)", "pytest-env (>=0.8.2)", "pytest-freezer (>=0.4.8)", "pytest-mock (>=3.11.1)", "pytest-randomly (>=3.12)", "pytest-timeout (>=2.1)", "setuptools (>=68)", "time-machine (>=2.10)"]
+
+[[package]]
+name = "werkzeug"
+version = "2.3.7"
+description = "The comprehensive WSGI web application library."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "werkzeug-2.3.7-py3-none-any.whl", hash = "sha256:effc12dba7f3bd72e605ce49807bbe692bd729c3bb122a3b91747a6ae77df528"},
+    {file = "werkzeug-2.3.7.tar.gz", hash = "sha256:2b8c0e447b4b9dbcc85dd97b6eeb4dcbaf6c8b6c3be0bd654e25553e0a2157d8"},
+]
+
+[package.dependencies]
+MarkupSafe = ">=2.1.1"
+
+[package.extras]
+watchdog = ["watchdog (>=2.3)"]
 
 [[package]]
 name = "win32-setctime"
