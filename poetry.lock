@@ -1188,13 +1188,13 @@ files = [
 
 [[package]]
 name = "reader"
-version = "3.8"
+version = "3.9"
 description = "A Python feed reader library."
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "reader-3.8-py3-none-any.whl", hash = "sha256:925eb433b58a71205e29390d1571cb4220ffd65020eec6ce4b69f6fd10599d65"},
-    {file = "reader-3.8.tar.gz", hash = "sha256:6aa7ca2e586e698b0ca3f9552f471b63f34daa8d904a92839c93859a4c8d5bdd"},
+    {file = "reader-3.9-py3-none-any.whl", hash = "sha256:861563aff0c9bfc65eca7ac72982b99b41ef2e7cfddb584bf9ae12045aec5213"},
+    {file = "reader-3.9.tar.gz", hash = "sha256:2b29efed0455a2ce5f556b5b54b956d0a7faeb5f4df05c143551633c5e37d574"},
 ]
 
 [package.dependencies]
@@ -1211,7 +1211,7 @@ cli = ["PyYAML", "click (>=7)"]
 dev = ["build", "pre-commit", "reader[app,cli,docs,tests,unstable-plugins]", "tox", "twine"]
 docs = ["click (>=7)", "setuptools", "sphinx", "sphinx-click", "sphinx-hoverxref", "sphinx-issues", "sphinx-rtd-theme (>=1.3.0rc1)", "sphinxcontrib-log-cabinet"]
 tests = ["coverage", "flaky", "html5lib", "lxml", "mechanicalsoup", "mypy", "pytest (>=4)", "pytest-cov", "pytest-randomly", "pytest-subtests", "requests-mock", "requests-wsgi-adapter", "types-beautifulsoup4", "types-requests"]
-unstable-plugins = ["beautifulsoup4", "blinker (>=1.4)", "mutagen", "requests"]
+unstable-plugins = ["beautifulsoup4", "blinker (>=1.4)", "mutagen", "requests", "tabulate"]
 
 [[package]]
 name = "requests"
