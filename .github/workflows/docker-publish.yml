@@ -17,7 +17,7 @@ jobs:
 
       # We need to set up QEMU and Docker Buildx to build multi-architecture images
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
         with:
           platforms: all
       - name: Set up Docker Buildx
