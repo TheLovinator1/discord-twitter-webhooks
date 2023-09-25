@@ -30,7 +30,7 @@ lxml = "^4.9.2"
 defusedxml = "^0.7.1"
 deepl = "^1.15.0"
 moviepy = "^1.0.3"
-pydantic = "2.3.0"
+pydantic = "2.4.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
