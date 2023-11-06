@@ -171,7 +171,7 @@ def send_embed(entry: Entry | EntryLike, group: Group) -> None:
         # Only do this if more than one image is found
         if len(embeds) > 1:
             embeds.insert(0, embed)
-            webhook = DiscordWebhook(url=entry_link, embeds=embeds, rate_limit_retry=True)  # type: ignore  # noqa: PGH003, E501
+            webhook = DiscordWebhook(url=entry_link, embeds=embeds, rate_limit_retry=True)  # type: ignore  # noqa: PGH003
         else:
             if embeds[0].image:
                 image = embeds[0].image
