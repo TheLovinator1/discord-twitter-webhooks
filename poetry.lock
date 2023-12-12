@@ -280,13 +280,13 @@ files = [
 
 [[package]]
 name = "deepl"
-version = "1.15.0"
+version = "1.16.1"
 description = "Python library for the DeepL API."
 optional = false
 python-versions = ">=3.6.2,<4"
 files = [
-    {file = "deepl-1.15.0-py3-none-any.whl", hash = "sha256:c8cddd1acd6808ab803d70d5f50fbffd1983d12d7d6b85d0c8b78f5cab1cbc5f"},
-    {file = "deepl-1.15.0.tar.gz", hash = "sha256:051142e11e5dd60c47c84248e35162d00cfc1aa9831bb990e85c7fa36dce19c1"},
+    {file = "deepl-1.16.1-py3-none-any.whl", hash = "sha256:17bd19a28850a10513377afc1b0e28ee907502e4a4a547d616bfa9cf65dfd4ea"},
+    {file = "deepl-1.16.1.tar.gz", hash = "sha256:b34d4a8644c9e62a7a9c24acfe80a07717bd0a3b2be77b633a10d5d4fe748dcd"},
 ]
 
 [package.dependencies]
