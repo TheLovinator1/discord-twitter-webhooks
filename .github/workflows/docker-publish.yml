@@ -42,7 +42,7 @@ jobs:
       # Build and push the image to Docker Hub
       - name: Build and push Docker image
         id: build-and-push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           platforms: linux/amd64, linux/arm64
