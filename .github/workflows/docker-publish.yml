@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checkout the repository
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # We need to set up QEMU and Docker Buildx to build multi-architecture images
       - name: Set up QEMU
